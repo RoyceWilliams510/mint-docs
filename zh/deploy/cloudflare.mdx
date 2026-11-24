@@ -1,0 +1,355 @@
+---
+title: "使用 Cloudflare Workers 在子路径下部署"
+sidebarTitle: "Cloudflare"
+description: "通过 Cloudflare Workers 将你的 Mintlify 文档部署到域名的子路径，包含分步设置和 DNS 配置说明。"
+keywords: ["Cloudflare Workers", "子路径路由", "反向代理设置", "Worker 配置", "Cloudflare WAF", "防火墙规则", "Bot Fight Mode", "403 错误"]
+boost: 3
+---
+
+import Propagating from "/snippets/zh/custom-subpath-propagating.mdx";
+import SubpathSetupSteps from "/snippets/zh/subpath-setup-steps.mdx";
+
+要使用 Cloudflare 将文档托管在诸如 `yoursite.com/docs` 这样的子路径下，你必须创建并配置一个 Cloudflare Worker。
+
+<Info>
+  在开始之前，你需要一个 Cloudflare 账号和一个域名（可以在 Cloudflare 内或外进行管理）。
+</Info>
+
+<div id="set-your-base-path">
+  ## 设置你的基础路径
+</div>
+
+<SubpathSetupSteps />
+
+控制台会显示一个已填入你的子域、域名和基础路径的 Cloudflare Worker 脚本。请在 [配置路由](#configure-routing) 步骤中使用该脚本，而不必手动替换示例脚本中的占位值。
+
+<div id="set-up-a-worker">
+  ## 设置 Worker
+</div>
+
+如果你尚未创建，请按照 [Cloudflare Workers 入门指南](https://developers.cloudflare.com/workers/get-started/dashboard/)创建一个 Cloudflare Worker。
+
+<Tip>
+  如果你的 DNS 提供商是 Cloudflare，请为该 CNAME 记录关闭代理，以避免潜在的配置问题。
+</Tip>
+
+<div id="proxies-with-vercel-deployments">
+  ### 使用 Vercel 部署时的代理
+</div>
+
+如果你在 Vercel 部署中使用 Cloudflare 作为代理，必须确保配置正确，以避免与 Vercel 的 domain 验证和 SSL 证书签发发生冲突。
+
+错误的代理配置可能会阻止 Vercel 为 Let's Encrypt SSL 证书进行签发，并导致 domain 验证失败。
+
+<div id="required-path-allowlist">
+  #### 必需的路径白名单
+</div>
+
+你的 Cloudflare Worker 必须允许以下特定路径的流量通过，且不能阻止或重定向：
+
+- `/.well-known/acme-challenge/*` - 用于 Let's Encrypt 证书验证，必需
+- `/.well-known/vercel/*` - 用于 Vercel domain 验证，必需
+
+虽然 Cloudflare 会自动处理许多验证规则，但创建额外的自定义规则可能会无意中拦截这些关键流量。
+
+<div id="header-forwarding-requirements">
+  #### 请求头转发要求
+</div>
+
+请确保你的 Worker 将 `Host` 头设置为你的 `<subdomain>.mintlify.site` 目标（如示例脚本所示），而不是直接透传原始请求的 `Host` 头。错误的 `Host` 头会导致验证请求失败。
+
+<div id="configure-routing">
+  ### 配置路由
+</div>
+
+在你的 Cloudflare 控制台中，选择 **Edit Code**，并添加 [Custom domain setup](https://app.mintlify.com/settings/project/custom-domain) 页面中已填入你自己值的脚本，或复制以下示例脚本。有关编辑 Worker 的更多信息，请参阅 [Cloudflare 文档](https://developers.cloudflare.com/workers-ai/get-started/dashboard/#development)。
+
+<Tip>
+  如果使用示例脚本，请将 `[SUBDOMAIN]` 替换为你唯一的子域，将 `[YOUR_DOMAIN]` 替换为你网站的基础 URL；如果希望使用不同的子路径，则将 `/docs` 替换为你想要的子路径。
+</Tip>
+
+```javascript
+addEventListener("fetch", (event) => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  try {
+    const urlObject = new URL(request.url);
+    
+    // 如果请求是 Vercel 验证路径,允许其通过
+    if (urlObject.pathname.startsWith('/.well-known/')) {
+      return await fetch(request);
+    }
+    
+    // 如果请求是 docs 子路径、Mintlify 静态资源或 API 路径
+    if (
+      /^\/docs/.test(urlObject.pathname) ||
+      /^\/mintlify-assets\//.test(urlObject.pathname) ||
+      /^\/_mintlify\//.test(urlObject.pathname)
+    ) {
+      // 然后代理到 Mintlify
+      const DOCS_URL = "[SUBDOMAIN].mintlify.site";
+      const CUSTOM_URL = "[YOUR_DOMAIN]";
+
+      let url = new URL(request.url);
+      url.hostname = DOCS_URL;
+
+      let proxyRequest = new Request(url, request);
+
+      proxyRequest.headers.set("Host", DOCS_URL);
+      proxyRequest.headers.set("X-Forwarded-Host", CUSTOM_URL);
+      proxyRequest.headers.set("X-Forwarded-Proto", "https");
+      // 如果部署到 Vercel,保留客户端 IP
+      proxyRequest.headers.set("CF-Connecting-IP", request.headers.get("CF-Connecting-IP"));
+
+      return await fetch(proxyRequest);
+    }
+  } catch (error) {
+    // 如果未找到操作,执行常规请求
+    return await fetch(request);
+  }
+}
+```
+
+<Warning>
+  除了你的子路径外，你的 Worker 还必须代理 `/_mintlify/*` 和 `/mintlify-assets/*`。这些路径为你的文档提供 CSS、JavaScript、字体、favicon 和 API 请求。缺少这些路径，页面加载时将没有样式。
+
+  如果你使用路由模式而非自定义域将流量路由到 Worker，请在子路径路由的基础上，为 `yoursite.com/mintlify-assets/*` 和 `yoursite.com/_mintlify/*` 添加路由。这些路径必须源自你域名的根路径，而不是子路径。
+</Warning>
+
+<Note>
+  示例脚本只代理文档流量。如果你将 Worker 添加为自定义域，则子路径、`/mintlify-assets/*`、`/_mintlify/*` 和 `/.well-known/*` 之外的请求将不会得到处理。如果你的主站点运行在同一域名上，请使用路由模式将 Worker 限定在文档路径。或者，按照 [Webflow 自定义路由](#webflow-custom-routing)所示将所有其他流量路由到你的主站点。
+</Note>
+
+点击 **Deploy**，然后等待更改生效。
+
+<Propagating />
+
+
+<div id="test-your-worker">
+  ### 测试你的 Worker
+</div>
+
+在部署代码后，测试你的 Worker，确保它正确路由到你的 Mintlify 文档。
+
+1. 使用 Worker 的预览 URL 进行测试：`your-worker.your-subdomain.workers.dev/docs`
+2. 确认该 Worker 能正确路由到你的 Mintlify 文档和你的网站。
+
+<div id="add-custom-domain">
+  ### 添加自定义 domain
+</div>
+
+1. 在你的 [Cloudflare 控制台](https://dash.cloudflare.com/)中，进入你的 Worker。
+2. 前往 **Settings > Domains & Routes > Add > Custom Domain**。
+3. 添加你的 domain。
+
+<Tip>
+  我们建议同时添加带有 `www.` 和不带有 `www.` 的 domain。
+</Tip>
+
+有关更多信息，请参阅 Cloudflare 文档中的 [Add a custom domain](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/#add-a-custom-domain)。 
+
+<div id="resolve-dns-conflicts">
+  ### 解决 DNS 冲突
+</div>
+
+如果你的 domain 已经指向其他服务，你必须移除现有的 DNS 记录。你的 Cloudflare Worker 必须配置为接管该 domain 的全部流量。
+
+1. 删除该 domain 的现有 DNS 记录。更多信息请参阅 Cloudflare 文档：[Delete DNS records](https://developers.cloudflare.com/dns/manage-dns-records/how-to/create-dns-records/#delete-dns-records)。
+2. 返回你的 Worker，添加你的自定义 domain。
+
+<div id="webflow-custom-routing">
+  ## Webflow 自定义路由
+</div>
+
+如果你使用 Webflow 托管主站点，并希望在同一 domain 的 `/docs` 路径下提供 Mintlify 文档，你需要通过 Cloudflare Workers 配置自定义路由，将所有非 docs 流量代理到你的主站点。
+
+<Warning>
+  在部署此 Worker 之前，请确保你的主站点已配置为某个落地页，否则访问你主站点的访客可能会看到错误。
+</Warning>
+
+1. 在 Webflow 中，为你的主站点设置一个落地页，例如 `landing.yoursite.com`。这是访客访问你的网站时首先看到的页面。
+2. 将你的主站点部署到该落地页。这样可以确保在你配置 Worker 的过程中，主站点依然可访问。
+3. 为避免冲突，将主站点中的任何绝对 URL 更新为相对路径。
+4. 在 Cloudflare 中选择 **Edit Code**，并将以下脚本添加到你的 Worker 代码中。
+
+<Tip> 将 `[SUBDOMAIN]` 替换为你唯一的子域，将 `[YOUR_DOMAIN]` 替换为你网站的基础 URL，将 `[LANDING_DOMAIN]` 替换为你的落地页 URL，如有需要，将 `/docs` 替换为你想要的其他子路径。 </Tip>
+
+```javascript
+  addEventListener("fetch", (event) => {
+  event.respondWith(handleRequest(event.request));
+  });
+  async function handleRequest(request) {
+  try {
+    const urlObject = new URL(request.url);
+    
+    // 如果请求是 Vercel 验证路径,允许其通过
+    if (urlObject.pathname.startsWith('/.well-known/')) {
+      return await fetch(request);
+    }
+    
+    // 如果请求是 docs 子路径、Mintlify 静态资源或 API 路径
+    if (
+      /^\/docs/.test(urlObject.pathname) ||
+      /^\/mintlify-assets\//.test(urlObject.pathname) ||
+      /^\/_mintlify\//.test(urlObject.pathname)
+    ) {
+      // 代理到 Mintlify
+      const DOCS_URL = "[SUBDOMAIN].mintlify.site";
+      const CUSTOM_URL = "[YOUR_DOMAIN]";
+      let url = new URL(request.url);
+      url.hostname = DOCS_URL;
+      let proxyRequest = new Request(url, request);
+      proxyRequest.headers.set("Host", DOCS_URL);
+      proxyRequest.headers.set("X-Forwarded-Host", CUSTOM_URL);
+      proxyRequest.headers.set("X-Forwarded-Proto", "https");
+      // 如果部署到 Vercel,保留客户端 IP
+      proxyRequest.headers.set("CF-Connecting-IP", request.headers.get("CF-Connecting-IP"));
+      return await fetch(proxyRequest);
+    }
+    // 将其他所有请求路由到主站点
+    const MAIN_SITE_URL = "[LANDING_DOMAIN]";
+    if (MAIN_SITE_URL && MAIN_SITE_URL !== "[LANDING_DOMAIN]") {
+      let mainSiteUrl = new URL(request.url);
+      mainSiteUrl.hostname = MAIN_SITE_URL;
+      return await fetch(mainSiteUrl, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body
+      });
+    }
+  } catch (error) {
+    // 如果未找到匹配操作,处理常规请求
+    return await fetch(request);
+  }
+  }
+```
+
+5. 选择 **Deploy**，等待更改完成传播。
+
+<Propagating />
+
+<div id="troubleshoot-firewall-blocking">
+  ## 排查防火墙拦截问题
+</div>
+
+如果你的文档站点在运行几秒后出现 500 错误，或导航变慢，可能是 Cloudflare 防火墙拦截了对 Mintlify 资源的请求。
+
+<div id="symptoms">
+  ### 症状
+</div>
+
+- 页面加载时没有样式，因为对 CSS 和 JavaScript 文件的请求被拦截。
+- 文档页面起初能加载，但 30–60 秒后崩溃并返回 500 错误。
+- 页面间的客户端导航缓慢或异常。
+- 对 `/_mintlify/*` 或 `/mintlify-assets/*` 路径的请求在浏览器控制台中显示 403 错误。
+- 来自 Cloudflare 的安全挑战提示“数据格式错误”或“可疑的 URL 模式”。
+
+<div id="root-cause">
+  ### 根本原因
+</div>
+
+由于以下原因，Cloudflare 的 Web Application Firewall（WAF）和 Bot Fight Mode 可能会将 Mintlify 的资源请求判定为可疑：
+
+- 编码的 URL 参数中包含多个“%”符号。
+- 含有特殊字符的较长 query 字符串。
+- 来自空闲标签页的自动化请求。
+
+<div id="solution">
+  ### 解决方案
+</div>
+
+创建一条 Cloudflare 防火墙规则，将 Mintlify 资产排除在安全检查之外。
+
+<div id="create-the-firewall-exception">
+  #### 创建防火墙例外
+</div>
+
+1. 登录你的 [Cloudflare 控制台](https://dash.cloudflare.com/)。
+2. 选择你的 domain。
+3. 前往 **Security > WAF**。
+4. 选择 **Create rule**。
+5. 按以下设置配置规则：
+
+**Rule name:** 允许 Mintlify 资源
+
+**When incoming requests match:**
+
+- Field: `Hostname`
+- Operator: `equals`
+- Value: `docs.yourdomain.com`（替换为你的实际文档 domain）
+
+**And:**
+
+- Field: `URI Path`
+- Operator: `starts with`
+- Value: `/_mintlify/`
+
+**Or:**
+
+- Field: `URI Path`
+- Operator: `starts with`
+- Value: `/mintlify-assets/`
+
+**Then:**
+
+- Action: `Skip`
+- Select: `All remaining custom rules`、`Managed rules` 和 `Super Bot Fight Mode`
+
+6. 启用 **Log** 以跟踪匹配的请求。
+7. 选择 **Deploy**。
+
+<div id="verify-the-rule">
+  #### 验证规则
+</div>
+
+部署后：
+
+1. 在浏览器中打开文档站点。
+2. 将页面闲置 2–3 分钟。
+3. 在各页面之间切换。
+4. 在浏览器控制台中检查是否出现 403 错误。
+
+如果问题仍然存在，请核对规则配置：
+
+- 确保主机名与文档的 domain 完全一致。
+- 确认 URI 路径使用 `starts with`（而非 `contains`）。
+- 不要在路径的值中包含通配符（`*`）。
+- 确认该规则已启用并完成部署。
+
+<div id="common-mistakes">
+  ### 常见错误
+</div>
+
+- 将 `contains` 运算符用于 `/mintlify-assets/*`。`*` 会被视为普通字符，而非通配符。
+- 对 URI Path 使用 `equals`。这只会匹配精确路径 `/mintlify-assets/`，不匹配子路径。
+- 忘记跳过 Bot Fight Mode。必须在 skip 操作中显式包含。
+- 主机名错误。必须与实际的文档 domain 完全匹配。
+
+<div id="additional-troubleshooting">
+  ### 其他故障排除
+</div>
+
+如果防火墙例外未能解决问题：
+
+1. 在 Cloudflare 的 **Security > Events** 日志中检查被拦截的请求。
+2. 验证你的 Cloudflare Worker（若使用自定义子路径）是否将 `Host` 头设置为你的 `<subdomain>.mintlify.site` 目标，而不是直接透传原始请求的 `Host` 头。
+3. 暂时将 Security Level 设置为 “Essentially Off”，以确认问题是否由 Cloudflare 引起。
+4. 检查是否有自定义 Page Rules 会覆盖该防火墙例外。
+
+<div id="example-working-configuration">
+  ### 可用配置示例
+</div>
+
+```
+Rule: Allow Mintlify assets
+Status: Enabled
+
+When incoming requests match:
+  (http.host eq "docs.yourdomain.com" and (starts_with(http.request.uri.path, "/_mintlify/") or starts_with(http.request.uri.path, "/mintlify-assets/")))
+
+Then:
+  Skip: All remaining custom rules, Managed rules, Super Bot Fight Mode
+  Log: Enabled
+```

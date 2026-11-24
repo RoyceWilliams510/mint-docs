@@ -1,0 +1,975 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Mintlify Admin API",
+    "description": "Una API de operaciones administrativas, incluidas las actualizaciones de documentación y la gestión de agentes.",
+    "version": "2.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.mintlify.com"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/agent/{projectId}/job": {
+      "post": {
+        "summary": "Crear trabajo del agente (v1)",
+        "deprecated": true,
+        "description": "En desuso: usa una [automatización personalizada con un disparador de webhook](/es/api/automations/webhook) en su lugar. Crea un nuevo trabajo del agente que puede generar y editar documentación según los mensajes proporcionados y la información de la branch.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Se puede copiar desde la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) en tu dashboard."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "messages"
+                ],
+                "properties": {
+                  "branch": {
+                    "type": "string",
+                    "description": "El nombre de la branch de Git en la que debe trabajar el agente. Si se omite, el agente genera un nombre de branch a partir del contenido del mensaje."
+                  },
+                  "messages": {
+                    "type": "array",
+                    "description": "Una lista de mensajes para proporcionar al agente. Siempre se antepone automáticamente un prompt del sistema predeterminado, por lo que normalmente solo necesitas incluir mensajes del usuario.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "role",
+                        "content"
+                      ],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "system",
+                            "user",
+                            "assistant"
+                          ],
+                          "description": "El rol del remitente del mensaje. Usa `user` para las instrucciones de la tarea. Usa `system` para agregar instrucciones complementarias que se añaden después del prompt del sistema predeterminado (no lo reemplaza). Usa `assistant` para proporcionar respuestas de ejemplo del assistant para el prompting de pocos ejemplos."
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "El contenido del mensaje."
+                        }
+                      }
+                    }
+                  },
+                  "asDraft": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Controla si la solicitud de extracción se crea en modo borrador o en modo normal. Cuando es true, crea una solicitud de extracción en borrador. Cuando es false (predeterminado), crea una solicitud de extracción regular lista para revisión."
+                  },
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "sonnet",
+                      "opus"
+                    ],
+                    "default": "sonnet",
+                    "description": "El modelo de IA que se usará para el trabajo del agente. Usa `sonnet` para un procesamiento más rápido y rentable. Usa `opus` para un procesamiento más capaz, pero más lento."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tarea de agente creada correctamente. Devuelve una respuesta en streaming con Server-Sent Events.",
+            "headers": {
+              "X-Session-Id": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Identificador único de sesión para la tarea de agente creada."
+              },
+              "X-Branch-Name": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Nombre de la rama Git donde el agente realiza los cambios."
+              }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Flujo Server-Sent Events que contiene los detalles de ejecución y resultados de la tarea de agente."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo de la solicitud no es válido o el ID del proyecto tiene un formato no válido. El cuerpo de la respuesta describe el error."
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye acceso a la API o al agente."
+          },
+          "403": {
+            "description": "Las funciones de IA no están disponibles en tu región, tu clave de API no tiene acceso de escritura o tu solicitud provino de una dirección IP que no está en la lista de IP permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización."
+          },
+          "429": {
+            "description": "Superaste el límite de 100 solicitudes por hora por organización."
+          }
+        }
+      }
+    },
+    "/v1/agent/{projectId}/job/{id}": {
+      "get": {
+        "summary": "Obtener trabajo del agente (v1)",
+        "deprecated": true,
+        "description": "En desuso: usa [v2 get agent job](/api/agent/v2/get-agent-job) en su lugar. Recupera los detalles y el estado de un trabajo del agente específico a partir de su ID.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Puedes copiarlo desde la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) en tu dashboard."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El identificador único del trabajo del agente que se va a recuperar."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles del trabajo del agente recuperados correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string",
+                      "description": "El subdomain al que pertenece esta sesión."
+                    },
+                    "subdomain": {
+                      "type": "string",
+                      "description": "El subdomain al que pertenece esta sesión."
+                    },
+                    "branch": {
+                      "type": "string",
+                      "description": "Nombre de la branch de Git en la que se realizaron los cambios.",
+                      "nullable": true
+                    },
+                    "haulted": {
+                      "type": "boolean",
+                      "description": "Indica si se detuvo la ejecución de la sesión."
+                    },
+                    "haultReason": {
+                      "type": "string",
+                      "enum": [
+                        "completed",
+                        "github_missconfigured",
+                        "error",
+                        "processing",
+                        "interrupted"
+                      ],
+                      "description": "Motivo de la interrupción de la sesión. `processing` indica que la tarea está en curso. `interrupted` indica que la tarea fue interrumpida manualmente."
+                    },
+                    "pullRequestLink": {
+                      "type": "string",
+                      "description": "Enlace a la solicitud de extracción creada."
+                    },
+                    "messageToUser": {
+                      "type": "string",
+                      "description": "Mensaje para el usuario sobre el resultado de la sesión."
+                    },
+                    "todos": {
+                      "type": "array",
+                      "description": "Lista de tareas pendientes de la sesión.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "content": {
+                            "type": "string",
+                            "description": "Breve descripción de la tarea."
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "pending",
+                              "in_progress",
+                              "completed",
+                              "cancelled"
+                            ],
+                            "description": "Estado actual de la tarea."
+                          },
+                          "priority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "medium",
+                              "low"
+                            ],
+                            "description": "Nivel de prioridad de la tarea."
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "Identificador único de la tarea pendiente."
+                          }
+                        }
+                      }
+                    },
+                    "userId": {
+                      "type": "string",
+                      "description": "El ID del usuario que creó esta sesión, si está disponible."
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Título generado que resume el trabajo del agente."
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Marca de tiempo de creación de la sesión."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No existe ningún trabajo del agente con este ID en este proyecto, o el ID del proyecto tiene un formato no válido."
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye acceso a la API o al agente."
+          },
+          "403": {
+            "description": "Tu solicitud provino de una dirección IP que no está en la lista de IP permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización."
+          }
+        }
+      }
+    },
+    "/v1/agent/{projectId}/jobs": {
+      "get": {
+        "summary": "Listar trabajos del agente (v1)",
+        "deprecated": true,
+        "description": "En desuso: usa [v2 get agent job](/api/agent/v2/get-agent-job) en su lugar. Recupera todas las tareas del agente para el domain especificado, incluido su estado y sus detalles.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Puedes copiarlo desde la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) en tu dashboard."
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Número de resultados a omitir para la paginación."
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 12
+            },
+            "description": "Número de resultados a devolver. Máximo 100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Todos los trabajos del agente se recuperaron correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "allSessions": {
+                      "type": "array",
+                      "description": "Matriz de todas las sesiones del agente para el domain.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string",
+                            "description": "El subdomain al que pertenece esta sesión."
+                          },
+                          "subdomain": {
+                            "type": "string",
+                            "description": "El subdomain al que pertenece esta sesión."
+                          },
+                          "branch": {
+                            "type": "string",
+                            "description": "Nombre de la branch de Git en la que se realizaron los cambios",
+                            "nullable": true
+                          },
+                          "haulted": {
+                            "type": "boolean",
+                            "description": "Indica si se detuvo la ejecución de la sesión."
+                          },
+                          "haultReason": {
+                            "type": "string",
+                            "enum": [
+                              "completed",
+                              "github_missconfigured",
+                              "error",
+                              "processing",
+                              "interrupted"
+                            ],
+                            "description": "Motivo de la interrupción de la sesión. `processing` indica que la tarea está en curso. `interrupted` indica que la tarea fue interrumpida manualmente."
+                          },
+                          "pullRequestLink": {
+                            "type": "string",
+                            "description": "Enlace a la solicitud de extracción creada."
+                          },
+                          "messageToUser": {
+                            "type": "string",
+                            "description": "Mensaje para el usuario sobre el resultado de la sesión."
+                          },
+                          "todos": {
+                            "type": "array",
+                            "description": "Lista de tareas pendientes de la sesión.",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "content": {
+                                  "type": "string",
+                                  "description": "Breve descripción de la tarea."
+                                },
+                                "status": {
+                                  "type": "string",
+                                  "enum": [
+                                    "pending",
+                                    "in_progress",
+                                    "completed",
+                                    "cancelled"
+                                  ],
+                                  "description": "Estado actual de la tarea."
+                                },
+                                "priority": {
+                                  "type": "string",
+                                  "enum": [
+                                    "high",
+                                    "medium",
+                                    "low"
+                                  ],
+                                  "description": "Nivel de prioridad de la tarea."
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "description": "Identificador único de la tarea pendiente."
+                                }
+                              }
+                            }
+                          },
+                          "userId": {
+                            "type": "string",
+                            "description": "El ID del usuario que creó esta sesión, si está disponible."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Título generado que resume el trabajo del agente."
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "marca de tiempo de creación de la sesión."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El ID del proyecto tiene un formato no válido."
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye acceso a la API o al agente."
+          },
+          "403": {
+            "description": "Tu solicitud provino de una dirección IP que no está en la lista de IP permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización."
+          }
+        }
+      }
+    },
+    "/v2/agent/{projectId}/job": {
+      "post": {
+        "summary": "Crear trabajo del agente",
+        "deprecated": true,
+        "description": "En desuso: usa una [automatización personalizada con un disparador de webhook](/es/api/automations/webhook) en su lugar. Crea un nuevo trabajo del agente que se ejecuta en segundo plano. El trabajo procesa el prompt de forma asíncrona. Consulta periódicamente el endpoint get job para seguir el progreso. Si el agente edita archivos correctamente, se crea automáticamente una solicitud de extracción.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Puedes copiarlo desde la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) en tu dashboard."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "La instrucción que debe ejecutar el agente."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Trabajo del agente creado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "La solicitud no es válida. Falta el `prompt` o está vacío, la fuente Git principal del proyecto no es GitHub, la app de GitHub no está configurada para el proyecto o el ID del proyecto tiene un formato no válido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye acceso a la API o al agente."
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso de escritura o tu solicitud provino de una dirección IP que no está en la lista de IP permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización."
+          },
+          "429": {
+            "description": "Superaste el límite de 100 solicitudes por hora por organización, o tu organización creó más de 20 trabajos del agente en la última hora.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Se produjo un error inesperado del servidor. Vuelve a intentar la solicitud. Si el error persiste, contacta con soporte."
+          }
+        }
+      }
+    },
+    "/v2/agent/{projectId}/job/{id}": {
+      "get": {
+        "summary": "Obtener trabajo del agente",
+        "description": "Recupera el estado actual y los detalles de un trabajo del agente. Consulta este endpoint para seguir el progreso del trabajo.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Puedes copiarlo desde la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) en tu dashboard."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El identificador único del trabajo del agente."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles del trabajo del agente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El ID del proyecto tiene un formato no válido."
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye acceso a la API o al agente."
+          },
+          "403": {
+            "description": "Tu solicitud provino de una dirección IP que no está en la lista de IP permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "No existe ningún trabajo del agente con este ID en este proyecto, o el proyecto no existe o no pertenece a tu organización.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/agent/{projectId}/job/{id}/message": {
+      "post": {
+        "summary": "Enviar mensaje de seguimiento",
+        "description": "Envía un mensaje de seguimiento a un trabajo del agente existente. El mensaje se procesa de forma asíncrona. Consulta periódicamente el endpoint get job para seguir el progreso.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Puedes copiarlo desde la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) de tu dashboard."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El identificador único del trabajo del agente al que se enviará un mensaje."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "La instrucción de seguimiento para el agente."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mensaje enviado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "La solicitud no es válida. Falta el `prompt` o está vacío, la fuente Git principal del proyecto no es GitHub, la app de GitHub no está configurada para el proyecto o el ID del proyecto tiene un formato no válido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye acceso a la API o al agente."
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso de escritura o tu solicitud provino de una dirección IP que no está en la lista de IP permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "No existe ningún trabajo del agente con este ID en este proyecto, o el proyecto no existe o no pertenece a tu organización.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Superaste el límite de 100 solicitudes por hora por organización.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/workflow/{projectId}/{workflowSchemaId}/webhook": {
+      "post": {
+        "summary": "Activar webhook de automatización",
+        "description": "Pone en cola una ejecución de una automatización personalizada con un activador de webhook, en lugar de esperar al evento configurado del activador. Útil para ejecutar automatizaciones desde pipelines de CI/CD, scripts de publicación o cualquier otro sistema que ya emita eventos. Solo se pueden activar automatizaciones personalizadas con un activador de webhook; los demás activadores devuelven una respuesta `404`.\n\nAutentícate con una clave de API de organización con acceso de escritura.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Cópialo desde la página [API keys](https://app.mintlify.com/settings/organization/api-keys) de tu dashboard."
+          },
+          {
+            "name": "workflowSchemaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de la automatización que se va a activar. Cópialo desde el panel de ajustes de la automatización en la página [Automatizaciones](https://app.mintlify.com/settings/project/automations) de tu dashboard."
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Ejecución de automatización puesta en cola correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Siempre `true` cuando la ejecución se pone en cola."
+                    },
+                    "runId": {
+                      "type": "string",
+                      "description": "El ID de la ejecución de automatización en cola. Aparece en la pestaña **Runs** de la configuración de [Automatizaciones](https://app.mintlify.com/settings/project/automations?tab=runs)."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El ID de la automatización o el ID del proyecto tiene un formato no válido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye acceso a la API o a las automatizaciones."
+          },
+          "402": {
+            "description": "Los créditos de IA se han agotado para este ciclo de facturación. Mejora tu plan o espera a que se renueven tus créditos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso de escritura o tu solicitud provino de una dirección IP que no está en la lista de IP permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización, o la automatización no existe, no está activa o no tiene un activador de webhook.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Superaste el límite de 10 solicitudes cada 10 segundos por organización. Este límite se comparte con los endpoints de activar implementación, activar automatización y webhook de automatización."
+          },
+          "500": {
+            "description": "No se pudo poner en cola la ejecución de la automatización debido a un error inesperado del servidor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "La comprobación de créditos falló. Vuelve a intentar la solicitud.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/autopilot/{projectId}/webhook": {
+      "post": {
+        "summary": "Activar webhook de Autopilot",
+        "description": "Inicia una ejecución de Autopilot que sigue el prompt del cuerpo de la solicitud. Es útil para pedir a Autopilot que actualice tu documentación desde pipelines CI/CD, scripts de publicación o herramientas internas.\n\nAutentícate con una clave de API de organización que tenga acceso de escritura.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El ID de tu proyecto. Cópialo desde la página [API keys](https://app.mintlify.com/settings/organization/api-keys) de tu dashboard."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "maxLength": 20000,
+                    "description": "Instrucciones para Autopilot, como qué cambió y qué actualizar en tu documentación."
+                  }
+                }
+              },
+              "example": {
+                "prompt": "We released v2.4 of the CLI. Add the new --watch flag to the CLI reference."
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "La ejecución de Autopilot se puso en cola correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Siempre es `true` cuando la ejecución está en cola."
+                    },
+                    "runId": {
+                      "type": "string",
+                      "description": "El ID de la ejecución de Autopilot en cola."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Falta el prompt, está vacío o supera los 20.000 caracteres, o el ID del proyecto tiene un formato incorrecto.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta la clave de API o no es válida, o tu plan no incluye Autopilot.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso de escritura, o tu solicitud provino de una dirección IP que no está en la lista de permitidos de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización, o Autopilot no está configurado para el proyecto.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Superaste el límite de 10 solicitudes cada 10 segundos por organización. Este límite se comparte con los endpoints de activar implementación, activar automatización y webhook de automatización."
+          },
+          "500": {
+            "description": "No se pudo poner en cola la ejecución de Autopilot debido a un error inesperado del servidor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationWebhookError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentJob": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único del trabajo del agente."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "archived",
+              "failed"
+            ],
+            "description": "Estado actual del trabajo. `active` — el agente está procesando la instrucción en este momento. `completed` — el agente finalizó correctamente y es posible que se haya creado una PR (verificar `prLink`). `archived` — el trabajo se ha archivado. `failed` — el agente encontró un error irrecuperable. Consulte periódicamente hasta que el estado sea `completed`, `archived` o `failed`."
+          },
+          "source": {
+            "type": "object",
+            "description": "Información del repositorio de origen.",
+            "properties": {
+              "repository": {
+                "type": "string",
+                "description": "URL completa del repositorio de GitHub."
+              },
+              "ref": {
+                "type": "string",
+                "description": "branch de Git en la que trabaja el agente.",
+                "nullable": true
+              }
+            }
+          },
+          "model": {
+            "type": "string",
+            "description": "El modelo de IA utilizado para esta tarea."
+          },
+          "prLink": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://github.com/org/repo/pull/123",
+            "description": "URL de la solicitud de extracción de GitHub creada por el agente. `null` mientras la tarea siga `active` o si no se ha cambiado ningún archivo. Se completa cuando el agente crea correctamente una PR.",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Marca de tiempo de creación de la tarea."
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Marca de tiempo de archivado de la tarea.",
+            "nullable": true
+          }
+        }
+      },
+      "AutomationWebhookError": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Siempre `false` en las respuestas de error."
+          },
+          "error": {
+            "type": "string",
+            "description": "Mensaje de error."
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Mensaje de error."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "El encabezado Authorization requiere un token de tipo Bearer. Usa una clave de API de administrador. Esta es una clave secreta del lado del servidor. Genera una en la [página de claves de API](https://dashboard.mintlify.com/settings/organization/api-keys) de tu dashboard."
+      }
+    }
+  }
+}

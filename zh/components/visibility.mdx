@@ -1,0 +1,151 @@
+---
+title: "Visibility"
+description: "使用 visibility 组件向人类读者、AI 代理、已登录用户、未登录用户或特定用户组展示不同内容。"
+keywords: ["visibility", "agents", "humans", "markdown", "AI", "conditional content", "signed-in", "signed-out", "groups", "authentication"]
+boost: 3
+---
+
+使用 `Visibility` 组件在同一页面上向不同受众显示不同的内容。你可以针对浏览你网站的人类读者、处理 Markdown 输出的 AI 代理，或根据读者的登录状态和用户组进行展示。这让你可以为不同受众定制信息，无需维护多个独立页面。
+
+在你已发布的网站上，标记为 `for="humans"` 的内容会正常渲染，而标记为 `for="agents"` 的内容则被隐藏。在 [Markdown 页面视图](/zh/ai/markdown-export)（`.md` URL）中则相反——代理内容会在 Markdown 输出中渲染，而仅供人类阅读的内容不会。同样的规则也适用于 [`llms-full.txt`](/zh/ai/llmstxt) 文件，以及[片段](/zh/create/reusable-snippets)或自定义组件中的 `<Visibility>`。请参阅[组件如何转换为 Markdown](/zh/ai/markdown-export#components-and-html)。
+
+<div id="example">
+  ## 示例
+</div>
+
+```mdx
+<Visibility for="humans">
+  <Note>
+    你正在**网页**上查看此内容。
+
+    此内容在你网站的标准页面上正常显示。
+
+    可用于如下步骤：点击右上角的 **Get started** 按钮来创建你的账户。
+
+    在此示例中，面向界面的说明显示在标准页面上。查看[此页面的 Markdown 版本](https://mintlify.com/docs/components/visibility.md)以查看面向代理的 API 说明。
+  </Note>
+</Visibility>
+
+<Visibility for="agents">
+  > 你正在以 **Markdown** 形式查看此内容。
+  >
+  > 此内容仅出现在页面的 Markdown 版本中。
+  >
+  > 可用于仅供代理使用的信息，例如：要创建账户，请调用 `POST /v1/accounts` 并提供有效的电子邮件地址。
+  >
+  > 在此示例中，面向 API 的说明显示在页面的 Markdown 版本中。查看[标准页面](https://mintlify.com/docs/components/visibility)以查看面向人类的界面说明。
+</Visibility>
+```
+
+<Visibility for="humans">
+  <Note>
+    你正在**网页**上查看此内容。
+
+    此内容在你网站的标准页面上正常显示。
+
+    可用于如下步骤：点击右上角的 **Get started** 按钮来创建你的账户。
+
+    在此示例中，面向界面的说明显示在标准页面上。查看[此页面的 Markdown 版本](https://mintlify.com/docs/components/visibility.md)以查看面向代理的 API 说明。
+  </Note>
+</Visibility>
+
+<Visibility for="agents">
+  > 你正在以 **Markdown** 形式查看此内容。
+  >
+  > 此内容仅出现在页面的 Markdown 版本中。
+  >
+  > 可用于仅供代理使用的信息，例如：要创建账户，请调用 `POST /v1/accounts` 并提供有效的电子邮件地址。
+  >
+  > 在此示例中，面向 API 的说明显示在页面的 Markdown 版本中。查看[标准页面](https://mintlify.com/docs/components/visibility)以查看面向人类的界面说明。
+</Visibility>
+
+<div id="show-content-by-sign-in-state-or-group">
+  ## 按登录状态或分组显示内容
+</div>
+
+如果你的网站使用了[身份验证](/zh/deploy/authentication-setup)或[个性化](/zh/create/personalization)，你可以根据读者是否已登录或其所属的[分组](/zh/deploy/authentication-setup#control-access-with-groups)来显示内容。
+
+```mdx
+<Visibility for="signed-in">
+  欢迎回来。前往你的[账户设置](/account)管理 API 密钥。
+</Visibility>
+
+<Visibility for="signed-out">
+  [登录](/login)以查看你账户的 API 密钥。
+</Visibility>
+
+<Visibility for={{ groups: ["admin", "enterprise"] }}>
+  管理员和企业客户可以在 **Security** 选项卡中配置 SSO。
+</Visibility>
+```
+
+- `signed-in` 内容仅对拥有活动会话的读者渲染。
+- `signed-out` 内容仅对未登录的读者渲染。
+- `groups` 内容仅对至少属于所列分组之一的已登录读者渲染。
+
+要排除分组，请传入一个包含 `includes` 和 `excludes` 列表的对象，而不是分组名称列表。排除规则优先于包含规则。仅包含 `excludes` 的规则会对所有不属于被排除分组的读者渲染，包括未登录的读者。
+
+```mdx
+<Visibility for={{ groups: { excludes: ["partner"] } }}>
+  Contact our sales team to upgrade your plan.
+</Visibility>
+
+<Visibility for={{ groups: { includes: ["staff"], excludes: ["contractor"] } }}>
+  Find the internal runbook in the team wiki.
+</Visibility>
+```
+
+要向所有已登录读者显示内容，请使用 `groups: ["*"]`。`excludes` 中不能使用 `*`。
+
+Markdown 页面视图和 `llms-full.txt` 对每位读者都是相同的。Mintlify 会从 Markdown 输出中移除 `signed-in` 内容和所有 `groups` 内容（包括仅包含 `excludes` 的规则），并包含 `signed-out` 内容。
+
+[AI 助手](/zh/assistant/index)、[MCP 服务器](/zh/ai/model-context-protocol)，以及[搜索](/zh/api/assistant/search) API 和[页面内容](/zh/api/assistant/get-page-content) API 遵循与你的网站相同的登录和用户组规则。
+
+要在本地检查这些规则，请运行 [`mint dev --signed-in` 或 `mint dev --groups`](/zh/cli/preview#preview-as-a-specific-group)。如果两个选项都未使用，本地预览将显示未登录视图。
+
+在启用了身份验证的网站上，Mintlify 只会将 `signed-in` 和 `groups` 内容发送给符合规则的读者。其他读者不会收到这些内容，页面源代码中也没有。
+
+<Warning>
+  在使用[个性化](/zh/create/personalization)但未启用身份验证时，登录和分组规则仅在浏览器中隐藏内容。Mintlify 仍会将被隐藏的内容发送到每位读者的浏览器。要限制对敏感内容的访问，请使用[身份验证](/zh/deploy/authentication-setup)。
+</Warning>
+
+<div id="interactive-components">
+  ## 交互式组件
+</div>
+
+计算器、可筛选的图库和图表等交互式组件在浏览器中生成输出，因此在 [Markdown 输出](/zh/ai/markdown-export#custom-react-components)中几乎不显示内容。将交互式组件包裹在 `for="humans"` 中，并在 `for="agents"` 中添加相同信息的静态版本。
+
+```mdx
+import { PricingCalculator } from "/snippets/pricing-calculator.jsx"
+import { PRICING } from "/snippets/pricing-data.jsx"
+
+<Visibility for="humans">
+  <PricingCalculator data={PRICING} />
+</Visibility>
+
+<Visibility for="agents">
+  | 套餐 | 每 100 万 token 价格 |
+  | --- | --- |
+  | Standard | $1.00 |
+  | Pro | $3.00 |
+</Visibility>
+```
+
+Markdown 输出从不包含组件源代码或 `PRICING` 等导入的数据，因此无需使用 `Visibility` 将代码排除在 Markdown 之外。用它来控制每类受众读到的内容。
+
+<div id="properties">
+  ## 属性
+</div>
+
+<ResponseField name="for" type="string | object" required>
+  包裹内容的目标受众。必须为以下之一：
+
+  - `humans`：在网页上可见，从 Markdown 输出中排除。
+  - `agents`：在网页上隐藏，包含在 Markdown 输出中。
+  - `signed-in`：在网页上对已登录读者可见，从 Markdown 输出中排除。
+  - `signed-out`：在网页上对未登录读者可见，包含在 Markdown 输出中。
+  - `{ groups: [...] }`：在网页上对至少属于所列分组之一的已登录读者可见，从 Markdown 输出中排除。
+  - `{ groups: { includes: [...], excludes: [...] } }`：在网页上对匹配 `includes` 且不属于 `excludes` 中任何分组的读者可见。至少设置两个列表之一。从 Markdown 输出中排除。
+
+  请使用静态值。Mintlify 会从 Markdown 输出中排除 `for` 值为计算结果（例如变量或条件表达式）的内容。
+</ResponseField>

@@ -1,0 +1,186 @@
+---
+title: "配置站内搜索的排名、结果和筛选器"
+sidebarTitle: "搜索"
+description: "配置你的 Mintlify 文档站点上的站内搜索：排名加权、每次查询的最大结果数、整页搜索结果，以及搜索筛选器。"
+keywords: ["搜索", "搜索排名", "搜索加权", "加权", "搜索优先级", "最大搜索结果数", "最大结果数", "searchable", "从搜索中排除", "筛选器", "整页搜索", "搜索结果页"]
+---
+
+配置你 Mintlify 托管的文档站点上的搜索栏的行为。这些设置仅影响站内搜索。它们不会改变外部搜索引擎对你页面的索引方式。
+
+<div id="boost-search-ranking">
+  ## 提升搜索排名
+</div>
+
+使用 `boost` 让特定页面或章节在站内搜索中获得更高的排名权重。该值是一个应用于每个内容片段相关性得分的数值乘数：`boost: 3` 会使某个片段的相关性提升为没有加权时的三倍。
+
+<div id="boost-a-single-page">
+  ### 为单个页面加权
+</div>
+
+在页面的 [frontmatter](/zh/organize/pages) 中设置 `boost`，可放大其搜索排名。
+
+```mdx
+---
+title: "Custom domain"
+description: "Connect your custom domain to your Mintlify documentation."
+boost: 3
+---
+```
+
+<div id="boost-a-navigation-group">
+  ### 为导航分组加权
+</div>
+
+在 `docs.json` 导航中的某个分组上设置 `boost`，可将该乘数应用于其下的每个页面。
+
+```json
+{
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get started",
+        "boost": 5,
+        "pages": [
+          "quickstart",
+          "concepts"
+        ]
+      }
+    ]
+  }
+}
+```
+
+页面会从最近一个设置了加权值的祖先那里继承加权因子。子页面或嵌套分组可以通过设置自己的 `boost` 值来覆盖继承的加权。页面 frontmatter 中的 `boost` 始终优先于从导航继承的值。
+
+<div id="de-prioritize-content">
+  ### 降低内容优先级
+</div>
+
+使用小于 `1` 的值可将页面在搜索结果中下推。例如，`boost: 0.5` 会将页面的相关性得分相对于其他页面减半。`boost` 为 `1` 时等同于不加权。
+
+```mdx
+---
+title: "Deprecated API"
+description: "Documentation for the deprecated v1 API."
+boost: 0.25
+---
+```
+
+<Note>
+  加权因子会与已有的相关性得分相乘。请谨慎使用。过大的乘数会导致相关性较低的页面在搜索结果中占据主导地位，从而降低整体搜索质量。
+</Note>
+
+<div id="recommended-boost-range">
+  ### 推荐的 boost 取值范围
+</div>
+
+`boost` 接受任意正数。在实际使用中，请将其保持在 `0.1` 到 `10` 之间：
+
+- `0.1`–`0.9`：降低旧版、已废弃或辅助性内容的优先级。
+- `1`：不做任何改变 (等同于省略 `boost`)。
+- `2`–`5`：优先展示关键落地页、快速入门或访问量较大的参考页面。
+- `5`–`10`：仅保留给少数几个几乎总应排在最前面的顶层页面。
+
+避免使用大于 `10` 的值。过大的乘数会压过底层的相关性得分，导致即便与查询匹配程度不高，加权页面也会被推到前面。
+
+<div id="how-boost-interacts-with-title-matches">
+  ### boost 与标题匹配的关系
+</div>
+
+搜索分两步对结果进行排序：
+
+1. 搜索根据结果与查询的匹配程度对结果进行分组。标题与查询匹配的页面构成最高的组，其次是章节标题中的匹配以及正文中的完全短语匹配。仅部分匹配查询的页面构成最低的组。
+2. 在每个组内，搜索按相关性得分对结果排序，`boost` 会对该得分进行乘算。
+
+boost 会调整组内结果的顺序，但不会将结果移到更高的组。标题中不包含搜索词的加权页面，排名仍低于标题中包含该词但未加权的页面。要让某个页面在搜索某个词时排在首位，请将该词加入页面的 `title`。将该词添加到 `keywords` 可以提高页面的相关性得分，但不算作标题匹配。
+
+<div id="exclude-a-page-from-search">
+  ## 将页面从搜索中排除
+</div>
+
+默认情况下，页面是可搜索的。`searchable` 字段为可选项，默认值为 `true`。在页面的 [frontmatter](/zh/organize/pages) 中设置 `searchable: false`，可将该页面从文档站点的搜索结果中排除。`searchable` 仅是页面级字段——若要排除某个导航标签页或分组下的所有页面，请改为隐藏该标签页或分组。有关标签页和分组级别的控制方式，请参阅[隐藏页面](/zh/organize/hidden-pages)。
+
+```mdx
+---
+title: "内部备注"
+description: "不希望出现在搜索结果中的参考资料。"
+searchable: false
+---
+```
+
+与 `noindex` 不同，`searchable: false` 不影响外部 SEO。该页面仍然：
+
+- 可被外部搜索引擎抓取
+- 列在你的 `sitemap.xml` 中
+
+它会从文档站点的搜索结果和 AI 助手 context 中被排除。
+
+将 `searchable: false` 用于那些应通过直接链接或外部搜索引擎保持可访问，但不应在用户在你的文档中搜索时出现的页面，例如，深度参考页面、遗留内容，或会挤占更相关结果的辅助资料。
+
+要将页面同时从站点搜索和外部索引中排除，请改用 [`noindex: true`](/zh/optimize/seo#disable-indexing)。
+
+<div id="maximum-search-results">
+  ## 最大搜索结果数
+</div>
+
+通过控制台控制搜索栏每次查询返回的结果数量。默认值为 `6` 个结果。你可以设置 `1` 到 `100` 之间的任意值。
+
+在控制台中前往 [站点](https://app.mintlify.com/settings/project/site) 设置页面。在 "搜索" 部分，将 **Results per query** 设置为你想要的值。
+
+较高的值会在每次查询中呈现更多匹配，这对覆盖主题广泛、用户期望浏览许多候选项的站点很有用。较低的值会让结果面板保持紧凑，并促使用户关注排名最高的匹配项。
+
+<div id="result-snippets">
+  ## 结果摘要
+</div>
+
+启用 **Result snippets** 可在每个搜索结果的页面标题和面包屑下方显示一行匹配内容的预览。摘要以用户查询的首次匹配位置为中心，并高亮显示匹配词。当结果没有匹配到查询，或用户尚未输入查询时，摘要会显示页面内容的开头部分。
+
+结果摘要通过展示查询在上下文中的位置，帮助用户区分标题相似的结果。如果你希望结果面板更紧凑，请保持关闭状态。
+
+在控制台的 [站点](https://app.mintlify.com/settings/project/site) 设置页面启用或禁用结果摘要。该选项默认关闭。
+
+<div id="full-page-search-results">
+  ## 整页搜索结果
+</div>
+
+启用 **Full-page search results**，为你的站点在 `/search` 提供一个专用的搜索结果页。启用后，搜索栏会显示 **Search for "query"** 选项，用于打开当前查询的结果页。该页面最多显示 50 条结果，每页 10 条，且 URL 中包含查询内容（例如 `/search?q=authentication`），方便用户收藏或分享。
+
+在包含多种[语言](/zh/organize/navigation#languages)的站点上，每种非默认语言都有自己的结果页，路径为 `/{language}/search`，例如 `/fr/search`。
+
+在控制台的 [Site](https://app.mintlify.com/settings/project/site) 设置页面中启用或禁用整页搜索结果。该设置默认关闭。
+
+<Warning>
+  启用整页搜索结果会占用 `/search` 路径。如果你的站点已在 `/search` 或 `/{language}/search` 存在页面，内置结果页会替换该页面。请在启用此设置前将该页面移至其他路径。
+</Warning>
+
+Mintlify 通过 `noindex` 将结果页从外部搜索引擎中排除。
+
+<div id="search-filters">
+  ## 搜索筛选器
+</div>
+
+<Info>
+  搜索筛选器需要 [Enterprise 套餐](https://mintlify.com/pricing?ref=search-filters)。
+</Info>
+
+搜索筛选器会在搜索结果中添加产品、版本和分区下拉菜单，以便用户将结果限定到单个产品、版本或导航标签页。对于维护多个不同产品、版本或标签页的站点，筛选器很有用，否则搜索查询可能会返回用户并不关心的内容匹配。
+
+在控制台的 [站点](https://app.mintlify.com/settings/project/site) 设置页面启用或禁用搜索筛选器。
+
+显示哪些下拉菜单取决于你的导航配置。
+
+- 当你的导航定义了多个[产品](/zh/organize/navigation#products)时，会出现 **Product** 筛选器。
+- 当你的导航定义了[版本](/zh/organize/navigation#versions)时，会出现 **Version** 筛选器。
+- 当你的导航定义了[标签页](/zh/organize/navigation#tabs)时，会出现 **Section** 筛选器。它会列出包含所选产品和版本中页面的标签页。隐藏的标签页和仅链接到外部页面的标签页不会出现。
+
+如果你的导航没有产品、版本或标签页，启用搜索筛选器不会产生任何可见效果。
+
+<div id="filters-on-the-search-results-page">
+  ### 搜索结果页上的筛选器
+</div>
+
+当你同时启用[整页搜索结果](#full-page-search-results)时，结果页会显示与搜索栏相同的 **Product**、**Version** 和 **Section** 筛选器。如果用户在搜索栏中选择了筛选器，然后打开结果页，结果页会保留这些筛选器。
+
+结果页 URL 包含所选的筛选器，例如 `/search?q=authentication&product=api&version=v2&tab=Guides`。用户可以收藏或分享该 URL，并获得相同的筛选结果。
+
+更改 **Product** 筛选器会清除 **Version** 和 **Section** 筛选器，因为每个产品都可以有自己的版本和标签页。当所选标签页在新版本中不存在时，更改 **Version** 筛选器会清除 **Section** 筛选器。

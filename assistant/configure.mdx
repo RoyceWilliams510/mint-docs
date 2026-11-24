@@ -1,0 +1,58 @@
+---
+title: "Set up the assistant"
+sidebarTitle: "Set up"
+description: "Turn on the AI assistant, add starter questions, enable bot protection, and test answers in local preview before users see them."
+keywords: ["assistant", "configure", "settings", "enable", "starter questions", "bot protection", "local preview"]
+---
+
+<Info>
+  The assistant requires a [Pro or Enterprise plan](https://mintlify.com/pricing?ref=assistant).
+</Info>
+
+Set up the assistant on the [Assistant](https://app.mintlify.com/products/assistant) page of your dashboard. After you turn it on and add starter questions, choose where questions the assistant can't answer go, then test it.
+
+## Enable or disable the assistant
+
+On the [Assistant](https://app.mintlify.com/products/assistant) page in your dashboard, click the status toggle to enable or disable the assistant for your site.
+
+## Add sample questions
+
+Help your users begin conversations with the assistant by adding starter questions.
+
+The assistant can generate page-specific questions based on the page a user is viewing, or you can add persistent questions that are available across pages.
+
+You can add up to three starter questions. Click **Ask Assistant** for recommended questions based on your documentation.
+
+<Frame>
+  <img src="/images/assistant/search-suggestions-light.png" alt="The search suggestions panel in the dashboard with contextual starter questions enabled." className="block dark:hidden" />
+  <img src="/images/assistant/search-suggestions-dark.png" alt="The search suggestions panel in the dashboard with contextual starter questions enabled." className="hidden dark:block" />
+</Frame>
+
+## Choose where unanswered questions go
+
+When the assistant can't answer a question, it can send the user to your support or sales team by email, a link to your help center, or a ticket in Plain or Zendesk. See [Route questions to your team](/assistant/support-routing).
+
+## Bot protection
+
+In the **Bot protection** section, enable invisible CAPTCHA to protect your assistant from automated abuse. The bot protection is privacy-friendly and invisible to nearly all visitors.
+
+To enable bot protection:
+
+1. Navigate to the [Assistant](https://app.mintlify.com/products/assistant) page in your dashboard.
+2. In the **Bot protection** section, toggle **Invisible CAPTCHA** on.
+
+Changes take up to 10 minutes to propagate.
+
+<Note>
+  If you use custom [Content Security Policy headers](/deploy/csp-configuration), you must include `hcaptcha.com` and `*.hcaptcha.com` in your allowlist.
+</Note>
+
+## Test the assistant
+
+The assistant is available in your local preview when you sign in with the CLI. Use local preview to test answers and custom instructions in `Assistant.md` while you write.
+
+1. If you haven't already, install the CLI with `npm i -g mint`.
+2. Run `mint login` to authenticate.
+3. Run `mint dev` to start the local preview.
+
+The assistant in local preview uses the same indexed content as your deployed documentation site.

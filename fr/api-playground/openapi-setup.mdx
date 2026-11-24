@@ -1,0 +1,143 @@
+---
+title: "Configurer OpenAPI"
+sidebarTitle: "Configurer OpenAPI"
+description: "Ajoutez une spécification OpenAPI à votre documentation depuis votre dépôt ou une URL, validez-la, gardez-la synchronisée avec votre API et contrôlez qui peut la télécharger."
+keywords: ["OpenAPI", "spécification d'API", "Swagger", "openapi.json", "spécification hébergée", "localhost", "mint validate", "télécharger la spécification"]
+---
+
+OpenAPI est un format de description des API HTTP. Ajoutez une spécification OpenAPI à votre documentation, et Mintlify génère une page pour chaque endpoint, avec un [playground d'API](/fr/api-playground/overview) interactif et des exemples de requête. Lorsque votre spécification change, les pages se mettent à jour.
+
+Mintlify prend en charge les documents OpenAPI 3.0, 3.1 et 3.2 en JSON ou en YAML. Pour utiliser un document Swagger 2.0, convertissez-le d'abord, par exemple avec [Swagger Editor](https://editor.swagger.io/) (**Edit** > **Convert to OpenAPI 3**).
+
+<div id="add-your-specification">
+  ## Ajouter votre spécification
+</div>
+
+<Steps>
+  <Step title="Ajoutez la spécification à votre projet.">
+    Placez le fichier de spécification dans votre dépôt de documentation, ou hébergez-le à une URL HTTPS publique.
+
+    ```bash
+    /your-project
+      |- docs.json
+      |- openapi.json
+    ```
+  </Step>
+  <Step title="Référencez la spécification dans votre navigation.">
+    Ajoutez un champ `openapi` à un onglet, une ancre ou un groupe dans votre `docs.json`. Définissez-le sur le chemin du fichier dans votre dépôt ou sur l'URL de la spécification.
+
+    ```json docs.json {5}
+    "navigation": {
+      "tabs": [
+        {
+          "tab": "API reference",
+          "openapi": "openapi.json"
+        }
+      ]
+    }
+    ```
+  </Step>
+  <Step title="Prévisualisez vos pages.">
+    Exécutez `mint dev`, ou ouvrez un déploiement de prévisualisation. Chaque endpoint de votre spécification a une page dans l'onglet **API reference**, regroupée par tag.
+  </Step>
+</Steps>
+
+Pour ne lister que certains endpoints, mélanger des endpoints avec d'autres pages ou utiliser plusieurs spécifications, consultez [Organiser les endpoints dans la navigation](/fr/api-playground/organize-endpoints).
+
+Mintlify ne prend en charge `$ref` que pour les références internes, au sein d'un seul document OpenAPI. Regroupez les spécifications multifichiers en un seul fichier avant de les ajouter.
+
+<div id="validate-your-specification">
+  ## Valider votre spécification
+</div>
+
+Exécutez `mint validate` pour vérifier vos spécifications, vos pages et votre navigation avant de déployer.
+
+```bash
+mint validate
+```
+
+Pour apprendre le format OpenAPI, consultez le [guide OpenAPI de Swagger](https://swagger.io/docs/specification/v3_0/basic-structure/) et la [spécification OpenAPI](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/). Le guide de Swagger couvre OpenAPI 3.0, mais l'essentiel s'applique aussi à 3.1 et 3.2. Pour les différences, consultez [Migrating from OpenAPI 3.0 to 3.1.0](https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0) et [Upgrading from OpenAPI 3.1 to 3.2](https://learn.openapis.org/upgrading/v3.1-to-v3.2.html).
+
+<div id="use-a-specification-from-a-local-server">
+  ## Utiliser une spécification depuis un serveur local
+</div>
+
+Pendant le développement local, vous pouvez référencer une spécification servie par une API qui s'exécute sur votre machine :
+
+```json docs.json
+"navigation": {
+  "tabs": [
+    {
+      "tab": "API reference",
+      "openapi": "http://localhost:8000/openapi.json"
+    }
+  ]
+}
+```
+
+Passez `--local-schema` pour permettre à la CLI de récupérer la spécification via HTTP :
+
+```bash
+mint dev --local-schema
+```
+
+Pour valider la même configuration, exécutez `mint validate --local-schema`. Les déploiements exigent que les URL des spécifications utilisent HTTPS.
+
+<div id="keep-a-hosted-specification-in-sync">
+  ## Garder une spécification hébergée synchronisée
+</div>
+
+Si votre champ `openapi` pointe vers une URL, votre documentation n'est recompilée que lorsque vous poussez sur votre dépôt de documentation. Les modifications de la spécification à cette URL ne déclenchent pas de recompilation.
+
+Pour mettre à jour votre documentation lorsque votre spécification change, appelez l'endpoint [Trigger deployment](/fr/api/update/trigger) depuis le job de CI qui publie votre spécification. Appelez-le une fois la nouvelle spécification en ligne, pour que la compilation ne récupère pas un fichier partiel.
+
+Les compilations récupèrent l'URL depuis l'internet public sans identifiants. Si votre spécification est protégée par une authentification ou se trouve sur un réseau privé, ajoutez-la plutôt à votre dépôt de documentation. Consultez [Corriger l'erreur « Failed to load OpenAPI file »](/fr/help-center/openapi-url-fetch-fails-during-build).
+
+Pour modifier une spécification qui ne vous appartient pas, comme celle publiée par une autre équipe, utilisez des [overlays](/fr/api-playground/overlays).
+
+<div id="control-access-to-your-specification">
+  ## Contrôler l'accès à votre spécification
+</div>
+
+Si votre site n'exige pas d'authentification, Mintlify sert chaque fichier JSON et YAML de votre dépôt de documentation à son chemin sur votre domaine de documentation, comme `https://docs.example.com/openapi.json`. Cela inclut les spécifications que `docs.json` ne référence pas. Supprimez de votre dépôt les fichiers de spécification que vous ne voulez pas rendre publics.
+
+[`x-hidden` et `x-excluded`](/fr/api-playground/organize-endpoints#hide-or-exclude-endpoints) excluent des endpoints de votre documentation, mais le fichier de spécification les contient toujours.
+
+<div id="let-visitors-download-your-spec">
+  ### Permettre aux visiteurs de télécharger votre spécification
+</div>
+
+Pour ajouter une option **Download API spec** au [menu contextuel de la page](/fr/organize/settings-structure#contextual), ajoutez `"download-spec"` à `contextual.options` dans votre `docs.json` :
+
+```json docs.json
+"contextual": {
+  "options": ["copy", "download-spec", "chatgpt", "claude"]
+}
+```
+
+L'option télécharge votre spécification OpenAPI. Si votre projet comporte plusieurs spécifications, le téléchargement est un fichier zip nommé `api-specs.zip`. Sur les sites avec [authentification](/fr/deploy/authentication-setup), seuls les lecteurs connectés peuvent télécharger la spécification.
+
+Activer `download-spec` publie aussi un catalogue d'API [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) à `/.well-known/api-catalog`. Le catalogue renvoie vers chaque spécification OpenAPI de votre `docs.json`, afin que les agents d'IA puissent trouver votre API sans explorer votre documentation. Sans `download-spec`, `/.well-known/api-catalog` renvoie une erreur 404.
+
+<Warning>
+  La spécification téléchargée est le fichier complet. Elle ne filtre pas les endpoints ni les champs par [groupe d'utilisateurs](/fr/create/personalization#openapi-content-filtering). Tout lecteur connecté qui peut ouvrir le menu contextuel obtient tous les endpoints et schémas. N'activez pas `download-spec` sur un site authentifié si votre spécification contient des endpoints ou des champs que vous jugez sensibles.
+</Warning>
+
+<div id="next-steps">
+  ## Étapes suivantes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Configurer le playground" icon="play" href="/fr/api-playground/configure-playground">
+    Définissez votre URL de base et l'authentification pour que les lecteurs puissent envoyer des requêtes.
+  </Card>
+  <Card title="Organiser les endpoints" icon="list-tree" href="/fr/api-playground/organize-endpoints">
+    Regroupez les endpoints, combinez des spécifications et masquez des endpoints.
+  </Card>
+  <Card title="URL et titres des endpoints" icon="link" href="/fr/api-playground/endpoint-urls">
+    Contrôlez les URL des pages et gardez-les stables lorsque votre spécification change.
+  </Card>
+  <Card title="Personnaliser les pages d'endpoints" icon="pencil" href="/fr/api-playground/customize-endpoint-pages">
+    Modifiez les titres des pages, ajoutez du contenu et créez des pages pour des endpoints individuels.
+  </Card>
+</CardGroup>

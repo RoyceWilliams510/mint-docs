@@ -1,0 +1,33 @@
+---
+title: "Aprovisionamiento SCIM"
+description: "Aprovisiona, desaprovisiona y asigna roles automáticamente a los miembros del dashboard con la sincronización de directorio desde Okta, Microsoft Entra u otro proveedor de identidad."
+keywords: ["SCIM", "sincronización de directorio", "Okta", "Microsoft Entra", "proveedor de identidad", "gestión de usuarios", "RBAC", "portal de administración"]
+---
+
+<Info>
+  SCIM requiere un [plan Enterprise](https://mintlify.com/pricing?ref=scim).
+</Info>
+
+SCIM (System for Cross-domain Identity Management) permite a los administradores aprovisionar y desaprovisionar miembros de la organización de Mintlify directamente desde tu proveedor de identidad mediante la sincronización de directorio.
+
+SCIM gestiona quién tiene acceso a tu organización. Para controlar cómo inician sesión los miembros, configura [SSO](/es/dashboard/sso).
+
+<div id="set-up-directory-sync">
+  ## Configurar la sincronización de directorio
+</div>
+
+1. Navega a la sección **SCIM** de la página [Security](https://app.mintlify.com/settings/organization/access) de tu dashboard.
+2. Haz clic en **Set up directory sync**.
+3. En el portal de administración, sigue los pasos para tu proveedor de identidad.
+
+Cuando la conexión está activa, **Directory sync** muestra una insignia **Connected**. A partir de ese momento, tu proveedor de identidad agrega miembros a tu organización y los elimina cuando los quitas de la aplicación de Mintlify en tu proveedor de identidad.
+
+Para cambiar la configuración de la sincronización de directorio más adelante, haz clic en **Manage directory** para volver a abrir el portal de administración.
+
+<div id="roles-for-provisioned-members">
+  ## Roles de los miembros aprovisionados
+</div>
+
+Los miembros aprovisionados reciben el [rol](/es/dashboard/roles) que les asigna tu proveedor de identidad. Cuando cambias la asignación de rol de un miembro en tu proveedor de identidad, su rol en Mintlify se actualiza para coincidir.
+
+En la página [Members](https://app.mintlify.com/settings/organization/members), los miembros aprovisionados muestran **Managed by SSO**. Cambia sus roles y elimínalos en tu proveedor de identidad en lugar de en el dashboard.

@@ -1,0 +1,50 @@
+---
+title: "Politiques d'accès au dashboard"
+sidebarTitle: "Politiques d'accès"
+description: "Restreignez l'accès au dashboard Mintlify à des IP de confiance et contrôlez la durée des sessions avec des délais d'inactivité et une durée maximale."
+keywords: ["liste d'adresses IP autorisées", "accès réseau", "CIDR", "restrictions IP", "sécurité", "accès au dashboard", "IP de confiance", "durée de session", "délai d'inactivité", "durée de la session"]
+---
+
+<Info>
+  Les politiques d'accès au dashboard nécessitent un [plan Enterprise](https://mintlify.com/pricing?ref=network-access).
+</Info>
+
+Contrôlez la façon dont les membres de l'organisation accèdent au dashboard Mintlify : restreignez l'accès à des adresses IP de confiance et définissez la durée de validité des sessions du dashboard. Gérez ces deux politiques dans la section **Policies** de la page [Security](https://app.mintlify.com/settings/organization/access) de votre dashboard.
+
+<div id="ip-allowlist">
+  ## Liste d'adresses IP autorisées
+</div>
+
+Utilisez une liste d'adresses IP autorisées pour restreindre l'accès au dashboard et à l'éditeur à des adresses IP et des plages CIDR de confiance. Lorsque vous activez la liste d'autorisation, les membres de l'organisation peuvent se connecter et utiliser le dashboard et l'éditeur web uniquement depuis une adresse IP autorisée.
+
+La liste d'adresses IP autorisées s'applique à votre dashboard et à votre éditeur Mintlify, y compris aux connexions SSO. Elle n'affecte pas votre site de documentation publié. Les requêtes API utilisent des contrôles d'IP distincts.
+
+Lorsqu'un membre tente de se connecter ou d'utiliser le dashboard depuis une adresse IP bloquée, Mintlify rejette la requête et affiche un message expliquant que son adresse ne figure pas dans la liste d'autorisation. Les membres peuvent contacter un administrateur pour faire ajouter leur adresse.
+
+Vous pouvez autoriser l'accès de deux façons :
+
+- **Adresse IP individuelle** : autorisez une seule adresse, telle que `203.0.113.7` ou `2001:db8::1`.
+- **Plage CIDR** : autorisez un bloc d'adresses, tel que `10.0.0.0/8` ou `2001:db8::/48`. Utilisez la notation CIDR pour accorder l'accès à un bureau entier ou à un réseau VPN sans lister chaque adresse individuellement.
+
+Les adresses IPv4 et IPv6 sont toutes deux prises en charge.
+
+<div id="configure-the-ip-allowlist">
+  ### Configurer la liste d'adresses IP autorisées
+</div>
+
+<Warning>
+  Ajoutez votre adresse IP actuelle à la liste d'autorisation avant de l'activer. Si votre adresse ne figure pas dans la liste, vous risquez de vous verrouiller hors du dashboard. La section **Policies** affiche votre adresse IP actuelle pour vous aider à éviter cela.
+</Warning>
+
+1. Dans votre dashboard Mintlify, accédez à la page [Security](https://app.mintlify.com/settings/organization/access).
+2. Dans la section **Policies**, sous **Allowed IP addresses**, saisissez une adresse IP individuelle (par exemple, `203.0.113.7`) ou une plage CIDR (par exemple, `10.0.0.0/8`).
+3. Appuyez sur <kbd>Enter</kbd> pour l'ajouter. Les modifications sont enregistrées immédiatement. Pour ajouter plusieurs entrées à la fois, séparez-les par des virgules.
+4. Lorsque vous ajoutez votre première entrée, cliquez sur **Add and enable** pour confirmer et commencer à appliquer la liste d'autorisation.
+
+La suppression de la dernière entrée désactive la liste d'autorisation.
+
+<div id="session-lifetimes">
+  ## Durées de session
+</div>
+
+Vous pouvez également définir un délai d'inactivité de session et une durée de session maximale pour les sessions du dashboard. Consultez [Sécurité des sessions](/fr/dashboard/session-security).

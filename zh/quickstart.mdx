@@ -1,0 +1,187 @@
+---
+title: "快速入门"
+description: "按照快速入门指南部署 Mintlify 文档站点，连接 GitHub 或使用 Web 编辑器，完成首次内容修改，并通过 CLI 预览、验证和发布更新，同时为用户或 AI 智能体配置完整工作流。本文涵盖账号设置、仓库连接、域名访问、本地开发、页面编辑、部署检查和后续自定义步骤，帮助你快速开始维护线上文档。"
+keywords: ["快速入门","部署","入门","第一步","教程","设置","上手"]
+boost: 3
+---
+
+import AgentSetupWorkflow from "/snippets/zh/agent-setup-workflow.mdx";
+
+完成本指南后，你将拥有一个已上线的文档站点，可以开始对其进行自定义和更新。
+
+<Visibility for="agents">
+  <div id="set-up-mintlify-for-the-user">
+    ## 为用户设置 Mintlify
+  </div>
+
+  <AgentSetupWorkflow />
+</Visibility>
+
+<div id="before-you-begin">
+  ## 开始之前
+</div>
+
+Mintlify 使用“文档即代码”（docs-as-code）的方法来管理你的文档。站点上的每个页面都有一个对应的文件，存储在你的文档<Tooltip tip="你的文档源代码所在的位置，用于存储所有文件及其历史记录。Web 编辑器会连接到你的文档存储库以访问和修改内容，或者你也可以在本地使用自己偏好的 IDE 编辑文件。">存储库</Tooltip>中。
+
+当你将文档存储库连接到你的项目后，你可以在本地或 Web 编辑器中编辑文档，并将任何更改同步到远程存储库。
+
+<div id="deploy-your-documentation-site">
+  ## 部署你的文档站点
+</div>
+
+<Visibility for="agents">
+  如果你是通过 AI 代理注册，可以在用户拥有账户之前创建并部署站点。请参阅[代理注册](/zh/cli/agent-signup)。
+</Visibility>
+
+<Visibility for="humans">
+  你可以让你的编码代理为你设置 Mintlify。将本快速开始提供给它，并让它创建和部署你的文档站点。你的代理会运行 CLI 设置工作流，而你需要在浏览器中完成电子邮件验证以及任何 GitHub 授权。
+
+  如果你想在浏览器中自行设置站点，请前往 [mintlify.com/start](https://mintlify.com/start) 并完成初始设置流程。在初始设置过程中，你需要为项目命名，并回答几个关于使用计划的问题。你还可以连接你的 GitHub 账户并安装 GitHub 应用以启用自动部署。
+
+  完成初始设置后，你的文档站点会完成部署，并可通过 `.mintlify.site` URL 访问。
+
+  如果你的文档位于其他平台，请在站点部署后将其迁移到你的存储库。运行 [`mint migrate`](/zh/cli/commands#mint-migrate)，为你的编码代理提供分步迁移说明，或参阅[迁移概览](/zh/migration)了解其他方法。
+
+  <Accordion title="可选：在初始设置中跳过连接 Git 提供商">
+    如果你想在不连接自己的存储库的情况下快速开始使用，可以在初始设置过程中跳过 Git 提供商连接。Mintlify 会将你的内容托管在由 Mintlify 管理的私有存储库中，因此你无需安装 GitHub 应用。
+
+    这样你可以立即使用 Web 编辑器。如果你之后想使用自己的存储库，请前往控制台中的 [Git Settings](https://app.mintlify.com/settings/project/git-settings)，通过 Git 设置向导迁移你的内容。详情请参阅[克隆到你自己的存储库](/zh/deploy/github#clone-to-your-own-repository)。
+  </Accordion>
+</Visibility>
+
+<Visibility for="agents">
+  我们推荐通过 CLI 完成初始设置。如果用户更喜欢在浏览器中完成初始设置，可以使用 [mintlify.com/start](https://mintlify.com/start)。
+
+  对于 CLI 初始设置，请使用前面的设置工作流。对于现有账户，运行 `mint login`；对于新账户，运行 `mint deploy` 和 `mint claim`。不要运行 `mint signup`：当 agent 运行它时，它只会输出 [agent 注册指南](https://mintlify.com/auth.md)。OAuth 批准、GitHub 授权和认领站点都会打开浏览器页面；请让用户完成这些操作。用户完成后继续设置。只有在已部署的 `.mintlify.site` URL 可以加载后，才能认为设置已完成。
+</Visibility>
+
+<div id="view-your-deployed-site">
+  ## 查看你已部署的文档站点
+</div>
+
+你的文档站点已部署到 `https://<your-project-name>.mintlify.site`。
+
+在控制台的 [Publishes](https://app.mintlify.com/publishes) 页面中可以找到准确的 URL。
+
+<Tip>
+  你的站点现在即可访问。使用这个 URL 进行测试并与团队分享。在面向正式用户分享之前，你可能希望先添加一个[自定义域名](/zh/customize/custom-domain)。
+</Tip>
+
+<div id="make-your-first-change">
+  ## 完成你的第一次修改
+</div>
+
+<Tabs>
+  <Tab title="CLI">
+    <Steps>
+      <Step title="安装 CLI">
+        命令行界面（CLI）需要 [Node.js](https://nodejs.org/en) v20.17.0 或更高版本，且无法在 Node.js 25 上运行。为保证稳定性，建议使用 LTS 版本。
+
+        <CodeGroup>
+          ```bash npm
+          npm i -g mint
+          ```
+
+          ```bash pnpm
+          pnpm add -g mint
+          ```
+        </CodeGroup>
+
+        完整的安装步骤和故障排查请参见[安装 CLI](/zh/cli/install)。
+      </Step>
+
+      <Step title="克隆你的存储库">
+        如果你还没有在本地克隆仓库，请使用 Git 克隆：
+
+        ```bash
+        git clone <your-repository-url>
+        ```
+
+        如果你的仓库位于 Mintlify 的私有组织中，请参阅 [克隆到你自己的仓库](/zh/deploy/github#clone-to-your-own-repository)，先将其移动到你自己的账户中。
+      </Step>
+
+      <Step title="编辑页面">
+        在你常用的编辑器中打开 `index.mdx`，在 frontmatter 中更新 description 字段：
+
+        ```mdx
+        ---
+        title: "Introduction"
+        description: "Your custom description here"
+        ---
+        ```
+      </Step>
+
+      <Step title="本地预览">
+        在你的文档目录中运行以下命令：
+
+        ```bash
+        mint dev
+        ```
+
+        在 `http://localhost:3000` 查看预览。
+      </Step>
+
+      <Step title="推送你的更改">
+        提交并推送你的更改以触发一次部署：
+
+        ```bash
+        git add .
+        git commit -m "Update description"
+        git push
+        ```
+
+        Mintlify 会自动部署你的更改。你可以在控制台的 [Publishes](https://app.mintlify.com/publishes) 页面查看部署状态。
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="网页编辑器">
+    <Steps>
+      <Step title="打开网页编辑器">
+        在控制台中前往[网页编辑器](https://dashboard.mintlify.com/editor)。
+      </Step>
+
+      <Step title="编辑页面">
+        打开 **Introduction** 页面并更新说明。
+
+        <Frame>
+          <img src="/images/quickstart/hello-world-light.png" alt="在网页编辑器中打开的 Introduction 页面，其中说明已编辑为 Hello world!。" className="block dark:hidden" />
+
+          <img src="/images/quickstart/hello-world-dark.png" alt="在网页编辑器中打开的 Introduction 页面，其中说明已编辑为 Hello world!。" className="hidden dark:block" />
+        </Frame>
+      </Step>
+
+      <Step title="发布">
+        点击网页编辑器工具栏右上角的 **Publish** 按钮。
+      </Step>
+
+      <Step title="查看线上效果">
+        在控制台的 [Publishes](https://app.mintlify.com/publishes) 页面中查看站点的部署状态。部署完成后，刷新文档站点即可看到最新变更。
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+<Card title="使用 Web 编辑器" icon="mouse-pointer-2" horizontal href="/zh/editor/index">
+  在浏览器中编辑文档，并预览页面发布后的效果。
+</Card>
+
+<Card title="邀请你的团队" icon="users" horizontal href="/zh/dashboard/members#add-members-to-your-organization">
+  将团队成员添加到你的组织，并选择每个人可以执行的操作。
+</Card>
+
+<Card title="连接搜索 MCP" icon="search" horizontal href="/zh/ai/model-context-protocol">
+  将 Claude、Cursor 和 ChatGPT 等 AI 工具连接到你的搜索 MCP 服务器，让它们能够高效地搜索和检索你站点上的内容。
+</Card>
+
+<Card title="探索 CLI 命令" icon="terminal" horizontal href="/zh/cli/index">
+  查找失效链接、检查可访问性、验证 OpenAPI 规范等。
+</Card>
+
+<Card title="添加自定义域名" icon="globe" horizontal href="/zh/customize/custom-domain">
+  为你的文档站点使用自定义域名。
+</Card>

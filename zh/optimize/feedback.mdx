@@ -1,0 +1,127 @@
+---
+title: "收集来自用户和 AI 智能体的页面反馈"
+sidebarTitle: "反馈"
+description: "启用反馈小部件、页面评分、上下文备注、代码片段反应以及智能体反馈，帮助你发现并修复文档中的问题。"
+keywords: ["user feedback", "thumbs rating", "contextual", "satisfaction", "agents"]
+boost: 3
+---
+
+<Info>
+  反馈功能需要 [Pro 或 Enterprise 套餐](https://mintlify.com/pricing?ref=feedback)。上下文反馈和代码片段反馈需要 [Enterprise 方案](https://mintlify.com/pricing?ref=feedback)。
+</Info>
+
+[分析](https://app.mintlify.com/analytics)页面的 **Feedback** 部分显示您页面的点赞和点踩评分,以及用户和 AI 智能体提交的书面反馈。使用这些信息来评估内容质量并进行改进。
+
+Feedback 部分包含两张卡片:
+
+- **Page ratings**:用户的点赞和点踩评分,按页面分组。
+- **Detailed feedback**:包含书面内容的反馈,例如评论、代码片段反馈和[智能体反馈](#agent-feedback)。
+
+您可以按时间段或按[页面或路径](/zh/analytics#filter-by-page-or-path)筛选 Feedback 部分。
+
+[Traffic](/zh/analytics/traffic) 视图中的 **Feedback** 总数统计所选时间段内的所有页面反馈,包括点赞点踩评分、代码片段反馈和智能体反馈。对助手回复的评分会作为满意度单独记录在 [Assistant](/zh/analytics/assistant) 视图中,不计入反馈总数。
+
+查看您的反馈数据可以:
+
+- **识别成功的内容**:获得最多正面反馈的页面显示了您文档中效果良好的部分。
+- **确定改进优先级**:获得最多负面反馈的页面表明哪些内容可能需要关注。
+- **采取行动**:根据用户的直接反馈进行文档更新。
+
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/analytics/feedback-light.png"
+    alt="分析页面中的反馈标签页。"
+  />
+
+  <img
+    className="hidden dark:block"
+    src="/images/analytics/feedback-dark.png"
+    alt="分析页面中的反馈标签页。"
+  />
+</Frame>
+
+<div id="enable-feedback">
+  ## 启用反馈
+</div>
+
+<Note>
+  如果您在 `docs.json` 文件中禁用了遥测,则无法启用反馈功能。
+</Note>
+
+要收集和查看用户反馈,您必须在仪表板的 [站点](https://app.mintlify.com/settings/project/site) 设置页面的 **Feedback** 部分启用反馈功能。
+
+1. 导航到 [站点](https://app.mintlify.com/settings/project/site) 设置页面。
+2. 在 **Feedback** 部分,启用您想要的反馈类型。
+  * **Thumbs rating**:简单的点赞/点踩投票,用于评估用户对页面的整体满意度。
+  * **Edit suggestions**:允许用户对您的文档提出编辑建议。仅适用于公开的仓库。
+  * **Raise issues**:允许用户直接从您的网站创建 issue。仅适用于公开的仓库。
+  * **Contextual feedback**:关于页面内容的自由格式反馈。可以选择启用电子邮件收集,允许用户在提交反馈时提供其电子邮件地址。
+  * **Code snippet feedback**:专门针对代码片段的反馈。
+
+<div id="review-feedback">
+  ## 查看反馈
+</div>
+
+<div id="page-ratings">
+  ### 页面评分
+</div>
+
+**Page ratings** 卡片列出各页面及其点赞和点踩数量。按 **Most negative** 或 **Most positive** 排序,即可找到用户认为最没有帮助和最有帮助的页面。
+
+点赞点踩评分也会计入 [User engagement](/zh/analytics/user-engagements) 视图中的操作。
+
+<div id="detailed-feedback">
+  ### 详细反馈
+</div>
+
+**Detailed feedback** 卡片列出包含额外信息的反馈。仅使用点赞或点踩评分而未附带评论的提交会出现在 **Page ratings** 中,而不会出现在 **Detailed feedback** 中。
+
+使用筛选菜单缩小列表范围:
+
+- **Sentiment**:显示正面、负面或两者兼有的反馈。
+- **Type**:显示 **Comments**、**Agent feedback**、**Code blocks** 或其任意组合。
+
+选择某条反馈即可查看其详细信息,包括页面、类型和日期。要在仪表板之外分析反馈,请[将其导出为 CSV](/zh/analytics/export)。
+
+<div id="dismiss-feedback">
+  ### 忽略反馈
+</div>
+
+忽略无关或不准确的反馈。从某条反馈的菜单或其详细信息面板中选择 **Dismiss**。被忽略的反馈将不再显示在 **Detailed feedback** 卡片中。
+
+<div id="agent-feedback">
+  ## 智能体反馈
+</div>
+
+<Note>
+  智能体反馈处于测试版,可能会发生变化。
+</Note>
+
+第三方 AI 智能体可以针对发现不正确、过时或难以使用的页面提交结构化反馈。
+
+这些反馈会显示在 **Detailed feedback** 卡片中。要仅显示智能体反馈,请在 **Type** 筛选器中选择 **Agent feedback**。Feedback 部分中的所有其他反馈均来自人类用户。管理智能体反馈的方式与管理人类反馈相同。
+
+<div id="how-agent-feedback-works">
+  ### 智能体反馈的工作原理
+</div>
+
+将智能体连接到您站点的 [Search MCP 服务器](/zh/ai/model-context-protocol)。该服务器提供 `submit_feedback` 工具,该工具需要页面路径和问题描述。
+
+<Note>
+  网页搜索和网页获取工具不会将智能体连接到 Search MCP 服务器。智能体必须连接到该服务器,才能发现并调用 `submit_feedback` 工具。
+</Note>
+
+该路径必须与您站点上的某个页面或您某个[重定向](/zh/create/redirects)的来源相匹配。您可以传入相对路径或完整 URL。查询字符串、片段、`.md` 和 `.mdx` 扩展名以及您站点的基础路径不会影响匹配。如果没有匹配的页面，`submit_feedback` 工具会返回错误，且该提交不会被记录。
+
+Mintlify 会将每次被接受的提交记录为指定页面的负面反馈。反馈将与人类反馈一起显示在仪表板中。
+
+<div id="retrieve-agent-feedback-via-api">
+  ### 通过 API 获取智能体反馈
+</div>
+
+使用[分析反馈端点](/zh/api/analytics/feedback)以编程方式获取智能体反馈。使用 `source=agent` 进行筛选,仅返回智能体反馈。
+
+智能体反馈响应包括:
+- `comment`:智能体提交的反馈文本。
+- `path`:反馈所针对页面的路径。

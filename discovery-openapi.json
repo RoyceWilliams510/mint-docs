@@ -1,0 +1,563 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Mintlify Assistant API",
+    "description": "An API to integrate Mintlify discovery features into your product.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.mintlify.com/discovery"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v2/assistant/{domain}/message": {
+      "post": {
+        "summary": "Create assistant message",
+        "description": "Generates a response message from the assistant for the specified domain. Compatible with AI SDK v5+.\n\nAuthenticate with an assistant API key.",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The domain identifier from your `domain.mintlify.site` URL. Can be found at the end of your dashboard URL. For example, `app.mintlify.com/organization/domain` has a domain identifier of `domain`."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fp",
+                  "messages"
+                ],
+                "properties": {
+                  "fp": {
+                    "type": "string",
+                    "description": "Fingerprint identifier for tracking conversation sessions. Use `anonymous` for anonymous users or provide a unique user identifier."
+                  },
+                  "threadId": {
+                    "default": null,
+                    "type": "string",
+                    "description": "An optional identifier used to maintain conversation continuity across multiple messages. When provided, it allows the system to associate follow-up messages with the same conversation thread. The `threadId` is returned in the response as `event.threadId` when `event.type === 'finish'`."
+                  },
+                  "messages": {
+                    "type": "array",
+                    "default": [
+                      {
+                        "id": "foobar",
+                        "role": "user",
+                        "parts": [
+                          {
+                            "type": "text",
+                            "text": "How do I get started"
+                          }
+                        ]
+                      }
+                    ],
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Unique identifier for the message."
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "system",
+                            "assistant",
+                            "user"
+                          ],
+                          "description": "The role of the message sender."
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Timestamp when the message was created."
+                        },
+                        "parts": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "description": "Text content part.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "text"
+                                    ]
+                                  },
+                                  "text": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "text"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "Reasoning content part with optional provider metadata.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "reasoning"
+                                    ]
+                                  },
+                                  "text": {
+                                    "type": "string"
+                                  },
+                                  "providerMetadata": {
+                                    "type": "object",
+                                    "description": "Optional provider-specific metadata."
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "text"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "Source URL reference part.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "source-url"
+                                    ]
+                                  },
+                                  "sourceId": {
+                                    "type": "string"
+                                  },
+                                  "url": {
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "providerMetadata": {
+                                    "type": "object",
+                                    "description": "Optional provider-specific metadata."
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "sourceId",
+                                  "url"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "File attachment part.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "file"
+                                    ]
+                                  },
+                                  "mediaType": {
+                                    "type": "string"
+                                  },
+                                  "url": {
+                                    "type": "string"
+                                  },
+                                  "filename": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "mediaType",
+                                  "url"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "Marks the start of a new step.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "step-start"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "type"
+                                ]
+                              }
+                            ]
+                          },
+                          "description": "Array of message parts. Each part has a type and type-specific fields."
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "description": "Optional metadata associated with the message."
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "parts"
+                      ]
+                    },
+                    "description": "Array of messages in the conversation. Use the handleSubmit function from the @ai-sdk/react package's useChat hook to manage messages and streaming responses."
+                  },
+                  "retrievalPageSize": {
+                    "type": "number",
+                    "default": 5,
+                    "description": "Number of documentation search results to use for generating the response. Higher values provide more context but may increase response time. Recommended: 5."
+                  },
+                  "filter": {
+                    "type": "object",
+                    "default": null,
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "description": "Optional version filter."
+                      },
+                      "language": {
+                        "type": "string",
+                        "description": "Optional language filter."
+                      },
+                      "groups": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Optional groups of the user the assistant answers for. If you omit `groups`, the assistant reads public content only. On deployments where every page requires authentication, omitting `groups` works like an empty array. An empty array means a signed-in user with no groups: the assistant also reads pages open to any signed-in user. When you pass groups, it also reads pages restricted to at least one of them. `<Visibility>` sections for signed-in readers or for specific groups follow the same rules. Mintlify doesn't verify group membership, so your backend must choose the groups for each user. On password-protected deployments that have public pages, pass an empty array to read pages that aren't marked public."
+                      }
+                    },
+                    "description": "Optional filter criteria for the search."
+                  },
+                  "context": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "code",
+                            "textSelection"
+                          ],
+                          "description": "The type of context being provided."
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "The code snippet or selected text content."
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "Optional path to the source file or page."
+                        },
+                        "elementId": {
+                          "type": "string",
+                          "description": "Optional identifier for the UI element containing the context."
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "value"
+                      ]
+                    },
+                    "description": "Optional array of contextual information to provide to the assistant."
+                  },
+                  "currentPath": {
+                    "type": "string",
+                    "description": "The path of the page the user is currently viewing. When provided, the assistant uses this context to provide more relevant answers. Maximum length: 200 characters."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Streaming response compatible with AI SDK v5. Use the [useChat hook from @ai-sdk/react](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat#usechat) to handle the response stream."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request body is invalid, such as a missing `fp` or `messages` field. The response body describes the error."
+          },
+          "401": {
+            "description": "The API key is missing or invalid, or the assistant isn't enabled for your organization."
+          },
+          "402": {
+            "description": "Your organization reached its credit limit for this billing cycle."
+          },
+          "403": {
+            "description": "AI features aren't available in your region, your API key doesn't have access to this domain, your plan doesn't include assistant API access, or your request came from an IP address that isn't on your API key's allowlist."
+          },
+          "404": {
+            "description": "No documentation site exists for this domain, or the `threadId` or `threadKey` is invalid."
+          },
+          "413": {
+            "description": "The conversation reached its maximum number of messages, or the input is too long."
+          },
+          "429": {
+            "description": "You exceeded the rate limit of 10,000 requests per hour per organization."
+          },
+          "500": {
+            "description": "An unexpected server error occurred. Retry the request. If the error continues, contact support."
+          }
+        }
+      }
+    },
+    "/v1/page/{domain}": {
+      "post": {
+        "summary": "Get page content",
+        "description": "Retrieves the full text content of a specific documentation page by its path. Use this after a search to fetch the complete content of a matching page.\n\nAuthenticate with an assistant API key. Page content requests do not consume credits.",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The domain identifier from your `domain.mintlify.site` URL. Can be found at the end of your dashboard URL. For example, `app.mintlify.com/organization/domain` has a domain identifier of `domain`."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "path"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "The page slug or path to retrieve content for. This corresponds to the `path` field returned by the [Search documentation](/api/assistant/search) endpoint."
+                  },
+                  "groups": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Optional groups of the user you're reading for. If you omit `groups`, you can read public pages only, with their public sections. On deployments where every page requires authentication, omitting `groups` works like an empty array. An empty array means a signed-in user with no groups: you can also read pages open to any signed-in user. When you pass groups, you can also read pages restricted to at least one of them. `<Visibility>` sections the user can't see are removed from the page. Mintlify doesn't verify group membership, so your backend must choose the groups for each user. On password-protected deployments that have public pages, pass an empty array to read pages that aren't marked public."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Page content retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "The page path that was requested."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "The full text content of the page."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The `path` is missing or empty, or `groups` isn't an array of strings. The response body describes the error."
+          },
+          "401": {
+            "description": "The API key is missing or invalid."
+          },
+          "403": {
+            "description": "Your API key doesn't have access to this domain, your plan doesn't include assistant API access, or your request came from an IP address that isn't on your API key's allowlist."
+          },
+          "404": {
+            "description": "No documentation site exists for this domain, the site doesn't have a search index, or no page exists at this path.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message describing why the page could not be found."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "You exceeded the rate limit of 10,000 requests per hour per organization."
+          },
+          "500": {
+            "description": "An unexpected server error occurred. Retry the request. If the error continues, contact support."
+          }
+        }
+      }
+    },
+    "/v1/search/{domain}": {
+      "post": {
+        "x-mint": {
+          "mcp": {
+            "enabled": true
+          }
+        },
+        "summary": "Search documentation",
+        "description": "Searches your documentation with semantic and keyword search, with configurable filtering and pagination.\n\nAuthenticate with an assistant API key. Search requests do not consume credits.",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The domain identifier from your `domain.mintlify.site` URL. Can be found at the end of your dashboard URL. For example, `app.mintlify.com/organization/domain` has a domain identifier of `domain`."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "The search query to execute against your documentation content."
+                  },
+                  "pageSize": {
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 50,
+                    "description": "Number of search results to return. Must be between 1 and 50. Defaults to 10 if not specified."
+                  },
+                  "scoreThreshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Minimum relevance score for results. Only results with a score at or above this threshold are returned. Must be between 0 and 1."
+                  },
+                  "filter": {
+                    "type": "object",
+                    "description": "Optional filtering parameters to narrow search results.",
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "description": "Filter results by documentation version."
+                      },
+                      "language": {
+                        "type": "string",
+                        "description": "Filter results by content language."
+                      },
+                      "tag": {
+                        "type": "string",
+                        "description": "Filter results by tag."
+                      },
+                      "groups": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Optional groups of the user you're searching for. If you omit `groups`, results include public content only. On deployments where every page requires authentication, omitting `groups` works like an empty array. An empty array means a signed-in user with no groups: results also include pages open to any signed-in user. When you pass groups, results also include pages restricted to at least one of them. `<Visibility>` sections for signed-in readers or for specific groups follow the same rules. Mintlify doesn't verify group membership, so your backend must choose the groups for each user. On password-protected deployments that have public pages, pass an empty array to search pages that aren't marked public."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "description": "The matching content from your documentation."
+                      },
+                      "path": {
+                        "type": "string",
+                        "description": "The path or URL to the source document."
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "description": "Additional metadata about the search result."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The `query` is missing or isn't a string, or `pageSize` or `filter` is invalid. The response body describes the error."
+          },
+          "401": {
+            "description": "The API key is missing or invalid."
+          },
+          "403": {
+            "description": "Your API key doesn't have access to this domain, your plan doesn't include assistant API access, or your request came from an IP address that isn't on your API key's allowlist."
+          },
+          "404": {
+            "description": "No documentation site exists for this domain, or the search returned no results."
+          },
+          "429": {
+            "description": "You exceeded the rate limit of 10,000 requests per hour per organization."
+          },
+          "500": {
+            "description": "An unexpected server error occurred. Retry the request. If the error continues, contact support."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "The Authorization header expects a Bearer token. Use an assistant API key. Generate one on the [API keys page](https://app.mintlify.com/settings/organization/api-keys) in your dashboard. In production, proxy requests through your backend rather than embedding the key in client-side code."
+      }
+    }
+  }
+}

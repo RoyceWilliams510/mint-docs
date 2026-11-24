@@ -1,0 +1,200 @@
+---
+title: "Deploy at a subpath with AWS Route 53 and CloudFront"
+sidebarTitle: "AWS"
+description: "Deploy your Mintlify documentation at a subpath on AWS by combining Route 53 DNS routing, a CloudFront distribution, and cache behaviors."
+keywords: ["AWS deployment", "Route 53 DNS", "CloudFront CDN", "cache policies"]
+---
+
+import Propagating from "/snippets/custom-subpath-propagating.mdx";
+import SubpathSetupSteps from "/snippets/subpath-setup-steps.mdx";
+
+To host your documentation at a subpath such as `yoursite.com/docs` using AWS Route 53 and CloudFront, configure your DNS provider to point to your CloudFront distribution.
+
+Before configuring AWS, set your base path in your dashboard:
+
+<SubpathSetupSteps />
+
+## Routes and cache policies
+
+<Note>
+  The following examples use the `/docs` base path. If you use a different base path, replace `/docs` with your base path.
+</Note>
+
+Route traffic to these paths with a Cache Policy of **CachingDisabled**:
+
+- `/.well-known/acme-challenge/*` - Required for Let's Encrypt certificate verification
+- `/.well-known/vercel/*` - Required for domain verification
+- `/docs/*` - Required for subpath routing
+- `/docs` - Required for subpath routing
+
+Route traffic to these paths with a Cache Policy of **UseOriginCacheControlHeaders-QueryStrings**, so CloudFront follows the cache headers Mintlify sends:
+
+- `/_mintlify/*` - Required for CSS, JavaScript, fonts, and API requests
+- `/mintlify-assets/*` - Required for favicons and static assets on some sites
+
+Route traffic to this path with a Cache Policy of **CachingOptimized**:
+
+- `Default (*)` - Your website's landing page
+
+All Behaviors must have an **origin request policy** of `AllViewerExceptHostHeader`.
+
+The behaviors for your subpath must allow all HTTP methods. CloudFront only allows `GET` and `HEAD` requests by default. This blocks the `POST` requests that Mintlify uses for analytics and other interactive features.
+
+## Create CloudFront distribution
+
+1. Navigate to [CloudFront](https://aws.amazon.com/cloudfront) inside the AWS console.
+2. Click **Create distribution**.
+3. For the Origin domain, input `[SUBDOMAIN].mintlify.site` where `[SUBDOMAIN]` is your project's unique subdomain.
+4. For "Web Application Firewall (WAF)," enable security protections.
+
+  <Note>
+    WAF rules can block the `POST` requests that Mintlify uses for analytics and other interactive features. If analytics stop appearing in your dashboard after enabling WAF, check your WAF logs. Look for blocked requests to paths under `/docs/_mintlify/`.
+  </Note>
+
+5. The remaining settings should be default.
+6. Click **Create distribution**.
+
+## Add default origin
+
+1. After creating the distribution, navigate to the "Origins" tab.
+2. Find your staging URL that mirrors the main domain. This varies depending on your landing page host. For example, the Mintlify staging URL is [mintlify-landing-page.vercel.app](https://mintlify-landing-page.vercel.app).
+
+<Info>
+  {/* vale Vale.Terms = NO */}
+  If Webflow hosts your landing page, use Webflow's staging URL. It would look like `.webflow.io`.
+  {/* vale Vale.Terms = YES */}
+
+  If you use Vercel, use the `.vercel.app` domain available for every project.
+</Info>
+
+3. Create a new Origin and add your staging URL as the "Origin domain."
+
+You should now have two Origins: one with `[SUBDOMAIN].mintlify.site` and another with your staging URL.
+
+## Set behaviors
+
+Behaviors in CloudFront enable control over the subpath logic. At a high level, you create the following logic:
+
+- **If a user lands on your custom subpath**, go to `[SUBDOMAIN].mintlify.site`.
+- **If a user lands on any other page**, go to the current landing page.
+
+1. Navigate to the "Behaviors" tab of your CloudFront distribution.
+2. Click the **Create behavior** button and create the following behaviors.
+
+### `/.well-known/*`
+
+Create behaviors for Vercel domain verification paths with a **Path pattern** of `/.well-known/*` and set **Origin and origin groups** to your docs URL.
+
+For "Cache policy," select **CachingDisabled** to ensure these verification requests pass through without caching.
+
+<Info>
+If `.well-known/*` is too generic, narrow it down to at least 2 behaviors for Vercel:
+  - `/.well-known/vercel/*` - Required for Vercel domain verification
+  - `/.well-known/acme-challenge/*` - Required for Let's Encrypt certificate verification
+</Info>
+
+### Your subpath
+
+Create a behavior with a **Path pattern** of your chosen subpath, for example `/docs`. Set **Origin and origin groups** to the `.mintlify.site` URL (for example, `acme.mintlify.site`).
+
+- Set "Cache policy" to **CachingDisabled**.
+- Set "Origin request policy" to **AllViewerExceptHostHeader**.
+- Set "Viewer protocol policy" to **Redirect HTTP to HTTPS**.
+- Set "Allowed HTTP methods" to **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE**.
+
+<Warning>
+  CloudFront only allows `GET` and `HEAD` requests by default. If you don't allow all HTTP methods, CloudFront rejects the `POST` requests that Mintlify uses for analytics. Your dashboard won't show any page views even though your docs load normally.
+</Warning>
+
+### Your subpath with wildcard
+
+Create a behavior with a **Path pattern** of your chosen subpath followed by `/*`, for example `/docs/*`, and **Origin and origin groups** pointing to the same `.mintlify.site` URL.
+
+These settings should exactly match your base subpath behavior, with the exception of the **Path pattern**.
+
+- Set "Cache policy" to **CachingDisabled**.
+- Set "Origin request policy" to **AllViewerExceptHostHeader**.
+- Set "Viewer protocol policy" to **Redirect HTTP to HTTPS**.
+- Set "Allowed HTTP methods" to **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE**.
+
+### `/mintlify-assets/*`
+
+Create a behavior with a **Path pattern** of `/mintlify-assets/*` and set **Origin and origin groups** to the `.mintlify.site` URL. This path serves favicons and static assets for some documentation sites from the root of your domain.
+
+ - Set "Cache policy" to **UseOriginCacheControlHeaders-QueryStrings**.
+ - Set "Origin request policy" to **AllViewerExceptHostHeader**.
+ - Set "Viewer protocol policy" to **Redirect HTTP to HTTPS**.
+
+### `/_mintlify/*`
+
+Create a behavior with a **Path pattern** of `/_mintlify/*` and set **Origin and origin groups** to the `.mintlify.site` URL. This path serves the CSS, JavaScript, fonts, and API requests for your documentation from the root of your domain. Without this behavior, pages load without styles.
+
+- Set "Cache policy" to **UseOriginCacheControlHeaders-QueryStrings**. Mintlify marks versioned assets as cacheable and API responses as uncacheable.
+- Set "Origin request policy" to **AllViewerExceptHostHeader**.
+- Set "Viewer protocol policy" to **Redirect HTTP to HTTPS**.
+- Set "Allowed HTTP methods" to **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE**.
+
+### `Default (*)`
+
+Edit the `Default (*)` behavior.
+
+1. Change the default behavior's **Origin and origin groups** to the staging URL (for example, `mintlify-landing-page.vercel.app`).
+2. Click **Save changes**.
+
+### Check that you set up behaviors correctly
+
+If you follow the preceding steps, your distribution has six behaviors:
+
+- `/docs/*`
+- `/docs`
+- `/mintlify-assets/*`
+- `/_mintlify/*`
+- `/.well-known/*`
+- `Default (*)`
+
+Confirm that each behavior points to the correct origin: the `.mintlify.site` URL for the docs, asset, API, and `/.well-known/*` paths, and your staging URL for `Default (*)`.
+
+## Preview distribution
+
+To test your distribution, go to the "General" tab and visit the **Distribution domain name** URL.
+
+All pages should route to your main landing page. When you append your chosen subpath, for example `/docs`, the URL should serve your Mintlify documentation.
+
+## Connect with Route 53
+
+Next, connect the CloudFront distribution to your primary domain.
+
+### Add your domain to the distribution
+
+First, add your domain to the CloudFront distribution. Without an alternate domain name, CloudFront rejects requests that arrive through your domain.
+
+1. Open your distribution's "General" tab, then click **Edit** in the "Settings" section.
+2. Add your domain (for example, `yoursite.com`) as an **Alternate domain name (CNAME)**.
+3. For "Custom SSL certificate," attach an AWS Certificate Manager (ACM) certificate that covers your domain.
+
+<Warning>
+  CloudFront only accepts ACM certificates issued in the US East (N. Virginia) `us-east-1` region. A certificate issued in any other region doesn't appear in the "Custom SSL certificate" menu.
+</Warning>
+
+### Create the Route 53 record
+
+<Note>
+  For this section, you can also refer to AWS's official guide on [Configuring
+  Amazon Route 53 to route traffic to a CloudFront
+  distribution](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-to-cloudfront-distribution.html#routing-to-cloudfront-distribution-config),
+  which covers these prerequisites.
+</Note>
+
+1. Navigate to [Route53](https://aws.amazon.com/route53) inside the AWS console.
+2. Navigate to the "Hosted zone" for your primary domain.
+3. Click **Create record**.
+4. Toggle `Alias` and then **Route traffic to** the `Alias to CloudFront distribution` option.
+5. Click **Create records**.
+
+<Note>
+  You may need to remove the existing A record if one currently exists.
+</Note>
+
+Your documentation is now live at your chosen subpath for your primary domain.
+
+<Propagating />

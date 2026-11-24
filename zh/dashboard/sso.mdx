@@ -1,0 +1,54 @@
+---
+title: "单点登录（SSO）"
+description: "使用 Okta 或 Microsoft Entra 等身份提供商为你的 Mintlify dashboard 设置 SAML 单点登录，并验证你的电子邮件域名。"
+keywords: ["SSO", "SAML 认证", "Okta 集成", "Microsoft Entra", "身份提供商", "JIT", "预配", "已验证域名", "管理门户"]
+---
+
+<Info>
+  SSO 适用于 [Enterprise 方案](https://mintlify.com/pricing?ref=sso)。
+</Info>
+
+管理员在 dashboard 的 [Security](https://app.mintlify.com/settings/organization/access) 页面上设置 SSO。每个设置按钮都会打开管理门户，引导你完成身份提供商的配置。
+
+要设置 SSO，请先验证你的电子邮件域名，然后连接你的身份提供商。
+
+<div id="verify-your-domain">
+  ## 验证你的域名
+</div>
+
+在设置 SSO 之前，请先验证你对电子邮件域名的所有权。连接 SSO 后，任何使用已验证域名上的电子邮件地址登录的人都会被转到你的身份提供商。
+
+1. 在 dashboard 中前往 [Security](https://app.mintlify.com/settings/organization/access) 页面。
+2. 在 **SSO** 部分，点击 **Verify email domains**。
+3. 在管理门户中添加你的域名。管理门户会显示一条 DNS 记录。
+4. 将管理门户中的 DNS 记录添加到你的 DNS 提供商。
+
+DNS 记录生效后，**Security** 页面上的 **Verified email domains** 会显示 **Verified** 标记。
+
+<div id="connect-your-identity-provider">
+  ## 连接你的身份提供商
+</div>
+
+1. 在 dashboard 中前往 [Security](https://app.mintlify.com/settings/organization/access) 页面。
+2. 在 **SSO** 部分，点击 **Set up SSO**。在你验证电子邮件域名之前，该按钮不可用。
+3. 在管理门户中，按照适用于你的身份提供商的步骤操作。
+
+连接激活后，**SSO** 部分会显示 **SAML SSO** 以及 **Connected** 标记。
+
+如需稍后更改 SSO 配置，请点击 **Manage SSO** 重新打开管理门户。
+
+<div id="sign-in-with-sso">
+  ## 使用 SSO 登录
+</div>
+
+成员可以使用已验证域名上的电子邮件地址从 [Mintlify 登录页面](https://app.mintlify.com/login)登录，也可以从你的身份提供商的应用目录登录。
+
+连接 SSO 后，请先在浏览器的隐私窗口中测试这两种登录流程，再通知你的团队使用 SSO。
+
+<div id="automatic-member-provisioning">
+  ## 自动成员预配
+</div>
+
+当某人首次通过 SSO 登录时，Mintlify 会将其添加到你的组织。新成员会获得你的身份提供商为其分配的[角色](/zh/dashboard/roles)。如果你的身份提供商未分配角色，他们将以编辑者身份加入。
+
+要在成员登录之前为其预配和取消预配，请设置 [SCIM](/zh/dashboard/scim)。

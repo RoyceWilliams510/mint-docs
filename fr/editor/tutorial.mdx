@@ -1,0 +1,64 @@
+---
+title: "Comment utiliser l'éditeur"
+description: "Tutoriel pas à pas de l'éditeur Mintlify : créez une branch, modifiez des pages, partagez un aperçu pour révision, puis publiez vos changements."
+keywords: ["editor", "tutorial", "branch", "publish"]
+---
+
+Ce tutoriel vous guide à travers une mise à jour de contenu complète avec l'éditeur. Vous allez créer une branch, faire une modification, partager un aperçu pour révision et publier vos modifications.
+
+<Info>
+  Vous devez avoir le rôle **administrateur** ou **éditeur** pour effectuer toutes les étapes de ce tutoriel. Si votre organisation utilise les rôles étendus, vous avez besoin du rôle **publieur**, **administrateur** ou **propriétaire**. Les visiteurs ne peuvent ni publier ni demander une révision. Consultez [Rôles](/fr/dashboard/roles).
+</Info>
+
+<Steps>
+  <Step title="Créer une branch">
+    Une branch est une copie temporaire de votre contenu. C'est là que vous effectuez vos modifications sans affecter votre site publié. Vous pouvez fusionner une branch dans votre site publié ou l'abandonner en toute sécurité si vous choisissez de ne pas appliquer les modifications.
+
+    Travailler sur une branch permet de garder vos modifications séparées de votre site publié jusqu'à ce que vous soyez prêt à partager le contenu avec vos utilisateurs.
+
+    1. Dans la barre d'outils de l'éditeur, cliquez sur le nom de la branch (généralement `main`, avec un badge **Live**). Si vous ne le voyez pas, [affichez le sélecteur de branch](/fr/editor/publish#show-the-branch-selector).
+    1. Dans **Find a branch**, saisissez un titre qui décrit votre modification, comme `Update quickstart`.
+    1. Cliquez sur **New branch**.
+
+    L'éditeur bascule vers votre nouvelle branch. Toutes les modifications que vous effectuez ne sont présentes que sur la branch, et elles sont commitées automatiquement sur la branch pendant que vous travaillez. Elles n'apparaissent sur votre site publié que si vous terminez le processus de publication.
+
+    Pour abandonner une branch au lieu de la publier, survolez-la dans le menu des branches, cliquez sur **Delete branch**, puis confirmez. Consultez [Supprimer une branch](/fr/guides/branches#delete-a-branch).
+  </Step>
+  <Step title="Effectuer vos modifications">
+    Modifiez une page existante ou créez-en une nouvelle.
+
+    **Pour modifier une page** : Cliquez sur le nom de la page dans la barre latérale de navigation pour l'ouvrir. Tapez directement dans l'éditeur pour ajouter du contenu. Appuyez sur <kbd>/</kbd> pour insérer des composants, des images ou d'autres contenus.
+
+    **Pour créer une page** : Cliquez sur le bouton <Icon icon="plus" /> plus à côté du group de navigation où vous souhaitez ajouter la page, puis cliquez sur **New page**. Saisissez un titre pour la page. L'éditeur nomme le fichier d'après le titre.
+
+  </Step>
+  <Step title="Publier votre branch">
+    Lorsque vous modifiez une branch pour la première fois, l'éditeur ouvre une pull request pour elle. Une pull request est une proposition visant à fusionner vos modifications dans la branch qui compile votre site publié. Vos modifications ne sont mises en ligne qu'une fois la pull request fusionnée.
+
+    Lorsque vous êtes prêt pour la révision, demandez-la depuis le menu de publication.
+
+    1. Cliquez sur **Publish** dans la barre d'outils pour ouvrir le menu de publication.
+    1. Vous pouvez cliquer sur n'importe quel fichier modifié de la liste pour consulter et comparer vos modifications à la version publiée.
+    1. Cliquez sur **Request review**.
+
+    Si votre pull request est déjà prête pour la révision, vous ne verrez pas **Request review**. Si Mintlify héberge votre dépôt et que votre deployment branch n'exige pas d'approbation, le menu affiche **Publish** à la place, ce qui fusionne directement votre branch.
+
+    <Info>
+      Les déploiements de prévisualisation nécessitent un [forfait payant](https://mintlify.com/pricing?ref=preview-deployments).
+    </Info>
+
+    Mintlify compile un [déploiement de prévisualisation](/fr/editor/review#preview-deployments) pour votre pull request : un lien temporaire où vos modifications s'affichent exactement comme elles apparaîtraient sur votre site publié. Retrouvez l'URL dans le commentaire de pull request du bot Mintlify, et partagez-la avec vos relecteurs.
+  </Step>
+  <Step title="Faire approuver votre pull request">
+    Partagez la pull request avec votre équipe. Pour l'ouvrir, cliquez sur **View request** dans le menu de publication. Les relecteurs peuvent ouvrir la pull request dans GitHub, GitLab ou Bitbucket pour laisser des commentaires, demander des modifications ou l'approuver.
+
+    Si un relecteur demande des modifications, effectuez-les dans l'éditeur sur la même branch. Vos mises à jour sont commitées automatiquement dans la pull request existante. Vous n'avez pas besoin d'en créer une nouvelle.
+
+    Une fois que tous les relecteurs requis ont approuvé, la pull request est prête à être fusionnée.
+  </Step>
+  <Step title="Fusionner et publier">
+    Une fois la pull request approuvée, cliquez sur **Publish** dans la barre d'outils pour rouvrir le menu de publication. Le menu affiche désormais l'état de la pull request et une option pour fusionner.
+
+    Cliquez sur **Merge and publish**. Si Mintlify héberge votre dépôt et qu'aucune approbation n'est requise, le bouton s'appelle **Publish** à la place. L'éditeur fusionne la pull request et vous ramène sur votre deployment branch. Mintlify compile et déploie vos modifications. Votre site publié se met à jour en environ 30 secondes à quelques minutes.
+  </Step>
+</Steps>

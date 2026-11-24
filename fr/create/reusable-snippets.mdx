@@ -1,0 +1,436 @@
+---
+title: "Extraits réutilisables"
+description: "Créez des extraits de contenu réutilisables avec des variables pour garantir la cohérence entre les pages de documentation et réduire la duplication en MDX."
+keywords: ["extraits de contenu", "contenu réutilisable", "variables"]
+---
+
+L’un des principes fondamentaux du développement logiciel est DRY (Don't Repeat Yourself), qui s’applique aussi à la documentation. Si vous vous retrouvez à répéter le même contenu à plusieurs endroits, créez un extrait personnalisé pour ce contenu. Les extraits contiennent du contenu que vous pouvez importer dans d’autres fichiers pour le réutiliser. Vous contrôlez l’endroit où l’extrait apparaît sur une page. Si vous devez un jour mettre à jour ce contenu, il vous suffit de modifier l’extrait plutôt que chaque fichier où l’extrait est utilisé.
+
+<div id="how-snippets-work">
+  ## Fonctionnement des snippets
+</div>
+
+Les snippets sont des fichiers `.mdx`, `.md`, `.js`, `.jsx` ou `.tsx` importés dans un autre fichier. Vous pouvez placer les fichiers de snippets n'importe où dans votre projet. Votre site charge chaque fichier `.js` de votre projet comme [script personnalisé](/fr/customize/custom-scripts#custom-javascript) sur chaque page, donc les snippets `.js` doivent uniquement exporter des données, sans exécuter de code.
+
+Dans les [vues de page Markdown](/fr/ai/markdown-export), une balise `<Snippet>` est remplacée par le fichier du snippet, avec les variables de `docs.json` renseignées. Le contenu inséré est converti en Markdown avec le reste de la page.
+
+Lorsque vous importez un snippet dans un autre fichier, celui-ci n'apparaît qu'à l'endroit où vous l'importez et n'est pas affiché comme une page autonome. Tout fichier dans le dossier `/snippets/` est toujours un snippet, même s'il n'est pas importé dans un autre fichier.
+
+<div id="create-snippets">
+  ## Créer des snippets
+</div>
+
+Créez un fichier avec le contenu que vous souhaitez réutiliser. Les snippets peuvent contenir tous les types de contenu pris en charge par Mintlify et peuvent importer d'autres snippets. Consultez [Snippets imbriqués](#nested-snippets) pour savoir où déclarer les imports lors de l'imbrication.
+
+<div id="import-snippets-into-pages">
+  ## Importer des snippets dans des pages
+</div>
+
+Importez des snippets dans des pages en utilisant soit un chemin absolu, soit un chemin relatif.
+
+- **Imports absolus** : commencez par `/` pour importer depuis la racine de votre projet.
+- **Imports relatifs** : utilisez `./` ou `../` pour importer des snippets par rapport à l’emplacement du fichier courant.
+
+Le nom utilisé pour rendre un snippet importé sous forme de balise JSX doit commencer par une lettre majuscule, comme `MySnippet`. MDX traite les balises commençant par une minuscule, comme `<mySnippet />`, comme des noms littéraux d’éléments HTML ou d’éléments personnalisés plutôt que comme des références à des snippets importés. Par convention, utilisez la PascalCase pour les noms de snippets.
+
+<Tip>
+  Les imports relatifs permettent la navigation dans l’IDE. Appuyez sur <kbd>Cmd</kbd> et cliquez sur le nom d’un snippet dans votre IDE pour accéder directement à la définition de ce snippet.
+</Tip>
+
+<div id="insert-snippets-in-the-web-editor">
+  ### Insérer des snippets dans l'éditeur web
+</div>
+
+Dans l'[éditeur web](/fr/editor), tapez <kbd>/snippet</kbd> sur une page MDX et choisissez un snippet. L'éditeur ajoute un import absolu en haut de la page et affiche le snippet à l'endroit où vous l'avez inséré.
+
+La liste des snippets inclut les fichiers de votre dossier `snippets/` et les fichiers que d'autres pages importent déjà en tant que snippets.
+
+Dans une page, un snippet s'affiche sous forme d'aperçu de son contenu. Pour modifier le contenu, ouvrez le fichier du snippet depuis **Files** et modifiez-le à cet endroit. La modification apparaît sur chaque page qui importe le snippet. Vous pouvez commenter le texte à l'intérieur de l'aperçu d'un snippet.
+
+<div id="import-text">
+  ### Importer du texte
+</div>
+
+1. Ajoutez à votre fichier de snippet le contenu que vous souhaitez réutiliser.
+
+    ```mdx shared/my-snippet.mdx wrap
+    Hello world! This is my content I want to reuse across pages.
+    ```
+
+2. Importez l'extrait dans votre fichier de destination à l'aide d'un chemin absolu ou relatif.
+
+    <CodeGroup>
+
+    ```mdx Import absolu
+    ---
+    title: "Une page d'exemple"
+    description: "Ceci est une page d'exemple qui importe un extrait."
+    ---
+
+    import MySnippet from "/shared/my-snippet.mdx";
+
+    Le contenu de l'extrait s'affiche sous cette phrase.
+
+    <MySnippet />
+    ```
+
+    ```mdx Import relatif
+    ---
+    title: "Une page d'exemple"
+    description: "Ceci est une page d'exemple qui importe un extrait."
+    ---
+
+    import MySnippet from "../shared/my-snippet.mdx";
+
+    Le contenu de l'extrait s'affiche sous cette phrase.
+
+    <MySnippet />
+    ```
+
+    </CodeGroup>
+
+<div id="nested-snippets">
+  ### Snippets imbriqués
+</div>
+
+Les snippets peuvent en importer d'autres. Déclarez l'import dans le fichier du snippet qui utilise le snippet imbriqué, et non dans la page qui importe le snippet parent.
+
+Chaque fichier résout ses propres imports. Les imports déclarés dans une page ne s'appliquent pas aux snippets que la page importe. Un snippet imbriqué qui dépend d'un import déclaré au niveau de la page peut s'afficher comme du contenu vide.
+
+1. Importez le snippet imbriqué dans le fichier du snippet parent. Déclarez l'import à l'endroit où vous souhaitez utiliser le snippet imbriqué.
+
+   ```mdx shared/parent-snippet.mdx
+   import ChildSnippet from "/shared/child-snippet.mdx";
+
+   Ce snippet affiche un autre snippet sous cette phrase.
+
+   <ChildSnippet />
+   ```
+
+2. N'importez que le snippet parent dans votre fichier de destination. Vous n'avez pas besoin d'importer le snippet imbriqué.
+
+   ```mdx destination-file.mdx
+   ---
+   title: "Une page d'exemple"
+   description: "Ceci est une page d'exemple qui importe un snippet contenant un snippet imbriqué."
+   ---
+
+   import ParentSnippet from "/shared/parent-snippet.mdx";
+
+   <ParentSnippet />
+   ```
+
+Évitez les imports circulaires, dans lesquels un snippet finit par s’importer lui-même par l’intermédiaire d’un ou plusieurs autres snippets. Les imports circulaires ne se résolvent pas, et l’aperçu local cesse de répondre jusqu’à ce que vous supprimiez le cycle.
+
+<div id="import-variables">
+  ### Importer des variables
+</div>
+
+Faites référence à des variables issues d’un extrait dans une page.
+
+1. Exportez des variables depuis un fichier de fragment.
+
+    ```mdx shared/custom-variables.mdx
+    export const myName = "Ronan";
+
+    export const myObject = { fruit: "strawberries" };
+
+    ;
+    ```
+
+2. Importez l’extrait depuis votre fichier de destination et utilisez la variable.
+
+    ```mdx destination-file.mdx
+    ---
+    title: "Une page d'exemple"
+    description: "Ceci est une page d'exemple qui importe un fragment avec des variables."
+    ---
+
+    import { myName, myObject } from "/shared/custom-variables.mdx";
+
+    Bonjour, je m'appelle {myName} et j'aime {myObject.fruit}.
+    ```
+
+<Note>
+  Les navigateurs évaluent les expressions MDX, comme les variables importées `{myName}` et les expressions en ligne `{1 + 1}`. Leurs valeurs n'apparaissent ni dans le HTML initial d'une page ni dans les [exports hors ligne](/fr/deploy/export), de sorte que les crawlers, les LLM et les autres outils qui n'exécutent pas JavaScript ne voient que le texte qui les entoure. Écrivez les valeurs en texte brut si elles doivent être visibles dans ces situations.
+</Note>
+
+<div id="import-snippets-with-variables">
+  ### Importer des extraits avec des variables
+</div>
+
+Utilisez des variables pour transmettre des données à un extrait lorsque vous l’importez.
+
+1. Ajoutez des variables à votre extrait et transmettez des propriétés lorsque vous l’importez. Dans cet exemple, la variable est `{word}`.
+
+    ```mdx shared/my-snippet.mdx
+    Mon mot-clé du jour est {word}.
+    ```
+
+2. Importez l’extrait dans votre fichier de destination en utilisant la variable. La propriété que vous transmettez remplace la variable dans la définition de l’extrait.
+
+    ```mdx destination-file.mdx
+    ---
+    title: "Une page d'exemple"
+    description: "Ceci est une page d'exemple qui importe un extrait avec une variable."
+    ---
+
+    import MySnippet from "/shared/my-snippet.mdx";
+
+    <MySnippet word="bananas" />
+    ```
+
+Les variables sont également interpolées à l'intérieur des blocs de code délimités. Cela est utile pour les extraits qui incluent des commandes d'installation ou d'autres exemples de code qui diffèrent selon le nom du package, la version ou l'environnement.
+
+````mdx shared/install-snippet.mdx
+export const InstallSnippet = ({ packageName }) => <></>;
+
+Installez le package :
+
+```bash
+npm install {packageName}
+```
+````
+
+```mdx destination-file.mdx
+import InstallSnippet from "/shared/install-snippet.mdx";
+
+<InstallSnippet packageName="@myorg/sdk" />
+```
+
+<div id="import-react-components">
+  ### Importer des composants React
+</div>
+
+1. Créez un extrait avec un composant JSX. Voir [Composants React](/fr/customize/react-components) pour en savoir plus.
+
+    ```js components/my-jsx-snippet.jsx
+    export const MyJSXSnippet = () => {
+      return (
+        <div>
+          <h1>Bonjour, monde !</h1>
+        </div>
+      );
+    };
+    ```
+
+<Note>
+  Important : lors de la création d'extraits JSX, utilisez la syntaxe de fonction fléchée (`=>`) plutôt que des déclarations de fonction. Le mot‑clé `function` n'est pas pris en charge dans les extraits.
+</Note>
+
+2. Importez l'extrait.
+
+    ```mdx destination-file.mdx
+    ---
+    title: "Une page d'exemple"
+    description: "Ceci est une page d'exemple qui importe un extrait avec un composant React."
+    ---
+
+    import { MyJSXSnippet } from "/components/my-jsx-snippet.jsx";
+
+    <MyJSXSnippet />
+    ```
+
+<div id="use-global-variables">
+  ## Utiliser des variables globales
+</div>
+
+Les variables globales remplacent des valeurs courtes, comme des noms de produits ou des numéros de version, partout où elles apparaissent dans votre contenu.
+
+Définissez les variables dans l'objet [`variables`](/fr/organize/settings-reference#variables) de votre `docs.json`.
+
+```json docs.json
+"variables": {
+  "productName": "Acme",
+  "latestVersion": "2.4.0"
+}
+```
+
+Faites référence à une variable avec `{{variableName}}` dans n'importe quelle page ou n'importe quel snippet, y compris dans les blocs de code.
+
+```mdx destination-file.mdx
+Install {{productName}} version {{latestVersion}}.
+```
+
+Mintlify remplace les variables uniquement dans le contenu des pages et des snippets. Les variables ne fonctionnent pas dans les champs du frontmatter comme `title` et `description` : écrivez donc ces valeurs en texte brut.
+
+Utilisez des noms en camelCase, comme `productName`. La commande `mint broken-links` analyse les pages avant de remplacer les variables. Elle signale donc une erreur d'analyse pour chaque page qui utilise un nom de variable contenant un tiret.
+
+Pour conserver les variables dans leur propre fichier, faites pointer la clé `variables` vers un fichier JSON avec [`$ref`](/fr/organize/settings#split-configuration-with-%24ref).
+
+```json docs.json
+"variables": {
+  "$ref": "./config/variables.json"
+}
+```
+
+<div id="use-different-values-for-the-same-content">
+  ### Utiliser des valeurs différentes pour le même contenu
+</div>
+
+Chaque variable a une seule valeur pour l'ensemble du site. Pour donner au même texte une valeur différente selon les pages, utilisez plutôt un [snippet avec des props](#import-snippets-with-variables).
+
+Pour publier le même contenu sous forme de deux sites avec des valeurs différentes, comme une version en marque blanche de votre documentation, créez un site distinct pour chaque version. Le `docs.json` de chaque site définit ses propres valeurs.
+
+<div id="render-content-from-structured-data">
+  ## Afficher du contenu à partir de données structurées
+</div>
+
+Conservez des données telles qu'une liste de composants SDK, une matrice de compatibilité ou un ensemble de forfaits dans un seul snippet et affichez-les sur plusieurs pages. Lorsque vous modifiez les données, chaque tableau, liste ou carte construit à partir d'elles est mis à jour.
+
+Stockez les données sous forme d'objet JSON simple dans un snippet `.js` avec un export nommé. Écrivez ensuite un snippet `.jsx` qui transforme les données en balisage.
+
+<Note>
+  Les snippets doivent être des fichiers `.mdx`, `.md`, `.js`, `.jsx` ou `.tsx`. Vous ne pouvez pas importer directement un fichier `.json` ou `.yaml`. Conservez les données dans un snippet `.js`, ou [générez-en un à partir de votre source JSON ou YAML](#generate-snippets-and-pages-from-json-or-yaml).
+</Note>
+
+<Steps>
+  <Step title="Exporter les données depuis un snippet">
+    ```js snippets/sdk-components.js
+    export const sdkComponents = [
+      { "name": "CardForm", "version": "2.4.0", "status": "Stable", "docs": "/components/card-form" },
+      { "name": "PinReveal", "version": "1.9.2", "status": "Beta", "docs": "/components/pin-reveal" }
+    ];
+    ```
+  </Step>
+  <Step title="Créer un snippet qui affiche les données">
+    Parcourez les données avec `map()` et renvoyez des éléments HTML ou des composants Mintlify.
+
+    ```jsx snippets/components-table.jsx
+    export const ComponentsTable = ({ rows }) => (
+      <table>
+        <thead>
+          <tr>
+            <th>Composant</th>
+            <th>Version</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.name}>
+              <td><a href={row.docs}>{row.name}</a></td>
+              <td><code>{row.version}</code></td>
+              <td>{row.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+    ```
+  </Step>
+  <Step title="Importer les deux snippets et transmettre les données comme propriété">
+    Filtrez ou triez les données dans la page pour afficher un sous-ensemble sans les dupliquer.
+
+    ```mdx destination-file.mdx
+    ---
+    title: "Composants SDK"
+    description: "Tous les composants du SDK, avec leur version actuelle et leur statut."
+    ---
+
+    import { sdkComponents } from "/snippets/sdk-components.js";
+    import { ComponentsTable } from "/snippets/components-table.jsx";
+
+    Le SDK inclut {sdkComponents.length} composants.
+
+    <ComponentsTable rows={sdkComponents} />
+
+    ## Composants stables
+
+    <ComponentsTable rows={sdkComponents.filter((row) => row.status === "Stable")} />
+    ```
+  </Step>
+</Steps>
+
+<div id="generate-snippets-and-pages-from-json-or-yaml">
+  ### Générer des snippets et des pages à partir de JSON ou YAML
+</div>
+
+Si vous stockez des données dans un fichier JSON ou YAML, générez des snippets à partir de ces données sources. Utilisez un script pour écrire le snippet de données avec une page par entrée et créer le groupe de navigation correspondant. Exécutez le script en CI chaque fois que le fichier source change et validez le résultat.
+
+<Steps>
+  <Step title="Écrire le générateur">
+    Ce script lit `sdk-components.yaml`, écrit le snippet de l'exemple précédent, crée une page pour chaque composant et remplace les pages du groupe de navigation nommé "Components" dans `docs.json`.
+
+    ```js scripts/generate-docs.mjs
+    import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+    import { parse } from "yaml";
+
+    const components = parse(readFileSync("sdk-components.yaml", "utf8"));
+    const slug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+    // Un snippet avec toutes les données, pour les tableaux et listes n'importe où dans la documentation.
+    writeFileSync("snippets/sdk-components.js", `export const sdkComponents = ${JSON.stringify(components, null, 2)};\n`);
+
+    // Une page par composant.
+    mkdirSync("components", { recursive: true });
+    for (const component of components) {
+      const page = `---
+    title: ${JSON.stringify(component.name)}
+    description: ${JSON.stringify(component.description)}
+    ---
+
+    {/* Généré à partir de sdk-components.yaml par scripts/generate-docs.mjs. Modifiez le YAML, pas ce fichier. */}
+
+    | Champ | Valeur |
+    | --- | --- |
+    | Version | \`${component.version}\` |
+    | Statut | ${component.status} |
+    `;
+      writeFileSync(`components/${slug(component.name)}.mdx`, page);
+    }
+
+    // Garder la navigation synchronisée : remplacer les pages du groupe nommé "Components", où qu'il se trouve.
+    const docs = JSON.parse(readFileSync("docs.json", "utf8"));
+    const findGroup = (node) => (Array.isArray(node) ? node.map(findGroup).find(Boolean) : node && typeof node === "object" ? (node.group === "Components" ? node : findGroup(Object.values(node))) : undefined);
+    const group = findGroup(docs.navigation);
+    if (group) {
+      group.pages = components.map((component) => `components/${slug(component.name)}`);
+      writeFileSync("docs.json", `${JSON.stringify(docs, null, 2)}\n`);
+    }
+    ```
+
+    Pour une source JSON, remplacez `parse()` par `JSON.parse()` et supprimez la dépendance `yaml`. Exécuter le script deux fois produit des fichiers identiques, il peut donc être exécuté à chaque push en toute sécurité.
+  </Step>
+  <Step title="L'exécuter dans une GitHub Action">
+    Le workflow s'exécute lorsque le fichier source ou le script change, puis valide ce que le script a produit. Le `GITHUB_TOKEN` par défaut ne déclenche pas d'autres workflows quand il pousse, donc le job ne peut pas boucler. Mintlify déploie le push comme n'importe quel autre commit.
+
+    ```yaml .github/workflows/generate-docs.yml
+    name: Generate docs from YAML
+
+    on:
+      push:
+        paths:
+          - sdk-components.yaml
+          - scripts/generate-docs.mjs
+      workflow_dispatch:
+
+    permissions:
+      contents: write
+
+    jobs:
+      generate:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-node@v4
+            with:
+              node-version: 22
+          - run: npm install yaml
+          - run: node scripts/generate-docs.mjs
+          - name: Commit generated files
+            run: |
+              git add -A
+              if git diff --cached --quiet; then
+                echo "Nothing changed."
+                exit 0
+              fi
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git commit -m "docs: regenerate from sdk-components.yaml"
+              git push
+    ```
+
+    Si vous stockez le fichier source dans un autre dépôt, exécutez le workflow là-bas à la place. Récupérez le dépôt de documentation avec un jeton qui peut y pousser, exécutez le script et validez.
+  </Step>
+</Steps>

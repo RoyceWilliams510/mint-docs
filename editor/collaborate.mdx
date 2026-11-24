@@ -1,0 +1,111 @@
+---
+title: "Collaborate in the editor"
+sidebarTitle: "Collaborate"
+description: "Leave comments, propose changes as suggestions, and edit alongside teammates in real time in the editor."
+keywords: ["comments", "suggestions", "collaboration", "review", "mentions", "real time"]
+---
+
+Work with your team on a page by commenting on it, suggesting changes to it, or editing it together at the same time.
+
+Comments and suggestions don't block publishing. To require a teammate's approval before changes on your deployment branch go live, see [Require review before publishing](/editor/review#require-review-before-publishing).
+
+## Comments
+
+<Info>
+  All [roles](/dashboard/roles) can comment, reply, and resolve threads. If your organization uses [expanded roles](/dashboard/roles#expanded-roles), viewers can read comments but can't add them. To let someone comment without editing, give them the commenter role.
+</Info>
+
+Comments let you leave feedback on specific text or on a whole page without editing the content.
+
+**Comments never reach your repository.** They only appear in the editor. Mintlify never includes them in your published site and never commits them to Git. If your repository is on GitHub or GitLab and your branch has an open pull request, Mintlify adds a summary of unresolved threads to the pull request description, with a link back to each comment. The summary updates as threads change. Threads copied from another branch by [Auto-create branches](/editor/settings#auto-create-branches) join the summary once someone replies to, edits, or resolves them.
+
+To add a comment, highlight text and click the <Icon icon="message-square-text" /> **Comment** icon in the toolbar or press <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (macOS) or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (Windows).
+
+To comment on a whole block, such as a paragraph, code block, image, table, or component, hover over the block, click <Icon icon="grip-vertical" /> **Block actions**, and select **Comment**. You can also place your cursor in the block without selecting any text and press <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (macOS) or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (Windows). If someone deletes a block that has an unresolved comment, the thread moves beside the page title with a note that the commented block was removed.
+
+To comment on the whole page instead of specific text, use either of these options:
+
+- Hover over the page title and click **Add comment**.
+- In the comments panel, click **New comment**.
+
+Page comments appear beside the page title.
+
+Type `@` to mention a teammate in a comment. They must be a member of your organization who has accepted their invitation. When you mention a teammate in a comment, they receive an email notification and an item in their [inbox](/dashboard/inbox). Manage which comment and suggestion emails you receive from the [Notifications](/dashboard/notifications) page of your dashboard.
+
+Replies to threads you started or were mentioned in, and new comments and suggestions on pages you own, also appear in your inbox.
+
+Comment threads appear in both visual and source mode. In source mode, you can read, reply to, and resolve existing threads, but starting a new comment requires visual mode.
+
+To see every thread on the current page:
+
+1. Click <Icon icon="ellipsis" /> **More options** in the top-right of the page.
+2. Click **Comments**.
+
+React to a comment to acknowledge it without replying. Hover over a comment, click the **Add reaction** button, and select an emoji. Reacting to someone else's comment notifies the comment's author.
+
+{/* vale Vale.Terms = NO */}
+To react to text on the page, highlight the text, click **Add reaction** in the toolbar, and select an emoji. Mintlify adds a comment on the highlighted text with the emoji as its content. Teammates can reply to, react to, resolve, or delete it like any other comment. Reacting to text requires visual mode.
+{/* vale Vale.Terms = YES */}
+
+To edit or delete a comment you wrote, click **More actions** on the comment. You can only edit your own comments. You can delete your own comments, and if your organization uses [roles](/dashboard/roles), admins can delete any comment or thread. Deleting the first comment in a thread deletes the entire thread.
+
+## Mentions in page content
+
+Type `@` while editing a page to open the mention menu. Mentions work in both visual and source mode.
+
+- **Mention a teammate** to reference them in the page content. If they have access to the page, Mintlify emails them and adds an item to their [inbox](/dashboard/inbox).
+- **Mention a page** to insert a link to it. Mintlify uses the page's title as the link text.
+
+Turn page mention emails on or off with the **Page @mention** setting on the [Notifications](/dashboard/notifications) page of your dashboard. This setting doesn't affect your inbox.
+
+## Suggestions
+
+Suggestions propose a change while leaving the current content in place, so a teammate can accept or reject it.
+
+Editors and admins can accept or reject any suggestion. Viewers cannot.
+
+To make a suggestion, highlight text and click **Switch to suggesting** in the toolbar, or press <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> (macOS) or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> (Windows). In suggesting mode, a **Suggesting** label appears in the top bar, and your deletions and insertions appear as highlighted text rather than edits. Formatting changes also become suggestions, including bold, italic, underline, strikethrough, and inline code. The text previews the proposed formatting, but the formatting applies only when someone accepts the suggestion. Click the label to go back to editing. Pending suggestions appear beside the page and in the comments panel.
+
+Suggesting mode works only in visual mode. While suggesting mode is on, you can't switch to source mode. Turn off suggesting mode to edit the MDX directly.
+
+<Note>
+  [Viewers](/dashboard/roles) are always in suggesting mode. Suggesting mode activates automatically when a viewer opens the editor so that they can propose changes without editing content directly. Members with the [commenter role](/dashboard/roles#expanded-roles) aren't switched to suggesting mode. They can comment on a page but can't edit it.
+</Note>
+
+Click a highlighted suggestion, then click **Accept suggestion** or **Reject suggestion**. Either choice resolves the suggestion thread. An accepted change becomes part of your current branch and goes live the next time you [publish](/editor/publish).
+
+## Ask the Mintlify agent
+
+Mention `@mintlify` in a comment, suggestion, or reply to ask the [editor agent](/editor/agent) about the current page. The agent runs in the background with the page, thread, and branch as context, then posts its answer as a reply in the same thread.
+
+```text
+@mintlify does this endpoint support pagination?
+@mintlify is this explanation clear for someone new to the API?
+```
+
+To ask about specific text, highlight it and click <Icon icon="square-sparkles" /> **Ask Mintlify** in the toolbar. Mintlify opens a new comment on the highlighted text with `@mintlify` already added, so you only need to type your question.
+
+If you can edit content, you can also ask the agent to change the page from the thread. Admins and editors can edit content. Without [role-based access control](/dashboard/roles), every member can.
+
+```text
+@mintlify fix the typo in this sentence
+```
+
+The agent edits the page on the thread's branch only when your comment explicitly asks for a change. For questions, feedback, or suggestions, it answers and offers to make the change instead. When it edits the page, its reply says what it changed. The agent doesn't publish, so review its changes and [publish](/editor/publish) them yourself.
+
+For [viewers](/dashboard/roles), the agent replies read-only. It can read pages and their open comments, view images, search and fetch web content, and search Mintlify's documentation, but it can't edit content.
+
+Mentions work on private pages for members who already have access.
+
+## Real-time editing
+
+When multiple people open the same page on the same branch, they edit together. Each person's cursor and edits are visible to everyone, with avatars in the toolbar.
+
+Real-time editing works in both visual mode and source mode. You can edit the MDX in source mode while a teammate works in visual mode on the same page. Their cursor and selection appear in your editor, and yours appear in theirs, including in the title and description fields.
+
+- Changes from all collaborators merge automatically. Two people editing the same section won't create conflicts.
+- Undo only affects your own edits.
+- If you lose your connection, edits save locally and sync when you reconnect.
+- In source mode, invalid MDX or frontmatter YAML stays local to you until you fix it. Teammates only receive valid content, and invalid MDX [blocks publishing](/editor/publish#invalid-mdx-blocks-publishing) until it's repaired.
+
+When the [Mintlify agent](/agent) edits a page through the API or MCP, it appears like any other collaborator, with an avatar and a live cursor at its most recent edit. The cursor clears when the agent finishes.

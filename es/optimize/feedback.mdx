@@ -1,0 +1,126 @@
+---
+title: "Recopilar comentarios de usuarios y agentes de IA"
+description: "Activa widgets de comentarios, calificaciones, notas contextuales, reacciones en fragmentos de código y comentarios de agentes para mejorar tus docs."
+keywords: ["user feedback", "thumbs rating", "contextual", "satisfaction", "agents"]
+boost: 3
+---
+
+<Info>
+  Los comentarios requieren un [plan Pro o Enterprise](https://mintlify.com/pricing?ref=feedback). Contextual feedback y code snippet feedback requieren un [plan Enterprise](https://mintlify.com/pricing?ref=feedback).
+</Info>
+
+La sección **Feedback** de la página de [analíticas](https://app.mintlify.com/analytics) muestra las calificaciones de pulgar arriba y pulgar abajo de tus páginas y los comentarios escritos que envían los usuarios y los agentes de IA. Utiliza esta información para evaluar la calidad de tu contenido y realizar mejoras.
+
+La sección Feedback tiene dos tarjetas:
+
+- **Page ratings**: Calificaciones de pulgar arriba y pulgar abajo de los usuarios, agrupadas por página.
+- **Detailed feedback**: Comentarios que incluyen contenido escrito, como comentarios, comentarios sobre fragmentos de código y [comentarios de agentes](#agent-feedback).
+
+Filtra la sección Feedback por período de tiempo o por [página o ruta](/es/analytics#filter-by-page-or-path).
+
+El total de **Feedback** en la vista [Traffic](/es/analytics/traffic) cuenta todos los comentarios de página del período de tiempo seleccionado, incluidas las calificaciones con pulgar, los comentarios sobre fragmentos de código y los comentarios de agentes. Las calificaciones de las respuestas del assistant se registran por separado como satisfacción en la vista [Assistant](/es/analytics/assistant) y no cuentan en los totales de comentarios.
+
+Revisa tus datos de comentarios para:
+
+- **Identificar contenido exitoso**: Las páginas con más comentarios positivos muestran qué funciona bien en tu documentación.
+- **Priorizar mejoras**: Las páginas con más comentarios negativos indican qué contenido podría necesitar atención.
+- **Tomar medidas**: Realiza actualizaciones en la documentación basadas en los comentarios directos de los usuarios.
+
+<Frame>
+  <img
+    className="block dark:hidden"
+    src="/images/analytics/feedback-light.png"
+    alt="Pestaña de comentarios en la página de analíticas."
+  />
+
+  <img
+    className="hidden dark:block"
+    src="/images/analytics/feedback-dark.png"
+    alt="Pestaña de comentarios en la página de analíticas."
+  />
+</Frame>
+
+<div id="enable-feedback">
+  ## Habilitar comentarios
+</div>
+
+<Note>
+  Si desactivas la telemetría en tu archivo `docs.json`, no podrás habilitar las funciones de comentarios.
+</Note>
+
+Para recopilar y ver los comentarios de los usuarios, debes habilitar los comentarios en la sección **Feedback** de la página de configuración [Sitio](https://app.mintlify.com/settings/project/site) en tu panel.
+
+1. Navega a la página de configuración [Sitio](https://app.mintlify.com/settings/project/site).
+2. En la sección **Feedback**, habilita los tipos de comentarios que desees.
+  * **Thumbs rating**: Votación simple con pulgar arriba/abajo para evaluar la satisfacción general con las páginas.
+  * **Edit suggestions**: Permite a los usuarios sugerir modificaciones a tu documentación. Solo disponible para repositorios públicos.
+  * **Raise issues**: Permite a los usuarios crear issues directamente desde tu sitio. Solo disponible para repositorios públicos.
+  * **Contextual feedback**: Comentarios de formato libre sobre el contenido de una página. Opcionalmente, habilita la recopilación de correos electrónicos para permitir que los usuarios proporcionen su dirección de correo al enviar comentarios.
+  * **Code snippet feedback**: Comentarios específicamente sobre fragmentos de código.
+
+<div id="review-feedback">
+  ## Revisar comentarios
+</div>
+
+<div id="page-ratings">
+  ### Calificaciones de página
+</div>
+
+La tarjeta **Page ratings** muestra las páginas con sus recuentos de pulgar arriba y pulgar abajo. Ordena por **Most negative** o **Most positive** para encontrar las páginas que los usuarios consideran menos y más útiles.
+
+Las calificaciones con pulgar también cuentan como acciones en la vista [User engagement](/es/analytics/user-engagements).
+
+<div id="detailed-feedback">
+  ### Comentarios detallados
+</div>
+
+La tarjeta **Detailed feedback** muestra los comentarios que incluyen información adicional. Los envíos que utilizan únicamente la calificación de pulgar arriba o pulgar abajo sin un comentario aparecen en **Page ratings**, no en **Detailed feedback**.
+
+Utiliza el menú de filtros para acotar la lista:
+
+- **Sentiment**: Muestra los comentarios calificados de forma positiva, negativa o ambas.
+- **Type**: Muestra **Comments**, **Agent feedback**, **Code blocks** o cualquier combinación.
+
+Selecciona un comentario para ver sus detalles, incluidos la página, el tipo y la fecha. Para analizar los comentarios fuera del dashboard, [expórtalos a CSV](/es/analytics/export).
+
+<div id="dismiss-feedback">
+  ### Descartar comentarios
+</div>
+
+Descarta los comentarios irrelevantes o inexactos. Selecciona **Dismiss** en el menú de un comentario o en su panel de detalles. Los comentarios descartados ya no aparecen en la tarjeta **Detailed feedback**.
+
+<div id="agent-feedback">
+  ## Comentarios de agentes
+</div>
+
+<Note>
+  Los comentarios de agentes están en beta y sujetos a cambios.
+</Note>
+
+Los agentes de IA de terceros pueden enviar comentarios estructurados sobre páginas que consideran incorrectas, desactualizadas o difíciles de usar.
+
+Estos comentarios aparecen en la tarjeta **Detailed feedback**. Para mostrar solo los comentarios de agentes, selecciona **Agent feedback** en el filtro **Type**. Todos los demás comentarios de la sección Feedback provienen de usuarios humanos. Gestiona los comentarios de agentes de la misma manera que los comentarios humanos.
+
+<div id="how-agent-feedback-works">
+  ### Cómo funcionan los comentarios de agentes
+</div>
+
+Conecta un agente al [servidor Search MCP](/es/ai/model-context-protocol) de tu sitio. El servidor proporciona una herramienta `submit_feedback` que requiere la ruta de la página y una descripción del problema.
+
+<Note>
+  Las herramientas de búsqueda y obtención web no conectan a un agente con el servidor Search MCP. El agente debe estar conectado al servidor para descubrir y llamar a la herramienta `submit_feedback`.
+</Note>
+
+La ruta debe coincidir con una página de tu sitio o con el origen de una de tus [redirecciones](/es/create/redirects). Puedes pasar una ruta relativa o una URL completa. Las cadenas de consulta, los fragmentos, las extensiones `.md` y `.mdx`, y la ruta base de tu sitio no afectan a la coincidencia. Si ninguna página coincide, la herramienta `submit_feedback` devuelve un error y el envío no se registra.
+
+Mintlify registra cada envío aceptado como un comentario no útil para la página especificada. Los comentarios aparecen en el panel junto con los comentarios humanos.
+
+<div id="retrieve-agent-feedback-via-api">
+  ### Recuperar los comentarios de agentes vía API
+</div>
+
+Utiliza el [endpoint de comentarios de analíticas](/es/api/analytics/feedback) para recuperar los comentarios de agentes de forma programática. Filtra por `source=agent` para devolver únicamente los comentarios de agentes.
+
+Las respuestas de comentarios de agentes incluyen:
+- `comment`: El texto del comentario enviado por el agente.
+- `path`: La ruta de la página sobre la que trata el comentario.

@@ -1,0 +1,691 @@
+---
+title: "Custom scripts"
+description: "Add custom JavaScript and CSS for analytics, widgets, styling, third-party integrations, and API playground server variables on your documentation site."
+keywords: ["CSS", "JavaScript", "Tailwind CSS", "style customization", "API Playground", "server variables"]
+---
+
+Use CSS to style HTML elements or add custom CSS and JavaScript to fully customize the look and feel of your documentation.
+
+## Style with Tailwind CSS
+
+Use Tailwind CSS v3 to style HTML elements and components. You can control layout, spacing, colors, and other visual properties. Some common classes are:
+
+- `w-full` - Full width
+- `aspect-video` - 16:9 aspect ratio
+- `rounded-xl` - Large rounded corners
+- `block`, `hidden` - Display control
+- `dark:hidden`, `dark:block` - Dark mode visibility
+
+### Style components with `className`
+
+Components accept a `className` prop. Mintlify merges your classes with the component's own styles, so you can restyle a single instance without wrapping it in extra markup or writing a CSS override.
+
+```mdx className example
+<Note className="mt-0">This callout has no top margin.</Note>
+
+<Card title="Quickstart" href="/quickstart" className="border-2 border-blue-500">
+  Deploy your first documentation site.
+</Card>
+```
+
+Three components do not accept `className`: [Banner](/components/banner), [MDX](/components/mdx), and [Visibility](/components/visibility).
+
+### Arbitrary values and variants
+
+Use arbitrary values when no utility class covers the value that you need.
+
+```mdx Arbitrary value examples
+<img src="/images/diagram.png" alt="System architecture diagram" className="w-[450px]" />
+
+<Frame className="lg:w-[calc(100%-2rem)] bg-[#0f172a]">
+  <img src="/images/hero.png" alt="Product hero image" />
+</Frame>
+```
+
+Variants work as they do in any Tailwind project, including responsive prefixes (`sm:`, `md:`, `lg:`), state variants (`hover:`, `focus:`), `dark:`, data attribute variants (`data-[state=open]:`), opacity modifiers (`bg-black/50`), and the `!` important modifier.
+
+Mintlify generates CSS for the Tailwind classes that it finds in your page source, so write class names out in full.
+
+```mdx Write class names in full
+{/* Generates CSS: the full class name appears in the page source. */}
+<div className="bg-blue-500" />
+
+{/* Generates no CSS: the class name is assembled at runtime. */}
+<div className={`bg-${color}-500`} />
+```
+
+<Note>
+  The web editor's live preview does not generate CSS for page-specific Tailwind classes, so a styled page can look unstyled while you edit it. See [Tailwind classes not applying in the editor's live preview](/help-center/tailwind-classes-not-applying-in-editor-preview).
+</Note>
+
+<Warning>
+  Avoid the `style` prop. It can cause a layout shift on page load, especially on custom mode pages. Use Tailwind CSS classes or custom CSS files instead.
+</Warning>
+
+## Add custom CSS
+
+Mintlify includes any `.css` file inside your content directory on every page of your site. The content directory is the folder in your repository that contains your `docs.json` file and MDX pages. You do not need to import or reference the file from `docs.json` or your MDX files.
+
+To add custom styles, create a `.css` file in your content directory. Any class names, ID selectors, or element selectors you define become available across all of your MDX files.
+
+For example, define a class in `style.css`:
+
+```css Example style.css
+.my-callout {
+  border-radius: 1rem;
+  background: #f0f9ff;
+  padding: 1rem;
+}
+```
+
+You can combine custom class names with [Tailwind CSS](#style-with-tailwind-css) classes on the same element.
+
+The references and styling of common elements are subject to change. Use custom styling with caution since breaking changes may occur in future updates.
+
+For example, you can add the following `style.css` file to customize the styling of the navbar and footer.
+
+```css
+#navbar {
+  background: #fffff2;
+  padding: 1rem;
+}
+
+footer {
+  margin-top: 2rem;
+}
+```
+
+CSS targeting hooks use different syntax:
+
+- **ID selectors**: unique page-level elements targeted with `#value { }` in CSS
+- **Class selectors**: component and layout classes targeted with `.value { }` in CSS, such as `.card`.
+- **Element selectors**: HTML tags targeted with `value { }` in CSS, such as `footer`.
+- **Attribute selectors**: component parts or states targeted with brackets, such as `[data-component-part="card-icon"]`.
+
+These selectors are not interchangeable. For example, `.card` targets a class, while `card` targets a tag named `<card>`. Hooks depend on the rendered theme, component, configuration, and state. See the [customization skill](/customize/agent-skill) for exact syntax, availability, lifecycle, and compatibility references.
+
+<Tip>
+  Use inspect element to find references to elements you're looking to customize.
+</Tip>
+
+### ID selectors
+
+Use these as `#value` in CSS. For example, `#navbar { background: red; }`. A hook exists only when its owning element renders; inspect the active mounted layout during navigation transitions.
+
+<AccordionGroup>
+<Accordion title="Page layout">
+  - `#body-content`: Outermost wrapper for the page body.
+  - `#content-area`: Primary content area, excluding the sidebar and table of contents.
+  - `#content`: Inner content element within the content area.
+  - `#header`: Page-level header element.
+  - `#banner`: Announcement banner displayed above the navbar.
+  - `#footer`: Page footer. Also targetable as an element selector: `footer`.
+  - `#page-title`: The `<h1>` heading at the top of each page.
+  - `#pagination`: Bottom pagination bar with previous and next page links.
+  - `#panel`: Floating panel overlay. Also targetable as an element selector: `panel`.
+  - `#background-color`: Page background color element.
+</Accordion>
+<Accordion title="Navigation">
+  - `#navbar`: Top navigation bar.
+  - `#topbar-cta-button`: Call-to-action button in the topbar.
+  - `#mobile-nav`: Mobile navigation overlay.
+  - `#mobile-nav-content`: Content area within the mobile navigation overlay.
+</Accordion>
+<Accordion title="Sidebar">
+  - `#sidebar`: The sidebar navigation panel.
+  - `#sidebar-content`: Scrollable content area within the sidebar.
+</Accordion>
+<Accordion title="Table of contents">
+  - `#table-of-contents`: Table of contents panel on the right side of the page.
+  - `#table-of-contents-layout`: Layout wrapper for the table of contents.
+  - `#table-of-contents-content`: Scrollable content within the table of contents.
+</Accordion>
+<Accordion title="Search">
+  - `#search-bar-entry`: Search bar trigger in the topbar.
+  - `#search-bar-entry-mobile`: Search bar trigger on mobile.
+  - `#search-input`: Text input field within the search modal.
+</Accordion>
+<Accordion title="AI assistant">
+  - `#assistant-entry`: AI assistant button in the topbar.
+  - `#assistant-entry-mobile`: AI assistant button on mobile.
+  - `#chat-assistant-sheet`: AI assistant chat panel.
+  - `#chat-assistant-textarea`: Text input within the AI assistant panel.
+</Accordion>
+<Accordion title="API reference">
+  - `#request-example`: Request example panel in the API playground.
+  - `#response-example`: Response example panel in the API playground.
+  - `#api-playground-input`: Input section of the API playground.
+  - `#endpoints-menu-trigger`: Button that opens the endpoint selector dropdown.
+</Accordion>
+<Accordion title="Code blocks">
+  - `#ask-assistant-code-block-button`: "Ask Assistant" button that appears on code blocks.
+  - `#code-snippet-feedback-button`: Feedback button on code snippets.
+  - `#code-snippet-feedback-textarea`: Text area within the code snippet feedback form.
+</Accordion>
+<Accordion title="Feedback">
+  - `#feedback-thumbs-up`: Thumbs-up feedback button at the bottom of a page.
+  - `#feedback-thumbs-down`: Thumbs-down feedback button at the bottom of a page.
+  - `#feedback-form`: Feedback form shown after a thumbs-down response.
+  - `#feedback-form-input`: Text input within the feedback form.
+  - `#feedback-form-cancel`: Cancel button within the feedback form.
+  - `#feedback-form-submit`: Submit button within the feedback form.
+</Accordion>
+<Accordion title="Page context menu">
+  - `#page-context-menu`: Contextual options menu for the current page.
+  - `#page-context-menu-button`: Button that triggers the page context menu.
+</Accordion>
+<Accordion title="Localization">
+  - `#localization-select-trigger`: Button that opens the language selector.
+  - `#localization-select-content`: Dropdown content of the language selector.
+  - `#localization-select-item`: Individual language option within the selector.
+</Accordion>
+<Accordion title="Changelog">
+  - `#changelog-filters`: Filter controls on a changelog page.
+  - `#changelog-filters-content`: Content area within the changelog filter panel.
+</Accordion>
+<Accordion title="Multi-view">
+  - `#multi-view-dropdown`: Dropdown for switching between documentation views.
+</Accordion>
+<Accordion title="Text selection">
+  - `#text-selection-tooltip`: Tooltip that appears when you select text on a page.
+  - `#text-selection-tooltip-button`: Action button within the text selection tooltip.
+</Accordion>
+</AccordionGroup>
+
+### Class and element hooks
+
+Multiple instances of these hooks can appear on a page. The list gives hook names; inspect the rendered element to determine whether the name is a class or a tag. For example, use `.accordion { border: 1px solid red; }` for the accordion class and `footer { margin-top: 2rem; }` for the HTML footer element.
+
+<AccordionGroup>
+  <Accordion title="Content components">
+    - `accordion`: Collapsible accordion item.
+    - `accordion-group`: Wrapper grouping multiple accordions.
+    - `callout`: Callout block (Note, Warning, Tip, etc.).
+    - `card`: Individual card element.
+    - `card-group`: Wrapper grouping multiple cards. Deprecated in favor of `columns`, but preserved for backward compatibility.
+    - `columns`: Multi-column layout wrapper.
+    - `code-block`: Code block element.
+    - `code-block-icon`: Icon displayed in a code block header.
+    - `code-block-copy-button`: Copy button shown on a code block. Hide it with `.code-block-copy-button { display: none; }`.
+    - `code-block-fade-overlay`: Fade overlay shown at the bottom of a collapsed code block.
+    - `code-group`: Tabbed group of code blocks.
+    - `expandable`: Expandable section element.
+    - `frame`: Frame wrapper for images or embedded content.
+    - `icon`: Inline icon element.
+    - `mermaid`: Mermaid diagram wrapper.
+    - `step`: Individual step within a steps sequence.
+    - `steps`: Numbered steps container.
+    - `tab-icon`: Icon displayed within a tab.
+    - `tabs`: Tabbed content container.
+    - `tile`: Tile component element.
+    - `tooltip`: Tooltip element.
+    - `update`: Changelog update entry.
+  </Accordion>
+  <Accordion title="Page layout">
+    - `mdx-content`: Rendered MDX content area.
+    - `panel`: Floating panel component. Also targetable as an ID selector: `#panel`.
+    - `eyebrow`: Small label displayed above a page title.
+    - `link`: Anchor link element.
+    - `breadcrumb-list`: Breadcrumb navigation list.
+    - `breadcrumb-item`: Individual breadcrumb item.
+  </Accordion>
+  <Accordion title="Topbar navigation">
+    - `nav-logo`: Logo image in the navigation bar. To override its default size utilities, target `img.nav-logo` and use `!important`.
+
+      ```css
+      img.nav-logo {
+        height: 3.75rem !important;
+        width: auto !important;
+      }
+      ```
+    - `navbar-link`: Link element within the navigation bar.
+    - `nav-anchors`: Container for anchor links in the topbar.
+    - `nav-anchor`: Individual anchor link in the topbar.
+    - `nav-tabs`: Tab bar in the top navigation.
+    - `nav-tabs-item`: Individual tab item in the top navigation tab bar.
+    - `mobile-nav-tabs-item`: Tab item in the mobile navigation tab bar.
+    - `topbar-right-container`: Right section of the topbar.
+    - `nav-tag-pill`: Tag pill shown in the navigation.
+    - `nav-tag-pill-text`: Text within a navigation tag pill.
+  </Accordion>
+  <Accordion title="Topbar dropdown">
+    - `nav-dropdown-trigger`: Button that opens a navigation dropdown.
+    - `nav-dropdown-content`: Content container for a navigation dropdown.
+    - `nav-dropdown-item`: Individual item within a navigation dropdown.
+    - `nav-dropdown-item-text-container`: Text wrapper within a dropdown item.
+    - `nav-dropdown-item-title`: Title text within a dropdown item.
+    - `nav-dropdown-item-description`: Description text within a dropdown item.
+    - `nav-dropdown-item-icon`: Icon within a dropdown item.
+  </Accordion>
+  <Accordion title="Products selector">
+    - `nav-dropdown-products-selector-trigger`: Button that opens the products selector dropdown.
+    - `nav-dropdown-products-selector-content`: Content container for the products selector.
+    - `nav-dropdown-products-selector-item`: Individual product in the selector.
+    - `nav-dropdown-products-selector-item-title`: Title of a product selector item.
+    - `nav-dropdown-products-selector-item-description`: Description of a product selector item.
+    - `nav-dropdown-products-selector-item-icon`: Icon of a product selector item.
+  </Accordion>
+  <Accordion title="Sidebar">
+    - `sidebar-group`: Group of related sidebar links.
+    - `sidebar-group-icon`: Icon for a sidebar group.
+    - `sidebar-group-header`: Header label for a sidebar group.
+    - `sidebar-title`: Top-level title in the sidebar.
+    - `sidebar-nav-group-divider`: Divider between sidebar navigation groups.
+    - `login-link`: Log in link on sites with authentication. Appears on both the navigation bar and sidebar versions of the link. In the sidebar, the class is on the `li` element, so use `event.target.closest('.login-link')` to match clicks in custom JavaScript.
+    - `logout-link`: Log out link on sites with authentication. Appears on both the navigation bar and sidebar versions of the link. In the sidebar, the class is on the `li` element.
+  </Accordion>
+  <Accordion title="Table of contents">
+    - `toc`: Table of contents container.
+    - `toc-item`: Individual heading entry in the table of contents.
+  </Accordion>
+  <Accordion title="Footer">
+    - `footer`: Standard page footer. Also targetable as an ID selector: `#footer`.
+    - `advanced-footer`: Extended footer with additional columns or content.
+  </Accordion>
+  <Accordion title="Pagination">
+    - `pagination-prev`: Previous page link in the pagination bar.
+    - `pagination-next`: Next page link in the pagination bar.
+    - `pagination-title`: Page title shown in the pagination bar.
+  </Accordion>
+  <Accordion title="API reference">
+    - `api-section`: Full section for a single API endpoint.
+    - `api-section-heading`: Heading area for an API endpoint section.
+    - `api-section-heading-title`: Title within an API endpoint section heading.
+    - `api-section-heading-subtitle`: Subtitle within an API endpoint section heading.
+    - `field`: Parameter or property field in the API reference.
+    - `option-dropdown`: Dropdown for selecting between API options.
+    - `tryit-button`: "Try it" button that opens the API playground.
+    - `method-pill`: HTTP method badge (GET, POST, etc.) on an endpoint.
+    - `method-nav-pill`: HTTP method badge shown in the sidebar navigation.
+    - `prompt`: Prompt component in the API reference.
+  </Accordion>
+  <Accordion title="AI assistant">
+    - `chat-assistant-sheet`: AI assistant panel container.
+    - `chat-assistant-sheet-header`: Header of the AI assistant panel.
+    - `chat-assistant-sheet-content`: Content area of the AI assistant panel.
+    - `chat-assistant-input`: Text input within the AI assistant panel.
+    - `chat-assistant-floating-input`: Floating input variant of the AI assistant.
+    - `chat-assistant-send-button`: Send button in the AI assistant panel.
+    - `chat-assistant-disclaimer-text`: Disclaimer text displayed in the AI assistant panel.
+    - `chat-assistant-payload-item`: Individual message or result item in the assistant panel.
+    - `starter-question-text`: Suggested starter question shown in an empty assistant panel.
+    - `chat-assistant-contact-form`: Contact form in the AI assistant panel. See [Style the contact form](/assistant/use#style-the-contact-form) for the classes on its fields, labels, and buttons.
+  </Accordion>
+  <Accordion title="Feedback">
+    - `feedback-toolbar`: Toolbar containing page feedback controls.
+    - `contextual-feedback-container`: Container for contextual inline feedback.
+    - `contextual-feedback-form`: Inline contextual feedback form.
+    - `contextual-feedback-form-title`: Title of the contextual feedback form.
+    - `contextual-feedback-input`: Text input within the contextual feedback form.
+    - `contextual-feedback-button`: Action button within the contextual feedback form.
+    - `contextual-feedback-form-submit-button`: Submit button for the contextual feedback form.
+  </Accordion>
+  <Accordion title="Code snippet feedback">
+    - `code-snippet-feedback-popover-content`: Popover content for code snippet feedback.
+    - `code-snippet-feedback-form`: Feedback form for a code snippet.
+    - `code-snippet-feedback-textarea`: Text area within the code snippet feedback form.
+    - `code-snippet-feedback-form-title`: Title of the code snippet feedback form.
+    - `code-snippet-feedback-form-description`: Description text in the code snippet feedback form.
+    - `code-snippet-feedback-form-submit-button`: Submit button for the code snippet feedback form.
+  </Accordion>
+  <Accordion title="Authentication">
+    - `login-link`: Link that initiates the login flow.
+    - `logout-link`: Link that initiates the logout flow.
+  </Accordion>
+  <Accordion title="Multi-view">
+    - `multi-view-item`: Individual view option in a multi-view switcher.
+    - `multi-view-dropdown`: Dropdown for selecting between multiple views.
+    - `multi-view-dropdown-trigger`: Button that opens the multi-view dropdown.
+    - `multi-view-dropdown-content`: Content area of the multi-view dropdown.
+    - `multi-view-dropdown-item`: Individual item within the multi-view dropdown.
+  </Accordion>
+  <Accordion title="Directory">
+    - `directory`: Root container for a directory page.
+    - `directory-group`: Group of related pages within a directory.
+    - `directory-page`: Individual page entry in a directory.
+    - `directory-card`: Card-style page entry in a directory.
+  </Accordion>
+  <Accordion title="404 page">
+    - `not-found-container`: Root container of the 404 page.
+    - `not-found-status-code`: Status code display on the 404 page.
+    - `not-found-title`: Title heading on the 404 page.
+    - `not-found-description`: Description text on the 404 page.
+    - `not-found-recommended-pages-list`: List of recommended pages shown on the 404 page.
+    - `not-found-recommended-page-link`: Individual link in the recommended pages list.
+  </Accordion>
+  <Accordion title="Color">
+    - `color`: Color swatch element.
+    - `color-row`: Row grouping color swatches.
+    - `color-item`: Individual color item within a color row.
+  </Accordion>
+  <Accordion title="Tree">
+    - `tree`: File tree container.
+    - `tree-folder`: Folder entry within a file tree.
+    - `tree-file`: File entry within a file tree.
+  </Accordion>
+  <Accordion title="Data attributes">
+    Some elements expose data attributes you can use as CSS selectors.
+
+    Active state (`data-active`):
+
+    - `nav-dropdown-item[data-active]`: Active item in a nav dropdown.
+    - `mobile-nav-tabs-item[data-active]`: Active tab in the mobile nav.
+    - `.sidebar-group:has(> li[data-active])`: Sidebar group containing the current page. The group itself has no `data-active`; its page and nested-group items do.
+    - `#sidebar-content li[data-active]`: Active sidebar link.
+    - `.nav-tabs-item[data-active]`: Active top nav tab. Only applies to simple tabs; tabs with dropdown menus do not receive `data-active`. Note the leading `.`: this targets a class on a standard `<a>` element, unlike most other components which use custom element names.
+    - `toc-item[data-active]`: Active table of contents item.
+    - `toc-item[data-active-deepest]`: Deepest active table of contents item. Only present on the exact heading currently in view, unlike `data-active` which is also set on its parent headings.
+
+    Layout regions (`data-layout-item`):
+
+    Use `data-layout-item` to target the main regions of your site with one selector that works the same in every theme. IDs for some regions differ between themes. For example, `#sidebar-content` is the outer sidebar in some themes and the inner scroll area in others, while `[data-layout-item="sidebar"]` is always the outer sidebar.
+
+    - `[data-layout-item="banner"]`: Announcement banner.
+    - `[data-layout-item="topbar"]`: Top navigation bar.
+    - `[data-layout-item="mobile-nav"]`: Navigation drawer on mobile.
+    - `[data-layout-item="sidebar"]`: Outer sidebar navigation panel.
+    - `[data-layout-item="content"]`: Primary content area.
+    - `[data-layout-item="page-header"]`: Page header with the title and description.
+    - `[data-layout-item="side-panel"]`: Right-side panel that contains the table of contents.
+    - `[data-layout-item="toc"]`: Table of contents.
+    - `[data-layout-item="pagination"]`: Previous and next page links at the bottom of a page.
+    - `[data-layout-item="footer"]`: Page footer.
+    - `[data-layout-item="search-entry"]`: Search bar or button that opens search, on desktop and mobile.
+    - `[data-layout-item="assistant-entry"]`: Button that opens the AI assistant, on desktop and mobile.
+
+    ```css style.css
+    [data-layout-item="sidebar"] {
+      border-right: 1px solid #e5e7eb;
+    }
+    ```
+
+    Component name (`data-component-name`):
+
+    Use `data-component-name` to target specific UI components with a stable selector that persists if internal class names change.
+
+    - `[data-component-name="mermaid-container"]`: Mermaid diagram wrapper, including the zoom controls overlay.
+    - `[data-component-name="mermaid-controls-wrapper"]`: Mermaid zoom and pan controls.
+    - `[data-component-name="primary-header-button"]`: Primary header button. Sequoia theme only.
+    - `[data-component-name="theme-toggle"]`: Theme toggle.
+
+    Component part (`data-component-part`):
+
+    Use `data-component-part` to target sub-elements within a component.
+
+    Card parts:
+
+    - `[data-component-part="card-content-container"]`: Inner wrapper around a card's content.
+    - `[data-component-part="card-icon"]`: Icon within a card. Use this to style card icons, since the `icon` element selector does not match icons inside cards.
+    - `[data-component-part="card-title"]`: Title text within a card.
+    - `[data-component-part="card-content"]`: Description content within a card.
+    - `[data-component-part="card-image"]`: Image displayed at the top of a card.
+    - `[data-component-part="card-cta"]`: Call-to-action label within a card.
+
+    Assistant panel parts:
+
+    - `[data-component-part="contact-support-button"]`: The `<a>` wrapper around the contact support link in the assistant panel.
+    - `[data-component-part="contact-support-icon"]`: The `<span>` wrapping the icon.
+    - `[data-component-part="contact-support-text"]`: The `<p>` element containing the label.
+
+    Badge attributes:
+
+    - `[data-badge]`: Any badge element.
+    - `[data-badge][data-color="blue"]`: Badge filtered by color.
+    - `[data-badge][data-size="sm"]`: Badge filtered by size.
+
+    Search parts (`data-search-item`):
+
+    Use `data-search-item` to style the search bar and search dialog with stable selectors that persist if internal class names change. Values follow a `<block>` or `<block>-<part>` pattern, and states use separate attributes.
+
+    - `[data-search-item="trigger"]`: Search bar in the navbar that opens the search dialog. Contains `trigger-icon`, `trigger-label`, and `trigger-hint` (the keyboard shortcut).
+    - `[data-search-item="backdrop"]`: Overlay behind the search dialog.
+    - `[data-search-item="dialog"]`: Search dialog container.
+    - `[data-search-item="header"]`: Search input area. Contains `header-icon`, `input`, `header-button` (the button that sends the query to the AI assistant), and `header-hint`. Has `data-disabled` when search is unavailable, such as in local previews before you sign in to the CLI.
+    - `[data-search-item="filter-list"]`: Row of search filters. Each filter has a `filter-trigger` with `filter-label`, plus a `filter-indicator` arrow or a `filter-button` that clears the selection. The open menu is `filter-content`, with `filter-item` and `filter-item-label` entries.
+    - `[data-search-item="list"]`: Results list. Has `data-loading` while results load. The scrollbar is `list-scrollbar`.
+    - `[data-search-item="group"]`: Group of results. `data-variant` is `recent`, `results`, or `ask-ai`. The group heading is `group-title`.
+    - `[data-search-item="item"]`: Individual result. Contains `item-icon`, `item-title`, `item-badge` (the HTTP method on API results), `item-breadcrumbs`, `item-breadcrumb`, `item-breadcrumb-separator`, and `item-description`. The row that asks the AI assistant has `data-variant="assistant"`.
+    - `[data-search-item="footer"]`: Keyboard hints at the bottom of the dialog. Contains `footer-hint` and `footer-icon`.
+
+    State and variant attributes on search parts:
+
+    - `[data-search-item="item"][data-highlighted]`: Result currently highlighted with the keyboard or pointer.
+    - `[data-search-item="item-icon"][data-variant="section"]`: Result icon by type. Values are `page`, `section`, and `api-playground`.
+    - `[data-search-item="item-badge"][data-method="post"]`: API result by HTTP method, in lowercase.
+    - `[data-search-item="filter-trigger"][data-variant="version"]`: Filter by type. Values are `product`, `version`, and `tab`.
+    - `[data-search-item="filter-trigger"][data-open]`: Filter whose menu is open. `filter-indicator` also has `data-open`.
+    - `[data-search-item="filter-trigger"][data-active]`: Filter with a value selected.
+    - `[data-search-item="filter-item"][data-selected]`: Selected option in a filter menu.
+
+    ```css style.css
+    [data-search-item="dialog"] {
+      border-radius: 0.5rem;
+    }
+
+    [data-search-item="item"][data-highlighted] [data-search-item="item-title"] {
+      color: #0D9373;
+    }
+    ```
+
+    Current path (`data-current-path`):
+
+    Use `data-current-path` to style custom CSS on specific pages or subpaths.
+
+    - `html[data-current-path="/"]`: Matches the root page.
+    - `html[data-current-path="/quickstart"]`: Matches a specific page.
+    - `html[data-current-path^="/api-reference/"]`: Matches any page under a section.
+  </Accordion>
+</AccordionGroup>
+
+### Change the sidebar width
+
+Set the `--sidebar-width` CSS variable to change the width of the sidebar on desktop. The content area, header, and footer adjust to the new width, so you don't need to override `#sidebar` or offset other elements yourself.
+
+```css style.css
+:root {
+  --sidebar-width: 20rem;
+}
+```
+
+If you don't set the variable, each theme uses its default sidebar width:
+
+| Theme | Default width |
+| :--- | :--- |
+| Mint, Linden, Willow, Aspen, Sequoia | `18rem` |
+| Maple, Palm | `19rem` |
+| Almond | `16.5rem` |
+| Luma | `14rem` |
+
+In the Palm theme, the variable sets the width of the expanded sidebar. The collapsed sidebar keeps its fixed width.
+
+### Change the content width
+
+Set the `--content-width` CSS variable to change the maximum width of the text column on pages that use the default [page mode](/organize/pages#page-mode). The value sets the width of the text itself. Each theme adds its own padding around the text, so the same value produces the same text width in every theme.
+
+```css style.css
+:root {
+  --content-width: 768px;
+}
+```
+
+The text column never grows wider than the space between the sidebar and the table of contents. If you set a large value, the column fills the available space without overlapping other elements.
+
+If you don't set the variable, each theme uses its default content width:
+
+| Theme | Default width |
+| :--- | :--- |
+| Mint, Palm, Aspen | No maximum. The text fills the available space. |
+| Linden | No maximum on smaller screens. `35.75rem` on extra-large screens. |
+| Maple | `36rem`. `42rem` on the largest screens. |
+| Willow | `600px` |
+| Almond | `36rem` |
+| Sequoia, Luma | `40.5rem` |
+
+`--content-width` does not affect pages in `wide`, `center`, `custom`, or `frame` mode.
+
+### Add styles to a single page
+
+To style one page without adding a global `.css` file, add a `<style>` block to the page. Write the CSS inside a template literal.
+
+```mdx Example page style
+<style>{`
+  .pricing-callout {
+    border-left: 4px solid #0D9373;
+    padding-left: 1rem;
+  }
+
+  @keyframes page-pulse {
+    from { opacity: 1; }
+    to { opacity: 0.3; }
+  }
+`}</style>
+
+<div className="pricing-callout">Prices shown in USD.</div>
+
+<span className="animate-[page-pulse_1s_ease-in-out_infinite_alternate]">Live</span>
+```
+
+Mintlify scopes every selector in the block to the page's content area, so the rules do not affect the navigation, sidebar, or other pages. Page styles render on your published site and in the web editor.
+
+You can use these at-rules in a page style:
+
+- `@media`, `@supports`, and `@container`.
+- `@keyframes`, when the name starts with `page-`. Reference the animation from an `animation` property or a Tailwind class such as `animate-[page-pulse_1s_infinite]`. The prefix prevents a page from replacing the animations that Mintlify uses.
+
+Mintlify removes anything else from the block:
+
+- Other at-rules, such as `@import` and `@font-face`.
+- Rules whose selector starts with a combinator (`>`, `+`, `~`) or uses the `&` nesting selector.
+- Declarations that load resources, such as `url()` and `image-set()`.
+- `position: fixed`.
+- `!important` inside keyframes.
+
+Mintlify ignores attributes on the `<style>` tag. It removes the whole block if the CSS is not a plain template literal, for example if it contains `${}` expressions or a variable.
+
+## Custom JavaScript
+
+Custom JavaScript lets you add custom executable code globally. It is the equivalent of adding a `<script>` tag with JavaScript code into every page.
+
+Mintlify includes any `.js` file inside your content directory on every page of your site. Custom JavaScript files run after the page becomes interactive. You cannot scope them to specific pages. When you include multiple `.js` files, they run without a guaranteed order.
+
+To load a third-party script, inject a `<script>` element from your custom JavaScript file instead of adding raw `<script src="...">` tags in MDX:
+
+```js Example third-party script
+const script = document.createElement('script');
+script.src = 'https://example.com/widget.js';
+script.async = true;
+document.head.appendChild(script);
+```
+
+For example, you can add the following `ga.js` file to enable [Google Analytics](https://marketingplatform.google.com/about/analytics) across your entire site.
+
+```js
+window.dataLayer = window.dataLayer || [];
+function gtag() {
+  dataLayer.push(arguments);
+}
+gtag('js', new Date());
+
+gtag('config', 'TAG_ID');
+```
+
+<Warning>
+  Use with caution to avoid introducing security vulnerabilities.
+</Warning>
+
+### Run code on every page
+
+Custom JavaScript runs once per visit. When a reader moves between pages, Mintlify swaps the page content without reloading, so code that changes page content only runs on the first page. Listen for the `mintlify:navigate` event to run it again after each navigation. The event fires on `window` once the new page renders, with `event.detail.path`, `event.detail.search`, and `event.detail.hash`. `path` uses the same format as `data-current-path`. It does not fire on the initial load, so call your function once yourself.
+
+```js Add a button to every heading
+function addCopyButtons() {
+  document.querySelectorAll('#content h2[id]').forEach((heading) => {
+    if (heading.querySelector('.copy-link')) return;
+
+    const button = document.createElement('button');
+    button.className = 'copy-link';
+    button.textContent = 'Copy link';
+    button.addEventListener('click', () => {
+      navigator.clipboard.writeText(`${location.origin}${location.pathname}#${heading.id}`);
+    });
+    heading.append(button);
+  });
+}
+
+addCopyButtons();
+window.addEventListener('mintlify:navigate', addCopyButtons);
+```
+
+Use the event instead of a `MutationObserver` on `document.body`, which runs on every DOM change and slows down large pages. To track clicks, use a single listener on `document` instead; it keeps working across navigations without the event.
+
+### Navigate to another page
+
+Use `window.mintlify.navigate` to send readers to another page from custom JavaScript. It uses client-side navigation, so the page changes without a full reload, and it fires the `mintlify:navigate` event. Setting `location.href` reloads the whole page instead.
+
+```js Navigate to a page
+window.mintlify.navigate('/quickstart');
+```
+
+To replace the current entry in the browser history instead of adding a new one, pass `replace: true`. Readers can't use the back button to return to the page you replaced.
+
+```js Replace the current page
+window.mintlify.navigate('/quickstart', { replace: true });
+```
+
+If your site is hosted at a [subpath](/deploy/docs-subpath), Mintlify adds the subpath to root-relative paths that don't already include it. For example, on a site at `/docs`, both `/quickstart` and `/docs/quickstart` go to `/docs/quickstart`.
+
+URLs on another domain, paths outside your subpath, and calls made before the page finishes loading use a full page load.
+
+### Set API playground server variables
+
+Use `window.mintlify.api.playground.setServerVariables` to prefill [OpenAPI server variables](/api-playground/configure-playground#set-the-base-url) from custom JavaScript. Use it when values become available after page load. For example, after authentication or a tenant change.
+
+Pass an object of string values. Each call replaces the previous runtime values, which take precedence over OpenAPI defaults and saved values.
+
+```js Set API playground server variables
+window.mintlify.api.playground.setServerVariables({
+  tenantDomain: 'example.us.auth0.com',
+});
+```
+
+To remove the runtime values, call:
+
+```js Clear API playground server variables
+window.mintlify.api.playground.clearServerVariables();
+```
+
+Calls made before the client initializes queue. Values apply to open and future playgrounds for the current page session and reset after a full-page refresh.
+
+<Warning>
+  Do not use server variables for API keys, tokens, or other secrets.
+</Warning>
+
+### Access personalized user data
+
+If your site uses [authentication](/deploy/authentication-setup) or [personalization](/create/personalization), custom scripts can read the identified visitor from `window.mintlify.user`. This is the same object exposed to MDX pages as the [`user` variable](/create/personalization#dynamic-mdx-content), so it reflects the `content` field of your user data.
+
+Because custom scripts run before user info resolves, listen for the `mintlify:user` event to identify when the user object is available. The event fires when user info resolves and again on any change. Its `detail` is the user object, or `null` when the visitor is signed out or unidentified.
+
+```js Read the user after it resolves
+window.addEventListener('mintlify:user', (event) => {
+  const user = event.detail;
+  if (!user) return; // Signed out or unidentified.
+
+  renderAppLauncher(user);
+});
+```
+
+If the user has already resolved by the time your script runs, read `window.mintlify.user` directly.
+
+```js Read the current user
+const user = window.mintlify?.user;
+if (user) {
+  renderAppLauncher(user);
+}
+```
+
+`window.mintlify.user` is `undefined` until user info resolves and when the visitor is signed out or unidentified. Use optional chaining when reading nested fields.
+
+<Warning>
+  Client-side scripts can access anything you place in the user `content` field. Do not include secrets or credentials that shouldn't be readable in the browser.
+</Warning>

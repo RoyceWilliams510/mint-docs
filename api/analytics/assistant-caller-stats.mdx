@@ -1,0 +1,23 @@
+---
+title: "Get assistant caller stats"
+openapi: /analytics.openapi.json GET /v1/analytics/{projectId}/assistant/caller-stats
+keywords: ["analytics", "assistant", "caller", "stats", "export"]
+
+---
+
+## Usage
+
+Use this endpoint to see how many assistant conversations come from each caller type. Each conversation counts once, no matter how many questions it contains. The response breaks down total conversations into:
+
+- `web`: Conversations from the documentation site
+- `api`: Conversations from direct API calls
+- `other`: Conversations from other sources (for example, integrations, SDKs)
+- **total**: Sum of all caller types
+
+## Filtering
+
+Filter by date range using `dateFrom` and `dateTo` parameters. Each conversation counts toward the range where it started.
+
+## Rate limits
+
+This endpoint allows 100 requests per organization per hour. All analytics endpoints share this limit.

@@ -1,0 +1,143 @@
+---
+title: "设置 OpenAPI"
+sidebarTitle: "设置 OpenAPI"
+description: "从你的仓库或 URL 将 OpenAPI 规范添加到文档中，对其进行验证，使其与 API 保持同步，并控制谁可以下载它。"
+keywords: ["OpenAPI", "API 规范", "Swagger", "openapi.json", "托管的规范", "localhost", "mint validate", "下载规范"]
+---
+
+OpenAPI 是一种描述 HTTP API 的格式。将 OpenAPI 规范添加到文档后，Mintlify 会为每个端点生成一个页面，其中包含交互式 [API 试验台](/zh/api-playground/overview)和请求示例。当你的规范发生变化时，页面也会随之更新。
+
+Mintlify 支持 JSON 或 YAML 格式的 OpenAPI 3.0、3.1 和 3.2 文档。要使用 Swagger 2.0 文档，请先进行转换，例如使用 [Swagger Editor](https://editor.swagger.io/)（**Edit** > **Convert to OpenAPI 3**）。
+
+<div id="add-your-specification">
+  ## 添加你的规范
+</div>
+
+<Steps>
+  <Step title="将规范添加到你的项目。">
+    将规范文件放入你的文档仓库，或将其托管在公开的 HTTPS URL 上。
+
+    ```bash
+    /your-project
+      |- docs.json
+      |- openapi.json
+    ```
+  </Step>
+  <Step title="在导航中引用该规范。">
+    在 `docs.json` 中的标签页、锚点或分组上添加 `openapi` 字段，并将其设置为该文件在仓库中的路径或规范的 URL。
+
+    ```json docs.json {5}
+    "navigation": {
+      "tabs": [
+        {
+          "tab": "API reference",
+          "openapi": "openapi.json"
+        }
+      ]
+    }
+    ```
+  </Step>
+  <Step title="预览你的页面。">
+    运行 `mint dev`，或打开预览部署。规范中的每个端点都会在 **API reference** 标签页中拥有一个页面，并按 tag 分组。
+  </Step>
+</Steps>
+
+如果只想列出部分端点、将端点与其他页面混合，或使用多个规范，请参阅[在导航中组织端点](/zh/api-playground/organize-endpoints)。
+
+Mintlify 仅支持在单个 OpenAPI 文档内使用 `$ref` 进行内部引用。在添加多文件规范之前，请先将其打包为一个文件。
+
+<div id="validate-your-specification">
+  ## 验证你的规范
+</div>
+
+在部署之前，运行 `mint validate` 检查你的规范、页面和导航。
+
+```bash
+mint validate
+```
+
+要了解 OpenAPI 格式，请参阅 [Swagger 的 OpenAPI 指南](https://swagger.io/docs/specification/v3_0/basic-structure/)和 [OpenAPI 规范](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/)。Swagger 的指南涵盖 OpenAPI 3.0，但大部分内容也适用于 3.1 和 3.2。有关差异，请参阅 [Migrating from OpenAPI 3.0 to 3.1.0](https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0) 和 [Upgrading from OpenAPI 3.1 to 3.2](https://learn.openapis.org/upgrading/v3.1-to-v3.2.html)。
+
+<div id="use-a-specification-from-a-local-server">
+  ## 使用本地服务器上的规范
+</div>
+
+在本地开发期间，你可以引用由本机上运行的 API 提供的规范：
+
+```json docs.json
+"navigation": {
+  "tabs": [
+    {
+      "tab": "API reference",
+      "openapi": "http://localhost:8000/openapi.json"
+    }
+  ]
+}
+```
+
+传入 `--local-schema`，让 CLI 通过 HTTP 获取规范：
+
+```bash
+mint dev --local-schema
+```
+
+要验证相同的配置，请运行 `mint validate --local-schema`。部署时要求规范 URL 使用 HTTPS。
+
+<div id="keep-a-hosted-specification-in-sync">
+  ## 保持托管规范同步
+</div>
+
+如果你的 `openapi` 字段指向一个 URL，文档只会在你向文档仓库推送时重新构建。URL 上的规范发生变化不会触发重新构建。
+
+要在规范变化时更新文档，请在发布规范的 CI 任务中调用 [Trigger deployment](/zh/api/update/trigger) 端点。请在新规范上线之后再调用，以免构建获取到不完整的文件。
+
+构建会在不使用凭据的情况下从公共互联网获取该 URL。如果你的规范需要身份验证或位于私有网络中，请改为将其提交到文档仓库。请参阅[修复 "Failed to load OpenAPI file" 错误](/zh/help-center/openapi-url-fetch-fails-during-build)。
+
+要修改不归你所有的规范（例如另一个团队发布的规范），请使用 [Overlay](/zh/api-playground/overlays)。
+
+<div id="control-access-to-your-specification">
+  ## 控制对规范的访问
+</div>
+
+如果你的站点不需要身份验证，Mintlify 会在你的文档域名下按路径提供文档仓库中的每个 JSON 和 YAML 文件，例如 `https://docs.example.com/openapi.json`。这包括 `docs.json` 未引用的规范。请从仓库中删除你不希望公开的规范文件。
+
+[`x-hidden` 和 `x-excluded`](/zh/api-playground/organize-endpoints#hide-or-exclude-endpoints) 可以让端点不出现在文档中，但规范文件中仍然包含这些端点。
+
+<div id="let-visitors-download-your-spec">
+  ### 允许访问者下载你的规范
+</div>
+
+要在[页面上下文菜单](/zh/organize/settings-structure#contextual)中添加 **Download API spec** 选项，请在 `docs.json` 的 `contextual.options` 中添加 `"download-spec"`：
+
+```json docs.json
+"contextual": {
+  "options": ["copy", "download-spec", "chatgpt", "claude"]
+}
+```
+
+该选项会下载你的 OpenAPI 规范。如果你的项目有多个规范，下载的是名为 `api-specs.zip` 的 zip 文件。在启用了[身份验证](/zh/deploy/authentication-setup)的站点上，只有已登录的读者才能下载规范。
+
+启用 `download-spec` 还会在 `/.well-known/api-catalog` 发布一个 [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) API 目录。该目录链接到 `docs.json` 中的每个 OpenAPI 规范，使 AI 智能体无需爬取文档即可找到你的 API。未启用 `download-spec` 时，`/.well-known/api-catalog` 返回 404。
+
+<Warning>
+  下载的规范是完整文件，不会按[用户组](/zh/create/personalization#openapi-content-filtering)过滤端点或字段。任何能够打开上下文菜单的已登录读者都会获得所有端点和 schema。如果你的规范包含你认为敏感的端点或字段，请不要在需要身份验证的站点上启用 `download-spec`。
+</Warning>
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="配置试验台" icon="play" href="/zh/api-playground/configure-playground">
+    设置基础 URL 和身份验证，以便读者发送请求。
+  </Card>
+  <Card title="组织端点" icon="list-tree" href="/zh/api-playground/organize-endpoints">
+    对端点分组、合并多个规范，并隐藏端点。
+  </Card>
+  <Card title="端点 URL 和标题" icon="link" href="/zh/api-playground/endpoint-urls">
+    控制页面 URL，并在规范变化时保持其稳定。
+  </Card>
+  <Card title="自定义端点页面" icon="pencil" href="/zh/api-playground/customize-endpoint-pages">
+    修改页面标题、添加内容，并为单个端点创建页面。
+  </Card>
+</CardGroup>

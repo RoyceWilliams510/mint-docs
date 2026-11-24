@@ -1,0 +1,257 @@
+---
+title: "Crear y editar páginas"
+sidebarTitle: "Editar contenido"
+description: "Cree páginas, edite contenido, añada multimedia, organice la navegación, restaure versiones anteriores y gestione páginas privadas en el editor."
+keywords: ["editor", "content", "pages", "navigation", "version history", "media", "images", "private pages", "site", "files", "move", "page settings", "share"]
+---
+
+<div id="sidebar-sections">
+
+## Secciones de la barra lateral
+
+</div>
+
+La barra lateral del editor agrupa sus páginas en secciones.
+
+- **Navigation**: Las páginas y groups de su navegación, tal y como se definen en `docs.json`.
+- **Files**: Cada archivo de su repositorio que no está en su navegación, incluidas imágenes, vídeos, especificaciones de OpenAPI y `docs.json`.
+- **Recents**: Las páginas que ha abierto más recientemente. La sección muestra las tres más recientes. Haga clic en **Show more** para ver hasta 10.
+- **Starred**: Páginas que ha marcado con estrella. Para marcar una página, abra su menú de opciones y seleccione **Star**. Las estrellas son personales.
+- **Personal**: Sus [páginas privadas](#private-pages).
+- **Shared with me**: Páginas que sus compañeros [han compartido con usted](#share-a-private-page) directamente.
+
+En un sitio, **Recents** y **Starred** solo muestran páginas privadas. En una [base de conocimiento](/es/base/index), también muestran páginas de **Navigation**.
+
+Recents, Starred y Shared with me permanecen ocultas mientras están vacías.
+
+Arrastre el encabezado de una sección para reordenar las secciones. Haga clic en el encabezado de una sección para contraerla o expandirla. El editor guarda en su cuenta las secciones contraídas y en su navegador el orden de las secciones.
+
+La barra superior cambia según la página que tenga abierta. En una página privada, tiene **Share**. En las demás páginas de un sitio, tiene el selector de branch, **Preview** y **Publish**.
+
+<div id="create-a-page">
+
+## Crear una página
+
+</div>
+
+Para crear una página, haga clic en el botón <Icon icon="plus" /> más donde la quiere y luego seleccione **New page**.
+
+- Encabezado de la sección **Navigation**: Añade una página nueva al principio de su navegación.
+- Un group u otro elemento de navegación: Añade una página nueva dentro de ese elemento.
+- Encabezado de la sección **Files** o una carpeta en **Files**: Crea un archivo que no está en su navegación.
+
+El botón **New page** de la parte inferior de la barra lateral también añade una página al principio de su navegación.
+
+<Tip>
+  Para añadir a su navegación una página que ya existe en su repositorio, haga clic en el botón <Icon icon="plus" /> más y seleccione **Add existing page**.
+</Tip>
+
+Los mismos menús crean elementos de navegación como groups, tabs, anchors, dropdowns, versions, languages y products. Para más información sobre cada elemento, consulte [Navegación](/es/organize/navigation).
+
+<div id="edit-page-settings">
+
+## Editar la configuración de la página
+
+</div>
+
+Establezca el título, la descripción y el icono de una página directamente en la parte superior de la página. Pase el cursor por encima del título y haga clic en **Add icon** para elegir un icono o un emoji. Cuando hay una página con icono abierta, la pestaña de su navegador muestra ese icono.
+
+Para otros ajustes, abra el menú de opciones de la página en la barra lateral o haga clic en <Icon icon="ellipsis" /> **More options** en la esquina superior derecha de la página y seleccione **Page settings**. El panel **Page settings** agrupa los ajustes en secciones:
+
+- **URL**: La ruta de la página y la URL de redirección. Cambiar la ruta mueve el archivo.
+- **Navigation**: Título en la barra lateral, etiqueta, modo y si la página está oculta.
+- **SEO & sharing**: Imagen de Open Graph y keywords.
+- **Thumbnails**: [Anulaciones de miniaturas](/es/organize/settings-appearance#override-thumbnails-for-a-page-or-section) para la imagen de vista previa social de la página. Cada ajuste usa el valor heredado a menos que lo cambie.
+
+Groups, tabs y otros elementos de navegación tienen sus propios paneles de configuración, como **Group settings** y **Tab settings**. Ábralos desde el menú de opciones del elemento. Groups, tabs, anchors, dropdowns, products, versions, languages y menu items también tienen una sección **Thumbnails** que establece anulaciones de miniaturas para las páginas de esa sección. Consulte [Páginas](/es/organize/pages) para más información sobre ajustes concretos.
+
+El panel **Page settings** también tiene una sección **Properties**, donde puede agregar un propietario y [propiedades personalizadas](/es/base/verify-pages#add-properties) a la página.
+
+<div id="edit-api-reference-pages">
+
+## Editar páginas de referencia de API
+
+</div>
+
+Las páginas con un campo `openapi`, `openapi-schema` o `api` en su frontmatter muestran el endpoint y sus campos en el editor, igual que aparecen en su sitio publicado. El editor etiqueta estas secciones como **Generated from OpenAPI**. No puede editarlas en el editor. Para cambiarlas, actualice su especificación OpenAPI o el frontmatter de la página. Consulte [Configuración de OpenAPI](/es/api-playground/openapi-setup).
+
+Escriba su propio contenido en la página entre el endpoint y los campos.
+
+Si la página no tiene `description` en su frontmatter, el editor muestra la descripción de la operación de su especificación OpenAPI. Haga clic en la descripción para editarla. Si la cambia, el editor guarda su texto como la `description` de la página, que reemplaza la descripción de la especificación en esa página.
+
+<div id="add-media">
+
+## Añadir archivos multimedia
+
+</div>
+
+Escriba <kbd>/image</kbd> o <kbd>/video</kbd> para subir un archivo o elegir uno que ya esté en su repositorio. También puede arrastrar archivos desde su equipo hasta la página, o arrastrar una imagen o un vídeo desde la sección **Files** hasta la página.
+
+- Los archivos subidos se guardan en sus carpetas `images/`, `videos/` y `files/` y se incluyen en el commit de su próxima publicación. Antes de insertar un archivo subido, puede editar su ruta.
+- Puede subir imágenes PNG, JPG, GIF, WebP, AVIF, ICO y BMP, vídeos MP4, WebM y MOV, y archivos PDF. Los archivos SVG no pueden subirse en el editor.
+- En un sitio, cada archivo puede tener hasta 20 MB.
+- Haga clic en una imagen para seleccionarla. Arrastre la imagen para moverla, incluso dentro o fuera de componentes como frames, cards, tabs y callouts. Arrastre los controles de sus bordes para cambiar su tamaño. Presione <kbd>Delete</kbd> o <kbd>Backspace</kbd> para eliminarla.
+- Para servir una imagen distinta en modo oscuro, seleccione la imagen, haga clic en **Edit Image** y establezca **Dark mode image**.
+- Escriba <kbd>/embed</kbd> para añadir un embed. En la pestaña **Video link**, pegue una URL de YouTube, Loom o Vimeo, o un enlace directo a un archivo de vídeo. En la pestaña **Embed code**, pegue un iframe u otro fragmento de embed.
+
+Para dar formato a las imágenes y usar el componente Frame, consulte [Imágenes e incrustaciones](/es/create/image-embeds).
+
+<div id="organize-navigation">
+
+## Organizar la navegación
+
+</div>
+
+Arrastre elementos en **Navigation** para reordenarlos o anidarlos. El editor escribe sus cambios en `docs.json` cuando publica.
+
+<Note>
+  Algunos elementos no pueden anidarse dentro de otros. Por ejemplo, las tabs no pueden anidarse dentro de groups. El editor impide las combinaciones no válidas.
+</Note>
+
+Para seleccionar varios elementos, haga <kbd>Shift</kbd>-clic para seleccionar un intervalo, o <kbd>Cmd</kbd>-clic (macOS) o <kbd>Ctrl</kbd>-clic (Windows) para añadir o quitar elementos individuales. Arrastre la selección o haga clic con el botón derecho sobre ella para mover, duplicar o eliminar todos los elementos seleccionados a la vez. Presione <kbd>Esc</kbd> para deshacer la selección.
+
+Para cambiar un group u otro elemento a un tipo distinto, abra su menú de opciones y seleccione **Convert to**.
+
+Los elementos de navegación global, como los anchors y las tabs que aparecen en todas las secciones de su sitio, no están en el árbol de la barra lateral. Para gestionarlos, abra una página en **Navigation**, haga clic en **Site configuration** en la parte inferior de la barra lateral y luego vaya a **Navigation**.
+
+<div id="add-and-remove-pages-from-your-navigation">
+
+### Añadir y quitar páginas de su navegación
+
+</div>
+
+Arrastre una página desde **Files** a **Navigation** para añadirla en esa posición. Arrastre una carpeta para añadirla como group. También puede seleccionar **Move to navigation** desde el menú de opciones de un archivo.
+
+Para quitar una página o un group de su navegación sin eliminar sus archivos, arrástrelos desde **Navigation** a **Files** o seleccione **Move to files** desde su menú de opciones. Aparece un aviso de deshacer después del movimiento.
+
+<div id="files">
+
+## Files
+
+</div>
+
+Haga clic en un archivo en **Files** para abrirlo.
+
+- Las imágenes se abren en una vista previa. Haga clic en la imagen para ampliarla.
+- Los vídeos se reproducen en el editor.
+- `docs.json` se abre en el modo source.
+- Los archivos de texto y de código, como YAML, JSON y CSS, se abren en el editor de source.
+- El editor no puede previsualizar otros archivos, como fuentes y comprimidos.
+
+Para subir archivos, arrástrelos desde su equipo hasta la sección **Files**.
+
+<div id="move-a-page">
+
+## Mover una página
+
+</div>
+
+Para mover una página, abra su menú de opciones y seleccione **Move** o presione <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> (Windows) con la página abierta.
+
+Puede abrir el menú de opciones de una página desde:
+
+- <Icon icon="ellipsis" /> **More options** en la esquina superior derecha de una página abierta.
+- El menú <Icon icon="ellipsis" /> junto a una página en la barra lateral.
+- Haciendo clic con el botón derecho sobre una página en la barra lateral.
+
+En el selector, busque para filtrar destinos, expanda carpetas y groups para ver destinos anidados y seleccione un destino para mover la página.
+
+Lo que ofrece el selector depende de dónde se encuentre el elemento en la barra lateral:
+
+- **Navigation**: Las páginas y los groups se mueven a otro group de su navegación. Mover un group mueve también sus páginas.
+- **Files**: Las páginas mueven su archivo a otra carpeta.
+- **Personal**: Las páginas y carpetas privadas se mueven a otra carpeta privada, o a **Navigation** para añadirlas a su sitio. Consulte [Mover una página a su sitio](#move-a-page-to-your-site).
+
+Los editors y admins pueden mover cualquier página que no sea privada. Puede mover páginas y carpetas privadas en **Personal**, pero no páginas en **Shared with me**.
+
+<div id="copy-a-page-to-another-project">
+
+## Copiar una página a otro proyecto
+
+</div>
+
+Para copiar una página a otro proyecto de su organización, abra su menú de opciones y seleccione **Copy to a project**, luego elija el proyecto. Debe tener el rol de editor o admin y acceso a ambos proyectos.
+
+<div id="delete-a-page">
+
+## Eliminar una página
+
+</div>
+
+Para eliminar una página, haga clic en <Icon icon="ellipsis" /> **More options** en la esquina superior derecha de la página y luego haga clic en **Move to trash**. También puede eliminar una página desde su menú de opciones en la barra lateral.
+
+Eliminar una página en **Navigation** elimina tanto el archivo como su entrada de navegación. Aparece un aviso con **Undo** después de eliminarla. Para quitar una página de su navegación sin eliminar su archivo, seleccione **Move to files** en su lugar.
+
+Eliminar una página privada es permanente. Para las páginas privadas, el menú **More options** muestra **Delete page**.
+
+Los editors y admins pueden eliminar cualquier página que no sea privada.
+
+<div id="version-history">
+
+## Historial de versiones
+
+</div>
+
+El historial de versiones le permite comparar una página con versiones guardadas anteriores y restaurar una. No está disponible para `docs.json`.
+
+El editor registra una versión nueva unos 10 segundos después de que deja de editar una página. Si edita de forma continua, el editor registra una versión al menos una vez por minuto. Los cambios que se sincronizan desde su repositorio de Git también crean versiones, que muestran **Git sync** como autor. El historial de versiones está limitado a la branch actual. Solo está disponible el historial de la branch actual.
+
+1. Haga clic en <Icon icon="ellipsis" /> **More options** en la esquina superior derecha de la página.
+1. Haga clic en **Version history**.
+1. Seleccione una versión. El editor muestra en qué se diferencia la página actual de esa versión.
+1. Para restaurarla, haga clic en **Restore this version**.
+
+Para salir de la comparación, haga clic en **Exit comparison**.
+
+Cualquiera puede comparar versiones. Los editors y admins pueden restaurar versiones de cualquier página que no sea privada. Para las páginas privadas, necesita el rol **Editor** o **Full Access** en la página para restaurar una versión.
+
+Restaurar una versión reemplaza el contenido actual de la página. Cuando restaura una página privada, se restaura en todas las branches. Cuando restaura cualquier otra página, solo se restaura en su branch actual.
+
+<div id="private-pages">
+
+## Páginas privadas
+
+</div>
+
+Las páginas privadas son borradores que viven en la sección **Personal** de la barra lateral. Son privadas para usted y no se hacen commit en su repositorio. Se guardan automáticamente y no tienen paso de publicación. Nunca aparecen en su sitio publicado a menos que las mueva a su sitio.
+
+Para crear una página o carpeta privada, haga clic en el botón <Icon icon="plus" /> más del encabezado de la sección **Personal** y luego seleccione **New page** o **New folder**.
+
+Para importar archivos Markdown como páginas privadas, arrastre archivos Markdown y MDX desde su ordenador a **Personal** o a una carpeta privada.
+
+Para establecer un icono o un emoji en una carpeta privada, abra su menú de opciones y seleccione **Change icon**. Elija un icono en la pestaña **Icons** o un emoji en la pestaña **Emojis**, o seleccione **Remove** para quitarlo.
+
+<div id="share-a-private-page">
+
+### Compartir una página privada
+
+</div>
+
+Para compartir una página privada, ábrala y haga clic en **Share** en la barra superior. Para compartir una carpeta, abra su menú de opciones en la barra lateral y seleccione **Share**. Busque compañeros y seleccione un rol para cada uno:
+
+- **Full Access**: Editar y compartir. El propietario de la página también puede moverla a su sitio.
+- **Editor**: Crear y editar contenido.
+- **Commenter**: Ver y comentar contenido.
+- **Viewer**: Solo ver contenido.
+
+En el acceso general, seleccione **Only people invited** o **Everyone at** su organización. Solo las personas con **Full Access** pueden cambiar quién tiene acceso.
+
+Si tiene acceso de **Viewer** a una página, haga clic en **View only** en la barra superior y luego en **Request edit access**. Las personas con **Full Access** pueden aprobar la solicitud.
+
+Las páginas compartidas con usted aparecen en **Shared with me**. Cuando un compañero comparte una página o carpeta directamente con usted, también aparece en su [bandeja de entrada](/es/dashboard/inbox). Para quitar una página de su barra lateral, abra su menú de opciones y seleccione **Leave**.
+
+<div id="move-a-page-to-your-site">
+
+## Mover una página a su sitio
+
+</div>
+
+Para añadir una página privada a su sitio, abra su menú de opciones en la barra lateral, seleccione **Move** y elija **Navigation** o un group dentro de ella. También puede arrastrar la página a **Navigation**. Necesita el rol de editor o admin.
+
+La página se mueve a su navegación en su branch actual como un cambio sin publicar, y la barra lateral la resalta. [Publique](/es/editor/publish) para que esté disponible en su sitio publicado.
+
+Mover una carpeta la añade a su navegación como group, con todas sus páginas y su icono. Puede mover hasta 20 páginas a la vez.
+
+<Warning>
+  Mover una página a su sitio es un cambio de un solo sentido. La página privada se elimina de inmediato, y descartar el cambio en su branch no la restaura. No puede volver a moverla a **Personal**.
+</Warning>

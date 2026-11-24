@@ -1,0 +1,529 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Mintlify External API",
+    "description": "Una API para gestionar la documentación de Mintlify y acceder a recursos.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.mintlify.com/v1"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "x-mcp": {
+    "enabled": true
+  },
+  "paths": {
+    "/project/update/{projectId}": {
+      "post": {
+        "summary": "Activar implementación",
+        "description": "Pone en cola una actualización de implementación para tu proyecto de documentación. Devuelve un ID de estado que se puede usar para hacer seguimiento del progreso de la actualización. La actualización se activa desde la rama de implementación que tengas configurada.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "El ID de tu proyecto. Puedes copiarlo de la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) de tu dashboard.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "La actualización se puso en cola. Usa el `statusId` devuelto para hacer seguimiento de su progreso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusId": {
+                      "type": "string",
+                      "description": "El ID de estado de la actualización que se activó."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El ID del proyecto tiene un formato incorrecto."
+          },
+          "401": {
+            "description": "La clave de API falta o no es válida, o tu plan no incluye acceso a la API."
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso de escritura, o tu solicitud provino de una dirección IP que no está en la lista de direcciones permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización."
+          },
+          "429": {
+            "description": "Superaste el límite de frecuencia de 10 solicitudes cada 10 segundos por organización. Este límite se comparte con los endpoints de activar implementación, activar automatización y webhook de automatización."
+          },
+          "500": {
+            "description": "No se pudo poner en cola la actualización. Vuelve a intentar la solicitud. Si el error persiste, contacta con soporte."
+          }
+        }
+      }
+    },
+    "/project/update-status/{statusId}": {
+      "get": {
+        "summary": "Obtener el estado de la implementación",
+        "description": "Obtiene el estado de una actualización de implementación mediante su ID de estado.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "statusId",
+            "in": "path",
+            "description": "El identificador de estado de una actualización activada.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "El estado de la actualización.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string",
+                      "description": "El ID de estado de la actualización que se activó."
+                    },
+                    "projectId": {
+                      "type": "string",
+                      "description": "El identificador del proyecto de documentación."
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Un ISODate con la fecha y la hora especificadas en UTC"
+                    },
+                    "endedAt": {
+                      "type": "string",
+                      "description": "Un ISODate con la fecha y hora especificadas en UTC"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "queued",
+                        "in_progress",
+                        "success",
+                        "failure",
+                        "skipped"
+                      ],
+                      "description": "El estado de la actualización."
+                    },
+                    "summary": {
+                      "type": "string",
+                      "description": "Resumen del estado de la actualización"
+                    },
+                    "logs": {
+                      "type": "array",
+                      "description": "Una matriz de registros.",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "subdomain": {
+                      "type": "string",
+                      "description": "El subdominio de la documentación que se está actualizando."
+                    },
+                    "screenshot": {
+                      "type": "string",
+                      "description": "Una captura de pantalla de la documentación."
+                    },
+                    "screenshotLight": {
+                      "type": "string",
+                      "description": "Una captura de pantalla de la documentación."
+                    },
+                    "screenshotDark": {
+                      "type": "string",
+                      "description": "Captura de pantalla de la documentación en modo oscuro."
+                    },
+                    "author": {
+                      "type": "object",
+                      "description": "El autor de la actualización.",
+                      "nullable": true,
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "El nombre del autor."
+                        },
+                        "avatarUrl": {
+                          "type": "string",
+                          "description": "URL de la imagen de avatar del autor."
+                        },
+                        "githubUserId": {
+                          "type": "number",
+                          "description": "El identificador de usuario de GitHub del autor."
+                        }
+                      }
+                    },
+                    "commit": {
+                      "type": "object",
+                      "description": "Detalles de la confirmación",
+                      "properties": {
+                        "sha": {
+                          "type": "string",
+                          "description": "El SHA de la confirmación."
+                        },
+                        "ref": {
+                          "type": "string",
+                          "description": "La referencia de la confirmación."
+                        },
+                        "message": {
+                          "type": "string",
+                          "description": "El mensaje de confirmación."
+                        },
+                        "filesChanged": {
+                          "type": "object",
+                          "description": "Detalles de los archivos modificados.",
+                          "properties": {
+                            "added": {
+                              "type": "array",
+                              "description": "Se han añadido nuevos archivos.",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "modified": {
+                              "type": "array",
+                              "description": "Archivos existentes que fueron modificados.",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "removed": {
+                              "type": "array",
+                              "description": "Archivos eliminados.",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "source": {
+                      "type": "string",
+                      "description": "Origen del disparador de la actualización.",
+                      "enum": [
+                        "internal",
+                        "github-app-installation",
+                        "api",
+                        "github",
+                        "dashboard",
+                        "gitlab",
+                        "onboarding"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "La clave de API falta o no es válida, la actualización pertenece a un proyecto fuera de tu organización, o tu plan no incluye acceso a la API."
+          },
+          "403": {
+            "description": "Tu solicitud provino de una dirección IP que no está en la lista de direcciones permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "No existe ninguna actualización con este ID de estado."
+          },
+          "429": {
+            "description": "Superaste el límite de frecuencia de 20 solicitudes cada 10 segundos por organización."
+          },
+          "500": {
+            "description": "El proyecto de esta actualización ya no existe."
+          }
+        }
+      }
+    },
+    "/project/preview/{projectId}": {
+      "post": {
+        "summary": "Activar implementación de vista previa",
+        "description": "Crea o actualiza una implementación de vista previa para una rama específica. Si ya existe una vista previa para la rama, se activa una reimplementación. Devuelve un ID de estado para hacer seguimiento del progreso y la URL de la vista previa.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "El ID de tu proyecto. Puedes copiarlo de la página de [API keys](https://dashboard.mintlify.com/settings/organization/api-keys) de tu dashboard.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "branch"
+                ],
+                "properties": {
+                  "branch": {
+                    "type": "string",
+                    "description": "El nombre de la rama de Git para la cual crear una implementación de vista previa.",
+                    "minLength": 1
+                  },
+                  "auth": {
+                    "description": "Restricción de acceso que se aplicará a la vista previa. Omítelo para mantener sin cambios la configuración de acceso actual de la vista previa. Requiere un plan que incluya la autenticación de vistas previas, y tu sitio debe tener habilitada la autenticación o la autenticación de vistas previas.",
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "title": "Contraseña",
+                        "required": [
+                          "type",
+                          "password"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "password"
+                            ],
+                            "description": "Protege la vista previa con contraseña. Cualquier persona con la contraseña puede verla."
+                          },
+                          "password": {
+                            "type": "string",
+                            "minLength": 8,
+                            "description": "La contraseña que los revisores introducen para ver la vista previa. Debe tener al menos 8 caracteres. Reemplaza cualquier contraseña existente en la vista previa."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "title": "Inicio de sesión en el dashboard",
+                        "required": [
+                          "type"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "mintlify"
+                            ],
+                            "description": "Restringe la vista previa a los miembros de tu organización que hayan iniciado sesión en Mintlify."
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Implementación de vista previa puesta en cola correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusId": {
+                      "type": "string",
+                      "description": "El ID de estado para hacer seguimiento de la implementación de vista previa. Úsalo con el endpoint [Get deployment status](/es/api/update/status)."
+                    },
+                    "previewUrl": {
+                      "type": "string",
+                      "description": "La URL donde se aloja la implementación de vista previa."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cuerpo de la solicitud no válido. El campo `branch` es obligatorio y `auth` debe coincidir con uno de los formatos admitidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "La clave de API falta o no es válida, o tu plan no incluye acceso a la API."
+          },
+          "403": {
+            "description": "Las implementaciones de vista previa no están disponibles en tu plan actual, se proporcionó `auth` y la autenticación de implementaciones de vista previa no está disponible en tu plan actual, tu clave de API no tiene acceso de escritura, o tu solicitud provino de una dirección IP que no está en la lista de direcciones permitidas de tu clave de API.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización."
+          },
+          "409": {
+            "description": "Se proporcionó `auth`, pero la autenticación no está habilitada. Habilita la autenticación o la autenticación de vistas previas para tu proyecto y asegúrate de que la autenticación esté habilitada en la vista previa antes de configurar la autenticación de la vista previa.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Superaste el límite de frecuencia de 5 solicitudes por minuto por organización."
+          },
+          "500": {
+            "description": "Mintlify no pudo actualizar la configuración de autenticación de la vista previa.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workflow/{projectId}/{workflowSchemaId}/trigger": {
+      "post": {
+        "summary": "Activar automatización",
+        "description": "Activa una automatización programada para que se ejecute de inmediato, en lugar de esperar a su próxima hora programada. Útil para ejecutar automatizaciones desde pipelines CI/CD, como una GitHub Action que se ejecuta en cada fusión a tu rama predeterminada. Solo se pueden activar automatizaciones programadas (con programación personalizada). La ejecución recoge los cambios desde la última ejecución completada, de forma idéntica a una ejecución programada normal.\n\nAutentícate con una clave de API de administrador.",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "El ID de tu proyecto. Puedes copiarlo de la página de [API keys](https://app.mintlify.com/settings/organization/api-keys) de tu dashboard.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflowSchemaId",
+            "in": "path",
+            "description": "El ID de la automatización que se va a activar. Puedes copiarlo del panel de configuración de la automatización en la página [Automatizaciones](https://app.mintlify.com/settings/project/automations) de tu dashboard.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Ejecución de la automatización puesta en cola correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schemaId": {
+                      "type": "string",
+                      "description": "El ID de la automatización activada."
+                    },
+                    "instanceId": {
+                      "type": "string",
+                      "description": "El ID de la ejecución de la automatización puesta en cola. Aparece en la pestaña **Runs** de la configuración de [Automatizaciones](https://app.mintlify.com/settings/project/automations?tab=runs)."
+                    },
+                    "jobId": {
+                      "type": "string",
+                      "description": "El ID del trabajo en segundo plano que procesa la ejecución."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud no válida. El ID de la automatización tiene un formato incorrecto, la automatización no está activa o no está configurada con una programación personalizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "La clave de API falta o no es válida, o tu plan no incluye acceso a la API o a las automatizaciones."
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso de escritura, o tu solicitud provino de una dirección IP que no está en la lista de direcciones permitidas de tu clave de API."
+          },
+          "404": {
+            "description": "El proyecto no existe o no pertenece a tu organización, o la automatización no existe o no pertenece a este proyecto.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Superaste el límite de frecuencia de 10 solicitudes cada 10 segundos por organización. Este límite se comparte con los endpoints de activar implementación, activar automatización y webhook de automatización."
+          },
+          "500": {
+            "description": "Se produjo un error inesperado del servidor. Vuelve a intentar la solicitud. Si el error persiste, contacta con soporte."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "El encabezado Authorization requiere un token de tipo Bearer. Usa una clave de API de administrador. Esta es una clave secreta del lado del servidor. Genera una en la [página de claves de API](https://dashboard.mintlify.com/settings/organization/api-keys) de tu dashboard."
+      }
+    }
+  }
+}

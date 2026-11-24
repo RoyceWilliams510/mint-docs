@@ -1,0 +1,260 @@
+---
+title: "Extension Mintlify MDX"
+description: "Installez l'extension Mintlify MDX pour l'autocomplétion, les diagnostics, la documentation au survol, un éditeur visuel et une prévisualisation."
+keywords: ["Cursor", "MDX", "autocomplétion", "diagnostics", "IntelliSense", "prévisualisation", "éditeur", "mode visuel"]
+---
+
+L'extension Mintlify MDX ajoute la prise en charge du langage pour les projets Mintlify à VS Code, Cursor, Devin Desktop et aux autres éditeurs compatibles avec l'API d'extensions de VS Code. L'extension connaît chaque composant intégré et chaque propriété, vous bénéficiez donc de l'autocomplétion pendant la saisie, et elle signale les composants inconnus, les propriétés invalides et les imports de snippets non résolus.
+
+L'extension ouvre également les fichiers `.mdx` dans un éditeur visuel et exécute une prévisualisation en direct dans votre éditeur, ce qui vous permet de rédiger et de voir le rendu sans passer par un navigateur.
+
+<div id="prerequisites">
+  ## Prérequis
+</div>
+
+- VS Code 1.85.0 ou plus récent
+- Un répertoire de documentation avec un fichier `docs.json` valide
+- La [CLI Mintlify](/fr/cli/install), uniquement pour la prévisualisation dans l'éditeur
+
+<div id="install-the-extension">
+  ## Installer l'extension
+</div>
+
+Installez depuis la ligne de commande :
+
+```bash
+code --install-extension mintlify.mintlify-snippets
+```
+
+Ou installez depuis votre éditeur :
+
+1. Ouvrez la vue Extensions.
+2. Recherchez `@id:mintlify.mintlify-snippets`.
+3. Cliquez sur **Install**.
+
+Vous pouvez également l'installer depuis le [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=mintlify.mintlify-snippets).
+
+Dans Cursor, Kiro, Windsurf et les autres éditeurs qui utilisent Open VSX, vous pouvez l'installer depuis l'[Open VSX Registry](https://open-vsx.org/extension/mintlify/mintlify-snippets).
+
+L'extension s'active lorsque vous ouvrez un fichier `.mdx` ou un espace de travail contenant un fichier `docs.json`.
+
+<div id="autocomplete">
+  ## Autocomplétion
+</div>
+
+Tapez `<` pour afficher tous les composants intégrés. L'autocomplétion suggère les propriétés et les valeurs des composants à l'intérieur des balises, propose les balises fermantes correspondantes après `</`, ainsi que les valeurs de propriétés énumérées comme `<Badge color="…">`.
+
+L'extension suggère les composants que vous importez depuis des [snippets réutilisables](/fr/create/reusable-snippets) aux côtés des composants intégrés. `className`, `id` et `style` sont proposés sur chaque composant et élément HTML, et la saisie à l'intérieur de `className="…"` suggère des classes utilitaires Tailwind, y compris les variantes comme `md:` et `hover:`.
+
+<div id="diagnostics">
+  ## Diagnostics
+</div>
+
+L'extension signale les problèmes dans le panneau Problèmes et les souligne dans votre fichier pendant que vous rédigez :
+
+- Composants inconnus.
+- Propriétés inconnues ou en double.
+- Valeurs invalides pour les propriétés énumérées.
+- Propriétés requises manquantes.
+- Balises non fermées ou mal appariées, y compris les éléments HTML simples comme `<div>`.
+- Imports de snippets non résolus.
+
+Ces classes d'erreurs provoquent des échecs de build, corrigez-les donc au fil de la rédaction pour éviter des déploiements en échec.
+
+Pour désactiver les diagnostics, définissez `mintlify.diagnostics.enabled` sur `false`.
+
+<div id="hover-documentation">
+  ## Documentation au survol
+</div>
+
+Survolez un composant ou une propriété pour voir sa fonction et un lien vers sa page dans la documentation Mintlify. Le survol d'un composant de snippet prévisualise le contenu du fichier de snippet.
+
+<div id="go-to-definition">
+  ## Atteindre la définition
+</div>
+
+Maintenez <kbd>Cmd</kbd> (macOS) ou <kbd>Ctrl</kbd> (Windows) et cliquez pour accéder à la définition :
+
+- des composants de snippet ;
+- des chemins d'import ;
+- des attributs `href` et `src` qui pointent vers des pages locales.
+
+L'extension trouve la racine de votre documentation en remontant depuis le fichier ouvert jusqu'à trouver `docs.json`, de sorte que les imports absolus comme `/snippets/example.mdx` se résolvent correctement. Le projet détecté apparaît dans la barre d'état. Pour vérifier quelle racine l'extension utilise, exécutez **Mintlify: Show detected docs root** depuis la palette de commandes.
+
+<div id="folding">
+  ## Repli de code
+</div>
+
+Utilisez les chevrons de la gouttière pour replier des régions d'une page :
+
+- Les régions de balises de composants et HTML, comme `<Accordion>…</Accordion>`.
+- Les sections de titres.
+- Le frontmatter.
+- Les blocs de code.
+- Les commentaires JSX.
+
+<div id="configuration-validation">
+  ## Validation de la configuration
+</div>
+
+L'extension valide `docs.json` par rapport au [schéma Mintlify](https://mintlify.com/docs.json).
+
+<div id="visual-mode">
+  ## Mode visuel
+</div>
+
+Ouvrez n'importe quel fichier `.mdx` en mode visuel pour modifier la page dans un éditeur enrichi semblable à celui du tableau de bord Mintlify. Les titres, listes, tableaux, liens, encarts, cartes, étapes, onglets, accordéons, blocs de code et images sont tous modifiables sur place.
+
+Pour basculer entre le mode visuel et l'éditeur de texte :
+
+- Appuyez sur <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> (macOS) ou <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> (Windows).
+- Ou utilisez le sélecteur d'éditeur à l'extrémité droite de la ligne des fils d'Ariane.
+
+Utilisez l'icône d'engrenage dans la barre de titre pour choisir avec quel éditeur les fichiers `.mdx` s'ouvrent par défaut.
+
+Les raccourcis Markdown fonctionnent à la saisie (`#` pour un titre, `-` pour un élément de liste, `**gras**`, `` `code` ``), et la barre d'outils et le menu `/` insèrent des composants. Les modifications sont réécrites en MDX par le même convertisseur que [`mint format`](/fr/cli/commands#mint-format). Les composants que le mode visuel ne connaît pas sont préservés tels quels.
+
+<div id="snippet-forms">
+  ### Formulaires de snippets
+</div>
+
+En mode visuel, un composant importé depuis un snippet est affiché sous forme de formulaire avec un champ par propriété plutôt que sous forme de balise opaque. Le mode visuel déduit les champs des props présentes dans la signature de la fonction du composant et de leurs valeurs par défaut. Une valeur par défaut de `true` devient une case à cocher, `2` devient un champ numérique, `icon` ou `logo` devient un chemin d'image avec une vignette, et `href` ou `url` devient un lien.
+
+Pour contrôler les champs, documentez le composant avec un commentaire JSDoc `@param` juste avant l'export. Dans les fichiers `.jsx` et `.tsx`, utilisez un bloc `/** … */`. Dans les snippets `.mdx`, utilisez un commentaire MDX (`{/* … */}`) pour qu'il ne s'affiche pas :
+
+```mdx
+{/*
+  A product tile with a price and a call to action.
+  @param {string} name - Product name, shown as the title
+  @param {image} [icon] - Path to a square icon under /images
+  @param {'Free' | 'Pro' | 'Enterprise'} [tier=Free] - Which plan it belongs to
+  @param {number} [seats=1] - Seats included
+  @param {boolean} [featured] - Highlight the card
+  @param {url} [href] - Where the button goes
+  @param {text} [summary] - One or two sentences under the title
+*/}
+export const ProductCard = ({ name, icon, tier = 'Free', seats = 1, featured = false, href, summary, children }) => ( ... );
+```
+
+Les types suivants produisent les champs de formulaire correspondants :
+
+| Type              | Champ                                     |
+| ----------------- | ----------------------------------------- |
+| `string`          | Champ de texte                            |
+| `text` (ou `markdown`) | Champ de texte multi-ligne           |
+| `boolean`         | Case à cocher                             |
+| `number`          | Champ numérique                           |
+| `'a' \| 'b'`      | Liste déroulante de ces valeurs           |
+| `image`           | Champ de chemin avec une vignette         |
+| `url`             | Champ de lien                             |
+| `color`           | Champ de texte avec un échantillon        |
+| tout autre type   | Expression `{…}` brute                    |
+
+Les crochets (`[name]`) indiquent qu'une propriété est optionnelle. Une propriété documentée sans crochets affiche un marqueur « requis ». `[name=value]` fournit une valeur par défaut lorsque la déstructuration n'en a pas. La première ligne du commentaire est la description affichée dans l'en-tête du formulaire et dans le menu **Insert**.
+
+`children` n'est jamais un champ : le corps de la balise est laissé tel quel et résumé sous le formulaire. Basculez vers l'éditeur de texte pour le modifier.
+
+Les snippets importés apparaissent également dans le menu **+ Insert** et dans le menu `/`.
+
+<div id="docs-sidebar">
+  ## Barre latérale de la documentation
+</div>
+
+La vue Mintlify dans la barre d'activité reflète l'arborescence de navigation de votre `docs.json`. Les produits et onglets de premier niveau restent à la racine, avec leur navigation imbriquée dans des lignes dépliables. La barre latérale utilise les icônes de `docs.json` et du frontmatter des pages, et les libellés des pages proviennent de `sidebarTitle` ou de `title`. Sélectionner une page l'ouvre en mode visuel.
+
+Utilisez l'action **+** pour ajouter des groupes, onglets, menus déroulants, ancres, langues, produits et versions. Faites glisser les lignes pour les réorganiser, ou déposez une page sur un groupe pour la déplacer en haut de ce groupe. L'arborescence bouge immédiatement, puis Mintlify enregistre le changement dans `docs.json`.
+
+L'arborescence suit la page active et se recharge lorsque `docs.json` ou une page change.
+
+<div id="preview-in-your-editor">
+  ## Prévisualisation dans votre éditeur
+</div>
+
+Ouvrez un fichier `.mdx` et sélectionnez l'icône de prévisualisation dans la barre de titre de l'éditeur, ou faites un clic droit sur le fichier et sélectionnez **Preview Mintlify**. Un panneau de prévisualisation s'ouvre à côté de votre éditeur et affiche le rendu de la page.
+
+La barre d'outils de la prévisualisation comporte des boutons précédent, suivant et recharger, une zone d'adresse et un bouton bascule **Follow editor**. Saisissez un chemin comme `/quickstart` dans la zone d'adresse et appuyez sur <kbd>Entrée</kbd> pour accéder à cette page. Avec **Follow editor** activé, la prévisualisation change de page à mesure que vous changez de fichier dans votre éditeur.
+
+Appuyez sur <kbd>Cmd</kbd>+<kbd>F</kbd> (macOS) ou <kbd>Ctrl</kbd>+<kbd>F</kbd> (Windows) dans la prévisualisation pour ouvrir une barre de recherche sur la page rendue. <kbd>Enter</kbd> et <kbd>Shift</kbd>+<kbd>Enter</kbd> permettent de parcourir les résultats. <kbd>Esc</kbd> ferme la barre de recherche.
+
+La prévisualisation dans l'éditeur s'affiche dans une iframe, donc les outils de développement du navigateur ne peuvent pas y accéder. Cliquez sur le bouton **Open in browser** dans la barre d'outils de la prévisualisation, ou exécutez **Mintlify: Open preview in browser**, pour ouvrir la page dans votre navigateur.
+
+Les prévisualisations dans l'éditeur nécessitent la [CLI Mintlify](/fr/cli/install). Le serveur de prévisualisation s'exécute par défaut sur le port `3939` afin de ne pas entrer en conflit avec des applications sur le port 3000. Modifiez le port avec le paramètre `mintlify.preview.port`.
+
+L'URL du serveur en cours d'exécution apparaît dans la barre d'état. Sélectionnez-la pour arrêter le serveur, ou exécutez **Mintlify: Stop preview server**.
+
+Pour voir la sortie du processus `mint dev` sous-jacent, ouvrez le canal de sortie **Mintlify Preview**.
+
+<Tip>
+  Utilisez la prévisualisation dans l'éditeur pendant que vous rédigez des pages individuelles, et [`mint dev`](/fr/cli/preview) dans un navigateur lorsque vous voulez tester la navigation, la recherche ou l'authentification sur l'ensemble de votre site.
+</Tip>
+
+<div id="wrap-content-in-components">
+  ## Encadrer du contenu dans des composants
+</div>
+
+L'extension inclut des snippets qui encadrent le texte sélectionné dans un composant, plutôt que d'insérer un composant vide à remplir.
+
+Pour les utiliser, sélectionnez le contenu à encadrer, puis exécutez **Snippets: Surround With** depuis la palette de commandes et sélectionnez un composant. Des snippets sont disponibles pour `AccordionGroup`, `CardGroup`, `CodeGroup`, `Expandable`, `Frame`, `RequestExample`, `ResponseExample` et les blocs de code délimités.
+
+<div id="settings">
+  ## Paramètres
+</div>
+
+| Paramètre | Valeur par défaut | Description |
+| --- | --- | --- |
+| `mintlify.diagnostics.enabled` | `true` | Signale les composants inconnus, les propriétés inconnues, les propriétés requises manquantes et les imports de snippets non résolus. |
+| `mintlify.warnAboutConflictingExtensions` | `true` | Avertit lorsqu'une autre extension MDX est installée aux côtés de l'extension Mintlify MDX. |
+| `mintlify.preview.command` | `mint dev --no-open` | Commande utilisée pour démarrer le serveur de prévisualisation, exécutée depuis la racine de votre projet. |
+| `mintlify.preview.followEditor` | `true` | Bascule la prévisualisation vers la page de l'éditeur actif lorsque vous changez de fichier. Également activable depuis la barre d'outils de la prévisualisation. |
+| `mintlify.preview.port` | `3939` | Port du serveur de prévisualisation. Ajouté à la commande de prévisualisation via `--port`, sauf si cette commande en définit déjà un. |
+
+`mintlify.preview.command` est un paramètre utilisateur, un espace de travail ne peut donc pas le remplacer. Cela empêche un dépôt cloné d'exécuter une commande arbitraire sur votre machine lorsque vous ouvrez une prévisualisation.
+
+<div id="commands">
+  ## Commandes
+</div>
+
+Exécutez-les depuis la palette de commandes :
+
+| Commande | Description |
+| --- | --- |
+| **Mintlify: Preview Mintlify** | Ouvre le panneau de prévisualisation pour le fichier actuel. |
+| **Mintlify: Stop preview server** | Arrête le serveur de prévisualisation en cours d'exécution. |
+| **Mintlify: Open preview in browser** | Ouvre la page prévisualisée dans votre navigateur. |
+| **Mintlify: Show detected docs root** | Affiche le fichier `docs.json` que l'extension a résolu. |
+| **Mintlify: Open component docs** | Ouvre la documentation du composant sous votre curseur. |
+| **Mintlify: Restart language server** | Redémarre le serveur de langage. |
+
+<div id="conflicting-extensions">
+  ## Extensions en conflit
+</div>
+
+D'autres extensions MDX fournissent leur propre coloration syntaxique et leurs propres fonctionnalités de langage pour les fichiers `.mdx`, ce qui entre en conflit avec cette extension. Désactivez les autres extensions MDX pour éviter les suggestions en double et une coloration incohérente.
+
+Pour le formatage du code, utilisez [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) aux côtés de cette extension ou exécutez [`mint format`](/fr/cli/commands#mint-format).
+
+<div id="troubleshooting">
+  ## Dépannage
+</div>
+
+<AccordionGroup>
+  <Accordion title="Les composants sont signalés comme inconnus">
+    L'extension résout les composants par rapport à la racine de votre documentation. Exécutez **Mintlify: Show detected docs root** pour confirmer qu'elle a trouvé le bon fichier `docs.json`. Si la racine est incorrecte ou manquante, ouvrez le dossier contenant votre fichier `docs.json` comme espace de travail.
+
+    Si la racine est correcte, exécutez **Mintlify: Restart language server**.
+  </Accordion>
+  <Accordion title="L'autocomplétion et la coloration se comportent de manière incohérente">
+    Une autre extension MDX est probablement active elle aussi. Ouvrez la vue Extensions, recherchez `mdx` et désactivez toute autre extension MDX dans cet espace de travail.
+  </Accordion>
+  <Accordion title="La prévisualisation ne démarre pas">
+    Ouvrez le canal de sortie **Mintlify Preview** pour voir l'erreur de `mint dev`.
+
+    - `could not run "mint dev --no-open"` : la CLI n'est pas installée. Installez-la avec `npm i -g mint`.
+    - `Trust the workspace first` : faites confiance à l'espace de travail via **Manage Workspace Trust**.
+    - `no docs.json found above this file` : ouvrez le dossier contenant votre fichier `docs.json` comme espace de travail.
+    - `Invalid docs.json` : exécutez [`mint validate`](/fr/cli/commands#mint-validate) pour trouver l'erreur de configuration.
+  </Accordion>
+  <Accordion title="Les imports de snippets sont signalés comme non résolus">
+    Les chemins d'import absolus se résolvent depuis la racine de votre documentation, pas depuis votre fichier. Vérifiez que le chemin correspond à l'emplacement du fichier de snippet par rapport à votre fichier `docs.json`, et que la racine détectée est correcte.
+  </Accordion>
+</AccordionGroup>

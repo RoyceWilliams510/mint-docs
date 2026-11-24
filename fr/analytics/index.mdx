@@ -1,0 +1,63 @@
+---
+title: "Vue d'ensemble des analytics"
+description: "Consultez le dashboard analytics de Mintlify pour suivre le trafic, l'usage de l'assistant, les recherches, l'engagement et les retours des lecteurs."
+keywords: ["analytics", "metrics", "page views", "traffic", "trends", "insights", "impressions", "CTA", "call-to-action"]
+boost: 3
+---
+
+<Info>
+  Les analytics nécessitent un [plan Pro ou Enterprise](https://mintlify.com/pricing?ref=analytics).
+</Info>
+
+La page [analytics](https://app.mintlify.com/analytics) de votre dashboard montre comment les visiteurs et les agents trouvent et utilisent votre documentation. Utilisez ces signaux pour identifier les pages précieuses, découvrir les lacunes de contenu et suivre les évolutions dans le temps.
+
+<Tip>
+  Posez des questions à l'[agent](/fr/editor/agent#ask-about-your-analytics) sur vos données analytics directement dans le panneau de chat. L'agent peut répondre à vos questions sur les données et fournir des recommandations pour améliorer votre documentation.
+</Tip>
+
+Les données analytics apparaissent généralement quelques minutes après une interaction. Les événements très récents peuvent ne pas apparaître immédiatement.
+
+<div id="select-an-analytics-view">
+  ## Sélectionner une vue analytics
+</div>
+
+<Card title="Trafic" horizontal icon="chart-line" href="/fr/analytics/traffic">
+  Suivez les visiteurs, les pages vues, les référents, ainsi que le trafic humain et agent.
+</Card>
+<Card title="Assistant" horizontal icon="message-square" href="/fr/analytics/assistant">
+  Consultez l'utilisation de l'assistant, les thèmes des conversations, la satisfaction et les transcriptions.
+</Card>
+<Card title="Recherche" horizontal icon="search" href="/fr/analytics/search">
+  Analysez le volume de recherches, les requêtes fréquentes et les taux de clics.
+</Card>
+<Card title="Engagements utilisateurs" horizontal icon="route" href="/fr/analytics/user-engagements">
+  Comprenez les actions sur le contenu, les parcours de navigation et les funnels de recherche et d'assistant.
+</Card>
+<Card title="Économies" horizontal icon="piggy-bank" href="/fr/analytics/savings">
+  Estimez les heures économisées grâce à Autopilot et aux automatisations, ainsi que les coûts de support économisés grâce à l'assistant.
+</Card>
+<Card title="Retours" horizontal icon="square-dashed-text" href="/fr/optimize/feedback">
+  Consultez les retours dans le temps, examinez les notes et commentaires écrits, et suivez les actions de suivi.
+</Card>
+<Card title="Exporter les analytics" horizontal icon="file-chart-column" href="/fr/analytics/export">
+  Exportez les données du dashboard vers un CSV pour analyse, reporting ou archivage.
+</Card>
+<Card title="Diffuser les événements analytics" horizontal icon="database" href="/fr/analytics/streaming">
+  Envoyez les événements analytics vers Amazon S3 pour un traitement en aval.
+</Card>
+
+<div id="filter-by-time-period">
+  ## Filtrer par période
+</div>
+
+Utilisez le sélecteur de plage dans une vue analytics pour ajuster la période des données affichées. Sélectionnez une plage prédéfinie, comme **Last 7 days** ou **All time**, ou une plage personnalisée dans le calendrier. Les exports utilisent également la plage de temps sélectionnée.
+
+Mintlify conserve les données analytics pendant 365 jours, donc **All time** affiche au maximum les 365 derniers jours de données. Pour conserver un historique plus long, [exportez](/fr/analytics/export) vos analytics ou [diffusez les événements analytics](/fr/analytics/streaming) vers votre propre stockage.
+
+<div id="filter-by-page-or-path">
+  ## Filtrer par page ou par chemin
+</div>
+
+Utilisez le menu **Filter** pour restreindre le tableau de bord à une seule page ou à un chemin. Lorsque vous sélectionnez un chemin, la page analytics affiche les données de chaque page située sous ce chemin. Par exemple, si vous filtrez sur `docs/authentication`, la page analytics affiche les données de toutes les pages du chemin `docs/authentication/*`. Les vues Assistant et Search affichent toujours les données de l'ensemble du site.
+
+Dans la vue Traffic, filtrer par page modifie le classement des pages populaires pour qu'il commence à la page sélectionnée et se poursuive vers le bas du classement, plutôt que d'afficher uniquement cette page.

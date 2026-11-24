@@ -1,0 +1,46 @@
+---
+title: "Single sign-on (SSO)"
+description: "Set up SAML single sign-on for your Mintlify dashboard with your identity provider, such as Okta or Microsoft Entra, and verify your email domains."
+keywords: ["SSO", "SAML authentication", "Okta integration", "Microsoft Entra", "identity provider", "JIT", "provisioning", "verified domains", "admin portal"]
+---
+
+<Info>
+  SSO requires an [Enterprise plan](https://mintlify.com/pricing?ref=sso).
+</Info>
+
+Admins set up SSO from the [Security](https://app.mintlify.com/settings/organization/access) page of the dashboard. Each setup button opens the admin portal, which walks you through the configuration for your identity provider.
+
+To set up SSO, first verify your email domain, then connect your identity provider.
+
+## Verify your domain
+
+Before you set up SSO, verify ownership of your email domains. After you connect SSO, anyone who signs in with an email address on a verified domain goes to your identity provider.
+
+1. Navigate to the [Security](https://app.mintlify.com/settings/organization/access) page in your dashboard.
+2. In the **SSO** section, click **Verify email domains**.
+3. In the admin portal, add your domain. The admin portal displays a DNS record.
+4. Add the DNS record from the admin portal to your DNS provider.
+
+After the DNS record propagates, **Verified email domains** shows a **Verified** badge on the **Security** page.
+
+## Connect your identity provider
+
+1. Navigate to the [Security](https://app.mintlify.com/settings/organization/access) page in your dashboard.
+2. In the **SSO** section, click **Set up SSO**. The button is unavailable until you verify an email domain.
+3. In the admin portal, follow the steps for your identity provider.
+
+When the connection is active, the **SSO** section shows **SAML SSO** with a **Connected** badge.
+
+To change your SSO configuration later, click **Manage SSO** to reopen the admin portal.
+
+## Sign in with SSO
+
+Members can sign in from the [Mintlify login page](https://app.mintlify.com/login) with an email address on a verified domain or from your identity provider's app catalog.
+
+After you connect SSO, test both sign-in flows in a private browser window before you tell your team to use SSO.
+
+## Automatic member provisioning
+
+When someone signs in through SSO for the first time, Mintlify adds them to your organization. New members get the [role](/dashboard/roles) that your identity provider assigns them. If your identity provider doesn't assign a role, they join as editors.
+
+To provision and deprovision members before they sign in, set up [SCIM](/dashboard/scim).

@@ -1,0 +1,104 @@
+---
+title: "About knowledge bases"
+description: "Learn what a knowledge base is, how it differs from a site, and how your team and its agents use knowledge bases."
+keywords: ["base", "internal", "teamspace", "workspace", "private", "public link", "share to web"]
+tag: "Beta"
+---
+
+<Note>
+  Knowledge bases are in beta and subject to change.
+</Note>
+
+A knowledge base is a type of project in Mintlify for your team and the agents they work with. Keep specs, runbooks, onboarding guides, and other internal team knowledge in one place. Connect your knowledge base to Claude, ChatGPT, Cursor, and other AI tools through MCP so agents work from the same information your team does.
+
+A knowledge base uses the same [editor](/editor/index) and [agent](/editor/agent) as your sites. The same workflows apply to both project types.
+
+## How a knowledge base differs from a site
+
+A knowledge base is one of two [project types](/organize/projects#project-types). Because a knowledge base has no published site, features that only apply to a site, such as the **Publishes** page, custom domains, the assistant, exports, analytics, and automations, aren't available for a knowledge base.
+
+To use [Autopilot](/autopilot) in a knowledge base, [connect your own repository](#where-your-pages-are-stored) first. Autopilot doesn't run on repositories that Mintlify hosts.
+
+You organize a knowledge base with only pages and groups. You cannot use tabs, anchors, versions, languages, or other navigation elements.
+
+{/* vale off */}
+
+## Where your pages are stored
+
+{/* vale on */}
+
+The editor sidebar in a knowledge base contains three types of pages.
+
+- **Navigation**: Pages your entire organization shares. Mintlify stores these pages as MDX files in a Git repository and commits your edits automatically.
+- **Personal**: [Private pages](/editor/pages#private-pages) for your drafts or content that's just for yourself. Private pages aren't stored in Git. They stay private to you unless you share them with teammates. If you want to share a private page, open its options menu, select **Move**, and choose **Navigation** or a group inside it.
+- **Shared with me**: Pages that teammates [shared with you](/editor/pages#share-a-private-page) directly.
+
+New knowledge bases use a Git repository that Mintlify hosts for you. To work on your knowledge base locally with your own tools, connect a GitHub, GitLab, Bitbucket, or Azure Repos repository in your [Git settings](https://app.mintlify.com/settings/project/git-settings). Commits you push to the connected repository update your knowledge base.
+
+Mintlify encrypts the content in your knowledge base at rest, with a key unique to your knowledge base.
+
+## How people and agents contribute
+
+Your team can update a knowledge base wherever they work:
+
+- **Editor**: Write and organize pages in your browser or the [desktop app](/desktop), with help from the [agent](/editor/agent).
+- **MCP**: Connect Claude, ChatGPT, Cursor, or another AI tool to the [admin MCP](/ai/mintlify-mcp) to read, search, and edit your knowledge base from a conversation.
+- **Slack**: Ask the [Mintlify agent in Slack](/agent/slack) questions that it answers from your knowledge base, or ask it to update pages.
+- **Git**: Clone your knowledge base's repository and edit the MDX files with any editor or coding agent.
+
+## Share a page to the web
+
+<Info>
+  Public links require a Pro or Enterprise plan for your knowledge base.
+</Info>
+
+You can share a knowledge base page with people outside your organization through a public link. Anyone with the link can view the page without signing in. They can't edit it.
+
+### Allow public links
+
+Public links are off by default. An admin must turn them on before anyone can share a page.
+
+1. Go to your [Security](https://app.mintlify.com/settings/organization/access) settings.
+2. In the **Sharing** section, turn on **Allow public links**.
+
+If an admin turns off **Allow public links**, every public link stops working until an admin turns the setting back on.
+
+### Share a page
+
+You can share a page in **Navigation** if you have the editor or admin role. You can share a private page if you have **Full Access** to it.
+
+1. Open the page in the editor.
+2. Open the <Icon icon="ellipsis" /> page options menu.
+3. Turn on **Share to web**.
+4. Click **Copy public link**.
+
+<Frame>
+  <img
+    alt="Page options menu."
+    className="block dark:hidden mx-auto max-w-xs"
+    src="/images/editor/page-menu-light.png"
+  />
+  <img
+    alt="Page options menu."
+    className="hidden dark:block mx-auto max-w-xs"
+    src="/images/editor/page-menu-dark.png"
+  />
+</Frame>
+
+When you share a page, a <Icon icon="globe" /> globe button appears in the top bar. Click the icon to copy the link again. The public page shows the page's current content.
+
+Each public page also has a Markdown version for AI tools. Add `.md` to the end of the public link to view it or request the link with an `Accept: text/markdown` header.
+
+### Stop sharing a page
+
+1. Open the <Icon icon="ellipsis" /> page options menu.
+2. Turn off **Share to web**.
+3. Click **Stop sharing** to confirm.
+
+The link stops working right away. If you share the page again, Mintlify generates a new link.
+
+## Get started
+
+<Card title="Set up a knowledge base" icon="rocket" href="/base/setup" horizontal>
+  Create a knowledge base, invite your team, and connect your AI tools.
+</Card>

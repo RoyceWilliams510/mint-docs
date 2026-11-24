@@ -1,0 +1,187 @@
+---
+title: "Preview deployments"
+description: "Get unique preview URLs for each pull request so reviewers can see documentation changes in a live environment before merging to production."
+keywords: ["preview URLs", "pull request previews", "branch previews", "staging environments"]
+---
+
+<Info>
+  Preview deployments require a [paid plan](https://mintlify.com/pricing?ref=preview-deployments).
+  
+  [Restricting access to previews](#restrict-access-to-preview-deployments), with an organization login or a password, requires an Enterprise plan.
+</Info>
+
+Preview deployments let you see how changes to your docs look before merging to production. Each preview creates a shareable URL that updates automatically as you push new changes.
+
+Preview URLs are publicly viewable by default, even if they contain unpublished content. Share the preview deployment URL with anyone who needs to review your changes.
+
+## Create preview deployments
+
+Create preview deployments automatically through pull requests or manually from your dashboard.
+
+### Automatic previews
+
+<Note>
+  Automatic previews are only created for pull requests targeting your [deployment branch](/guides/git-concepts#deployment-branch), for GitHub [stacked pull requests](#stacked-pull-requests) based on it, and for GitHub pull requests that the Mintlify bot opens. For any other GitHub pull request that targets another branch, you can [build a preview on demand](#pull-requests-to-other-branches).
+</Note>
+
+When you create a pull request, the Mintlify bot automatically adds a link to view the preview deployment in your pull request. The preview updates each time you push new commits to the branch.
+
+<Frame>
+  <img src="/images/previews/preview-deployment-light.png" alt="Link to view deployment in the pull request timeline" className="block dark:hidden" />
+  <img src="/images/previews/preview-deployment-dark.png" alt="Link to view deployment in the pull request timeline" className="hidden dark:block" />
+</Frame>
+
+### Stacked pull requests
+
+In a GitHub stack, each pull request targets the one below it instead of your deployment branch. If the bottom pull request in the stack targets your deployment branch, Mintlify builds a preview for every pull request in the stack.
+
+Each preview also includes changes from the pull requests below it in the stack. The [preview widget](#preview-widget) lists the changed files compared to your deployment branch.
+
+### Pull requests to other branches
+
+If the Mintlify bot opened a GitHub pull request that targets a branch other than your deployment branch, such as a pull request from the [agent](/agent), Mintlify builds its preview automatically.
+
+For any other GitHub pull request that targets another branch, Mintlify adds a skipped **Mintlify Deployment** check to the pull request instead. To build a preview from this check, you need write or admin access to the repository.
+
+1. Open the **Checks** tab of your pull request.
+2. Select the **Mintlify Deployment** check.
+3. Click **Build preview**.
+
+<Frame>
+  <img src="/images/previews/build-preview-check.png" alt="Skipped Mintlify Deployment check with a Build preview button in the GitHub Checks tab" />
+</Frame>
+
+Mintlify builds a preview from the latest commit on the pull request and marks the check as successful with the GitHub username of the person who requested it. The [preview widget](#preview-widget) lists the changed files compared to your deployment branch.
+
+### Fork pull requests
+
+Pull requests opened from a fork require approval before Mintlify builds a preview. Mintlify doesn't build fork content automatically because a preview runs the contributor's code, including MDX components and custom scripts.
+
+When someone opens a pull request from a fork, Mintlify adds a **Mintlify Preview (fork)** check with an **Action required** status and comments on the pull request with a link to approve the preview.
+
+### Manual previews
+
+You can manually create a preview for any branch.
+
+1. Go to the [Previews](https://app.mintlify.com/publishes/previews) page in your dashboard.
+2. Click **Create custom preview**.
+3. Enter the name of the branch you want to preview.
+4. Click **Create preview**.
+
+If your project uses [multiple repositories](/deploy/multi-repo), the dialog also shows a **Repository** menu. Select the repository that contains the branch before you enter the branch name. The menu lists each repository source with its URL path and defaults to the base source.
+
+Mintlify builds the selected repository from your branch and the other repositories from their configured branches.
+
+### API
+
+You can also create preview deployments programmatically using the [Trigger preview deployment](/api/preview/trigger) API endpoint. This is useful for integrating preview creation into continuous integration and continuous delivery (CI/CD) pipelines or custom tooling.
+
+## Redeploy a preview
+
+Redeploy a preview to refresh content or retry after a failed deployment.
+
+1. Go to the [Previews](https://app.mintlify.com/publishes/previews) page in your dashboard.
+2. Click the preview you want to redeploy.
+3. Click **Redeploy**.
+
+## Preview widget
+
+The preview widget appears on preview deployments to help you navigate and review updated pages. The widget is a floating button in the bottom-right corner of your preview deployment.
+
+<Frame>
+  <img src="/images/previews/widget-light.png" alt="Preview widget expanded to show list of changed files." className="block dark:hidden" />
+  <img src="/images/previews/widget-dark.png" alt="Preview widget expanded to show list of changed files." className="hidden dark:block" />
+</Frame>
+
+1. Click the widget to show all added, modified, or removed files in the preview.
+1. Click a file to view the changes on the corresponding page.
+1. Use the search bar to filter the list of changed files.
+1. Hover over a file and click the **Open in editor** icon to edit the file directly in the web editor.
+
+The widget only appears on preview deployments, not on your live site or local previews.
+
+## Restrict access to preview deployments
+
+<Info>
+  Restricting access to preview deployments requires an [Enterprise plan](https://mintlify.com/pricing?ref=preview-deployments).
+</Info>
+
+By default, preview deployments are publicly accessible to anyone with the URL. You can restrict access by requiring organization authentication for all previews or by password-protecting individual previews.
+
+If your site requires [authentication](/deploy/authentication-setup) to access, Mintlify automatically enables preview authentication and you cannot disable it. Reviewers sign in to previews with their Mintlify account, so only members of your Mintlify organization can view them. To share a preview with someone outside your organization, [switch preview authentication to password protection](#change-access-for-an-existing-preview). If you turn off authentication for your site and your plan does not include preview authentication, new previews are publicly accessible.
+
+If your organization has multiple sites, each preview follows the settings of the site it belongs to. Previews of a site that requires authentication need organization sign-in, while previews of your other sites stay public unless you restrict them.
+
+### Require organization authentication
+
+Restrict preview access to authenticated members of your Mintlify organization.
+
+1. Go to the **Previews** section of the [Site](https://app.mintlify.com/settings/project/site) page in your dashboard.
+2. Click the **Preview authentication** toggle to enable or disable preview authentication.
+
+### Password-protect an individual preview
+
+Password-protect a specific preview to share it with external reviewers without adding them to your Mintlify organization. This option is available when you create a manual preview from your dashboard. The **Make private** toggle does not appear if your plan does not include preview authentication or if your site requires authentication.
+
+You can also set a password or organization login on a preview when you create or redeploy it with the [Trigger preview deployment](/api/preview/trigger) API by passing an `auth` object in the request body.
+
+1. Go to the [Previews](https://app.mintlify.com/publishes/previews) page in your dashboard.
+2. Click **Create custom preview**.
+3. Enter the name of the branch you want to preview.
+4. Toggle **Make private** on and enter a password. Passwords must be at least 8 characters.
+5. Click **Create preview**.
+
+### Change access for an existing preview
+
+Switch an existing preview between organization login and password protection without recreating it. You need permission to update authentication settings. Your site must also have preview authentication or site authentication enabled.
+
+1. Go to the [Previews](https://app.mintlify.com/publishes/previews) page in your dashboard.
+2. Click the preview to open its details.
+3. Under **Auth override**, select an option:
+   - **Dashboard login**: Only members of your organization signed in to Mintlify can view the preview.
+   - **Password**: Anyone with the password can view the preview. Enter a password of at least 8 characters.
+4. Click **Save**.
+
+Mintlify redeploys the preview with the new access settings. If the preview already has a password, Mintlify asks you to confirm before removing or replacing it. The previous password stops working after you save.
+
+### Existing previews when you turn on authentication
+
+Previews created before you turn on [authentication](/deploy/authentication-setup) for your site keep the access settings they were built with. A preview without its own access restriction stays publicly accessible to anyone with the URL.
+
+When you turn on authentication for your production deployment, the **Existing preview deployments** setting controls what happens to these previews:
+
+- **Delete public** (default): Delete previews that don't have organization login or password protection.
+- **Keep existing**: Leave all existing previews unchanged.
+- **Delete all**: Delete every existing preview. Mintlify asks you to confirm before saving.
+
+This setting only appears when you turn on authentication. It does not appear when you edit or switch an authentication method that is already on.
+
+Deleted previews remain on the [Previews](https://app.mintlify.com/publishes/previews) page with a **Deleted** status. You cannot visit or redeploy a deleted preview.
+
+## Preview lifetime
+
+Preview deployments stay live as long as their source branch exists in your repository and continue to receive updates on every push.
+
+- **Automatic previews**: The preview for a pull request remains available while the pull request is open and after it's merged or closed, as long as the source branch still exists. When you delete the branch, the next dashboard sync removes the preview. For Azure Repos, Mintlify deletes the preview when you complete or abandon the pull request. See [Azure Repos](/deploy/azure-repos#preview-deployments).
+- **Manual previews**: Manual previews stay live until you delete them. Redeploying a manual preview refreshes its content against the latest commit on the specified branch.
+- **Previews from a previous repository**: If you change the repository in your [Git settings](https://app.mintlify.com/settings/project/git-settings), previews built from the previous repository stop receiving updates. Mintlify automatically deletes them after seven days. If you switch back to the original repository before then, Mintlify keeps the previews.
+- **Delete a preview**: On the [Previews](https://app.mintlify.com/publishes/previews) page of your dashboard, open the preview and click **Delete** to remove it immediately.
+
+Preview URLs are unique per branch. If you delete a preview and later recreate one for the same branch, Mintlify may issue a new URL.
+
+Mintlify generates preview URLs automatically. The subdomain and domain are not configurable, and custom domains only apply to your production deployment.
+
+## Troubleshooting preview deployments
+
+If your preview deployment fails, try these troubleshooting steps.
+
+- **View the build logs**: On the [Previews](https://app.mintlify.com/publishes/previews) page of your dashboard, click the failed preview. The deployment logs show errors that caused failures.
+- **Check your configuration**:
+   - Missing `docs.json` at the configured content root. If your `docs.json` is in a subdirectory, confirm the **docs.json is in a subdirectory** setting points to the correct path.
+   - Invalid `docs.json` syntax (for example, an empty file or a stray trailing comma that breaks JSON parsing).
+   - Schema errors in `docs.json` such as an invalid `theme`, malformed `navigation`, or unresolved `$ref` values.
+   - Missing or incorrect file paths referenced in your navigation.
+   - Invalid frontmatter in MDX files.
+   - Broken image links or missing image files.
+- **Validate locally**: Run `mint dev` and `mint validate` locally to catch configuration and build errors before pushing to the repository.
+- **Check recent changes**: Review the most recent commits in your branch to identify what changes caused the build to fail.

@@ -1,0 +1,185 @@
+---
+title: "Lists and tables"
+description: "Format structured data in your documentation with Markdown tables, ordered and unordered lists, nested structures, and task list checkboxes."
+keywords: ["ordered", "unordered", "Markdown tables", "table formatting"]
+---
+
+## Lists
+
+Lists follow the official [Markdown syntax](https://www.markdownguide.org/basic-syntax/#lists-1).
+
+### Ordered list
+
+To create an ordered list, add numbers followed by a period before list items.
+
+1. First item
+2. Second item
+3. Third item
+4. Fourth item
+
+```mdx
+1. First item
+2. Second item
+3. Third item
+4. Fourth item
+```
+
+### Unordered list
+
+To create an unordered list, add dashes (`-`), asterisks (`*`), or plus signs (`+`) before list items.
+
+- First item
+- Second item
+- Third item
+- Fourth item
+
+```mdx
+- First item
+- Second item
+- Third item
+- Fourth item
+```
+
+### Nested list
+
+Indent list items to nest them.
+
+- First item
+- Second item
+  - Additional item
+  - Additional item
+- Third item
+
+```mdx
+- First item
+- Second item
+  - Additional item
+  - Additional item
+- Third item
+```
+
+### Task list
+
+To create a task list, add `[ ]` for an unchecked checkbox or `[x]` for a checked checkbox after unordered list markers.
+
+- [x] Completed item
+- [ ] Incomplete item
+
+```mdx
+- [x] Completed item
+- [ ] Incomplete item
+```
+
+## Tables
+
+Tables follow the official [Markdown syntax](https://www.markdownguide.org/extended-syntax/#tables).
+
+To add a table, use three or more hyphens (`---`) to create each column's header, and use pipes (`|`) to separate each column. For compatibility, you should also add a pipe on either end of the row.
+
+| Property | Description                           |
+| -------- | ------------------------------------- |
+| Name     | Full name of user                     |
+| Age      | Reported age                          |
+| Joined   | Whether the user joined the community |
+
+```mdx
+| Property | Description                           |
+| -------- | ------------------------------------- |
+| Name     | Full name of user                     |
+| Age      | Reported age                          |
+| Joined   | Whether the user joined the community |
+```
+
+### Escape pipe characters
+
+To include a literal pipe character (`|`) in a table cell, prefix it with a backslash (`\|`). Escape pipe characters even when they appear inside inline code. Otherwise, the pipe is treated as a column separator and can cause parsing errors during preview or validation.
+
+| Value         | Description                       |
+| ------------- | --------------------------------- |
+| `read\|write` | A value containing a literal pipe |
+
+```mdx
+| Value         | Description                       |
+| ------------- | --------------------------------- |
+| `read\|write` | A value containing a literal pipe |
+```
+
+### Column alignment
+
+Use colons in the separator row to align column content:
+
+| Left aligned | Center aligned | Right aligned |
+| :----------- | :------------: | ------------: |
+| Left         | Center         | Right         |
+| Text         | Text           | Text          |
+
+```mdx
+| Left aligned | Center aligned | Right aligned |
+| :----------- | :------------: | ------------: |
+| Left         | Center         | Right         |
+| Text         | Text           | Text          |
+```
+
+### Column widths
+
+Markdown tables size their columns automatically based on content. To control column widths, write the table in HTML and add a `<colgroup>` element that sets a width on every `<col>`.
+
+In the [editor](/editor)'s visual mode, drag a column border to resize it. The editor converts the table to HTML and writes the `<colgroup>` widths for you.
+
+When every `<col>` declares a width, through the `width` attribute or an inline style, the table uses your widths and wraps long content within each column. If any `<col>` is missing a width, Mintlify ignores the declared widths and sizes columns based on content. Tables that are too wide for the page scroll horizontally.
+
+<table>
+  <colgroup>
+    <col width="25%" />
+    <col width="15%" />
+    <col width="60%" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>name</td>
+      <td>string</td>
+      <td>Full name of the user</td>
+    </tr>
+    <tr>
+      <td>age</td>
+      <td>number</td>
+      <td>Reported age of the user</td>
+    </tr>
+  </tbody>
+</table>
+
+```html
+<table>
+  <colgroup>
+    <col width="25%" />
+    <col width="15%" />
+    <col width="60%" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>name</td>
+      <td>string</td>
+      <td>Full name of the user</td>
+    </tr>
+    <tr>
+      <td>age</td>
+      <td>number</td>
+      <td>Reported age of the user</td>
+    </tr>
+  </tbody>
+</table>
+```

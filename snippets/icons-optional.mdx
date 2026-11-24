@@ -1,0 +1,25 @@
+<ResponseField name="icon" type="string">
+  The icon to display.
+
+  Options:
+  - [Font Awesome](https://fontawesome.com/icons) icon name, if you have the `icons.library` [property](/organize/settings-appearance#icons) set to `fontawesome` in your `docs.json`
+  - [Lucide](https://lucide.dev/icons) icon name, if you have the `icons.library` [property](/organize/settings-appearance#icons) set to `lucide` in your `docs.json`
+  - [Tabler](https://tabler.io/icons) icon name, if you have the `icons.library` [property](/organize/settings-appearance#icons) set to `tabler` in your `docs.json`
+  - A single emoji (for example, `💡` or `🚀`)
+  - URL to an externally hosted icon
+  - Path to an icon file in your project
+  - SVG code wrapped in curly braces
+
+  For custom SVG icons:
+  1. Convert your SVG using the [SVGR converter](https://react-svgr.com/playground/).
+  2. Paste your SVG code into the SVG input field.
+  3. Copy the complete `<svg>...</svg>` element from the JSX output field.
+  4. Wrap the JSX-compatible SVG code in curly braces: `icon={<svg ...> ... </svg>}`.
+  5. Adjust `height` and `width` as needed.
+</ResponseField>
+
+<ResponseField name="iconType" type="string">
+  The [Font Awesome](https://fontawesome.com/icons) icon style. Only used with Font Awesome icons. 
+  
+  Options: `regular`, `solid`, `light`, `thin`, `sharp-solid`, `sharp-regular`, `sharp-light`, `sharp-thin`, `sharp-duotone-solid`, `duotone`, `brands`.
+</ResponseField>

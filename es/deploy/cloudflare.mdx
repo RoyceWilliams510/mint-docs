@@ -1,0 +1,353 @@
+---
+title: "Despliega en una subruta con Cloudflare Workers"
+sidebarTitle: "Cloudflare"
+description: "Despliega tu documentación de Mintlify en una subruta de tu dominio usando Cloudflare Workers con configuración paso a paso y ajustes de DNS."
+keywords: ["Cloudflare Workers", "enrutamiento de subrutas", "configuración de proxy inverso", "configuración de Worker", "Cloudflare WAF", "reglas de firewall", "Bot Fight Mode", "errores 403"]
+boost: 3
+---
+
+import Propagating from "/snippets/es/custom-subpath-propagating.mdx";
+import SubpathSetupSteps from "/snippets/es/subpath-setup-steps.mdx";
+
+Para alojar tu documentación en una subruta como `yoursite.com/docs` utilizando Cloudflare, debes crear y configurar un Cloudflare Worker.
+
+<Info>
+  Antes de comenzar, necesitas una cuenta de Cloudflare y un nombre de dominio (puede gestionarse dentro o fuera de Cloudflare).
+</Info>
+
+<div id="set-your-base-path">
+  ## Configura tu ruta base
+</div>
+
+<SubpathSetupSteps />
+
+El dashboard muestra un script de Cloudflare Worker con tu subdominio, dominio y ruta base ya completados. Usa este script en el paso [Configurar el enrutamiento](#configure-routing) en lugar de reemplazar manualmente los valores de marcador de posición en el script de ejemplo.
+
+<div id="set-up-a-worker">
+  ## Configura un Worker
+</div>
+
+Crea un Cloudflare Worker siguiendo la [guía de inicio de Cloudflare Workers](https://developers.cloudflare.com/workers/get-started/dashboard/), si aún no lo has hecho.
+
+<Tip>
+  Si tu proveedor de DNS es Cloudflare, desactiva el proxy para el registro CNAME para evitar posibles problemas de configuración.
+</Tip>
+
+<div id="proxies-with-vercel-deployments">
+  ### Proxies con implementaciones de Vercel
+</div>
+
+Si utilizas Cloudflare como proxy con implementaciones de Vercel, debes asegurarte de una configuración adecuada para evitar conflictos con la verificación del dominio de Vercel y el aprovisionamiento de certificados SSL.
+
+Una configuración de proxy incorrecta puede impedir que Vercel aprovisione certificados SSL de Let's Encrypt y provocar fallos en la verificación del dominio.
+
+<div id="required-path-allowlist">
+  #### Lista obligatoria de rutas permitidas
+</div>
+
+Tu Cloudflare Worker debe permitir el tráfico a estas rutas específicas sin bloquear ni redirigir:
+
+- `/.well-known/acme-challenge/*` - Obligatoria para la verificación de certificados de Let's Encrypt
+- `/.well-known/vercel/*` - Obligatoria para la verificación del dominio de Vercel
+
+Aunque Cloudflare gestiona automáticamente muchas reglas de verificación, crear reglas personalizadas adicionales puede bloquear inadvertidamente este tráfico crítico.
+
+<div id="header-forwarding-requirements">
+  #### Requisitos para el reenvío de cabeceras
+</div>
+
+Asegúrate de que tu Worker establezca el encabezado `Host` con el destino `<subdomain>.mintlify.site`, como se muestra en el script de ejemplo, en lugar de pasar el encabezado `Host` original de la solicitud. Encabezados `Host` incorrectos provocan que las solicitudes de verificación fallen.
+
+<div id="configure-routing">
+  ### Configurar el enrutamiento
+</div>
+
+En tu dashboard de Cloudflare, haz clic en **Edit Code** y añade el script de tu página de [configuración de dominio personalizado](https://app.mintlify.com/settings/project/custom-domain), que tiene tus valores ya completados, o copia el siguiente script de ejemplo. Consulta la [documentación de Cloudflare](https://developers.cloudflare.com/workers-ai/get-started/dashboard/#development) para obtener más información sobre cómo editar un Worker.
+
+<Tip>
+  Si usas el script de ejemplo, reemplaza `[SUBDOMAIN]` por tu subdominio único, `[YOUR_DOMAIN]` por la URL base de tu sitio web y `/docs` por la subruta que desees si es diferente.
+</Tip>
+
+```javascript
+addEventListener("fetch", (event) => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  try {
+    const urlObject = new URL(request.url);
+    
+    // If the request is to a Vercel verification path, allow it to pass through
+    if (urlObject.pathname.startsWith('/.well-known/')) {
+      return await fetch(request);
+    }
+    
+    // If the request is to the docs subpath or a Mintlify asset or API path
+    if (
+      /^\/docs/.test(urlObject.pathname) ||
+      /^\/mintlify-assets\//.test(urlObject.pathname) ||
+      /^\/_mintlify\//.test(urlObject.pathname)
+    ) {
+      // Then Proxy to Mintlify
+      const DOCS_URL = "[SUBDOMAIN].mintlify.site";
+      const CUSTOM_URL = "[YOUR_DOMAIN]";
+
+      let url = new URL(request.url);
+      url.hostname = DOCS_URL;
+
+      let proxyRequest = new Request(url, request);
+
+      proxyRequest.headers.set("Host", DOCS_URL);
+      proxyRequest.headers.set("X-Forwarded-Host", CUSTOM_URL);
+      proxyRequest.headers.set("X-Forwarded-Proto", "https");
+      // If deploying to Vercel, preserve client IP
+      proxyRequest.headers.set("CF-Connecting-IP", request.headers.get("CF-Connecting-IP"));
+
+      return await fetch(proxyRequest);
+    }
+  } catch (error) {
+    // If no action found, serve the regular request
+    return await fetch(request);
+  }
+}
+```
+
+<Warning>
+  Además de tu subruta, tu Worker debe hacer proxy de `/_mintlify/*` y `/mintlify-assets/*`. Estas rutas sirven el CSS, JavaScript, fuentes, favicons y solicitudes de API de tu documentación. Sin ellas, las páginas se cargan sin estilos.
+
+  Si diriges el tráfico a tu Worker con patrones de ruta en lugar de un dominio personalizado, añade rutas para `yoursite.com/mintlify-assets/*` y `yoursite.com/_mintlify/*` junto con la ruta de tu subruta. Estas rutas deben originarse desde la raíz de tu dominio, no desde tu subruta.
+</Warning>
+
+<Note>
+  El script de ejemplo solo hace proxy del tráfico de la documentación. Si añades el Worker como dominio personalizado, las solicitudes fuera de tu subruta, `/mintlify-assets/*`, `/_mintlify/*` y `/.well-known/*` quedan sin gestionar. Si tu sitio principal se ejecuta en el mismo dominio, limita el Worker a las rutas de la documentación con patrones de ruta. Como alternativa, dirige todo el resto del tráfico a tu sitio principal como se muestra en [Enrutamiento personalizado de Webflow](#webflow-custom-routing).
+</Note>
+
+Haz clic en **Deploy** y espera a que se propaguen los cambios.
+
+<Propagating />
+
+<div id="test-your-worker">
+  ### Prueba tu Worker
+</div>
+
+Después de desplegar tu código, prueba tu Worker para asegurarte de que dirige a tu documentación de Mintlify.
+
+1. Prueba usando la URL de vista previa del Worker: `your-worker.your-subdomain.workers.dev/docs`
+2. Verifica que el Worker dirija a tu documentación de Mintlify y a tu sitio web.
+
+<div id="add-custom-domain">
+  ### Agregar dominio personalizado
+</div>
+
+1. En tu [dashboard de Cloudflare](https://dash.cloudflare.com/), ve a tu Worker.
+2. Ve a **Settings > Domains & Routes > Add > Custom Domain**.
+3. Agrega tu dominio. 
+
+<Tip>
+  Agrega tu dominio tanto con `www.` como sin `www.` al inicio.
+</Tip>
+
+Consulta [Add a custom domain](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/#add-a-custom-domain) en la documentación de Cloudflare para obtener más información. 
+
+<div id="resolve-dns-conflicts">
+  ### Resolver conflictos de DNS
+</div>
+
+Si tu dominio ya apunta a otro servicio, debes eliminar el registro DNS existente. Tu Cloudflare Worker debe controlar todo el tráfico de tu dominio.
+
+1. Elimina el registro DNS existente para tu dominio. Consulta [Eliminar registros DNS](https://developers.cloudflare.com/dns/manage-dns-records/how-to/create-dns-records/#delete-dns-records) en la documentación de Cloudflare para obtener más información.
+2. Vuelve a tu Worker y agrega tu dominio personalizado.
+
+<div id="webflow-custom-routing">
+  ## Enrutamiento personalizado de Webflow
+</div>
+
+Si usas Webflow para alojar tu sitio principal y quieres servir la documentación de Mintlify en `/docs` en el mismo dominio, configura un enrutamiento personalizado mediante Cloudflare Workers. El Worker redirige mediante proxy todo el tráfico que no sea de docs hacia tu sitio principal.
+
+<Warning>
+  Configura tu sitio principal en una landing page antes de desplegar este Worker, o los visitantes de tu sitio principal podrían ver errores.
+</Warning>
+
+1. En Webflow, configura una landing page para tu sitio principal, por ejemplo `landing.yoursite.com`. Esta es la página que verán los visitantes cuando entren a tu sitio.
+2. Despliega tu sitio principal en la landing page. Esto garantiza que tu sitio principal siga siendo accesible mientras configuras el Worker.
+3. Para evitar conflictos, actualiza cualquier URL absoluta en tu sitio principal para que sea relativa.
+4. En Cloudflare, haz clic en **Edit Code** y añade el siguiente script en el código de tu Worker.
+
+  <Tip> Reemplaza `[SUBDOMAIN]` por tu subdominio único, `[YOUR_DOMAIN]` por la URL base de tu sitio web, `[LANDING_DOMAIN]` por la URL de tu landing page y `/docs` por la subruta que desees si es diferente. </Tip>
+
+  ```javascript
+  addEventListener("fetch", (event) => {
+  event.respondWith(handleRequest(event.request));
+  });
+  async function handleRequest(request) {
+  try {
+    const urlObject = new URL(request.url);
+    
+    // If the request is to a Vercel verification path, allow it to pass through
+    if (urlObject.pathname.startsWith('/.well-known/')) {
+      return await fetch(request);
+    }
+    
+    // If the request is to the docs subpath or a Mintlify asset or API path
+    if (
+      /^\/docs/.test(urlObject.pathname) ||
+      /^\/mintlify-assets\//.test(urlObject.pathname) ||
+      /^\/_mintlify\//.test(urlObject.pathname)
+    ) {
+      // Proxy to Mintlify
+      const DOCS_URL = "[SUBDOMAIN].mintlify.site";
+      const CUSTOM_URL = "[YOUR_DOMAIN]";
+      let url = new URL(request.url);
+      url.hostname = DOCS_URL;
+      let proxyRequest = new Request(url, request);
+      proxyRequest.headers.set("Host", DOCS_URL);
+      proxyRequest.headers.set("X-Forwarded-Host", CUSTOM_URL);
+      proxyRequest.headers.set("X-Forwarded-Proto", "https");
+      // If deploying to Vercel, preserve client IP
+      proxyRequest.headers.set("CF-Connecting-IP", request.headers.get("CF-Connecting-IP"));
+      return await fetch(proxyRequest);
+    }
+    // Route everything else to main site
+    const MAIN_SITE_URL = "[LANDING_DOMAIN]";
+    if (MAIN_SITE_URL && MAIN_SITE_URL !== "[LANDING_DOMAIN]") {
+      let mainSiteUrl = new URL(request.url);
+      mainSiteUrl.hostname = MAIN_SITE_URL;
+      return await fetch(mainSiteUrl, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body
+      });
+    }
+  } catch (error) {
+    // If no action found, serve the regular request
+    return await fetch(request);
+  }
+  }
+  ```
+5. Haz clic en **Deploy** y espera a que se propaguen los cambios.
+
+<Propagating />
+
+<div id="troubleshoot-firewall-blocking">
+  ## Solución de problemas de bloqueo del firewall
+</div>
+
+Si tu sitio de documentación muestra errores 500 tras unos segundos o la navegación se vuelve lenta, el firewall de Cloudflare podría estar bloqueando solicitudes a los recursos de Mintlify.
+
+<div id="symptoms">
+  ### Síntomas
+</div>
+
+- Las páginas se cargan sin estilos porque se bloquean las solicitudes de archivos CSS y JavaScript.
+- La página de documentación carga inicialmente pero se bloquea con un error 500 después de 30-60 segundos.
+- Navegación del lado del cliente lenta o interrumpida entre páginas.
+- Errores 403 en la consola del navegador en solicitudes a las rutas `/_mintlify/*` o `/mintlify-assets/*`.
+- Mensajes de desafíos de seguridad de Cloudflare sobre "datos malformados" o "patrones de URL sospechosos".
+
+<div id="root-cause">
+  ### Causa raíz
+</div>
+
+El Firewall de aplicaciones web (WAF) y el Bot Fight Mode de Cloudflare pueden marcar como sospechosas las solicitudes de recursos de Mintlify debido a:
+
+- Múltiples símbolos `%` en parámetros de URL codificados.
+- Cadenas de consulta largas con caracteres especiales.
+- Solicitudes automatizadas desde pestañas inactivas.
+
+<div id="solution">
+  ### Solución
+</div>
+
+Crea una regla de firewall en Cloudflare para excluir los recursos de Mintlify de las comprobaciones de seguridad.
+
+<div id="create-the-firewall-exception">
+  #### Crear la excepción del firewall
+</div>
+
+1. Inicia sesión en tu [dashboard de Cloudflare](https://dash.cloudflare.com/).
+2. Selecciona tu dominio.
+3. Ve a **Security > WAF**.
+4. Haz clic en **Create rule**.
+5. Configura la regla con estos ajustes:
+
+**Nombre de la regla:** Permitir assets de Mintlify
+
+**Cuando las solicitudes entrantes coincidan:**
+
+- Campo: `Hostname`
+- Operador: `equals`
+- Valor: `docs.yourdomain.com` (reemplaza con tu dominio real de documentación)
+
+**Y:**
+
+- Campo: `URI Path`
+- Operador: `starts with`
+- Valor: `/_mintlify/`
+
+**O:**
+
+- Campo: `URI Path`
+- Operador: `starts with`
+- Valor: `/mintlify-assets/`
+
+**Entonces:**
+
+- Acción: `Skip`
+- Selecciona: `All remaining custom rules`, `Managed rules` y `Super Bot Fight Mode`
+
+6. Activa **Log** para rastrear las solicitudes coincidentes.
+7. Haz clic en **Deploy**.
+
+<div id="verify-the-rule">
+  #### Verifica la regla
+</div>
+
+Después del despliegue:
+
+1. Abre tu sitio de documentación en un navegador.
+2. Deja la página inactiva durante 2-3 minutos.
+3. Navega entre páginas.
+4. Revisa la consola del navegador en busca de errores 403.
+
+Si los problemas persisten, verifica la configuración de la regla:
+
+- Asegúrate de que el hostname coincida exactamente con tu dominio de docs.
+- Confirma que la ruta URI use `starts with` (no `contains`).
+- No incluyas comodines (`*`) en el valor de la ruta.
+- Verifica que hayas habilitado y desplegado la regla.
+
+<div id="common-mistakes">
+  ### Errores comunes
+</div>
+
+- Usar el operador `contains` con `/mintlify-assets/*`. El `*` se interpreta como un carácter literal, no como un comodín.
+- Usar `equals` para la ruta URI. Esto solo coincide con la ruta exacta `/mintlify-assets/` y no con subrutas.
+- Olvidar excluir Bot Fight Mode. Inclúyelo explícitamente en la acción de exclusión.
+- Configurar un nombre de host incorrecto. Debe coincidir con tu dominio de documentación real.
+
+<div id="additional-troubleshooting">
+  ### Solución de problemas adicional
+</div>
+
+Si la excepción del firewall no resuelve el problema:
+
+1. Revisa el registro de **Security > Events** de Cloudflare para detectar solicitudes bloqueadas.
+2. Verifica que tu Cloudflare Worker (si usas una subruta personalizada) establezca el encabezado `Host` con tu destino `<subdomain>.mintlify.site` en lugar de pasar el encabezado `Host` original de la solicitud.
+3. Configura temporalmente el nivel de seguridad en "Essentially Off" para confirmar que Cloudflare es la causa.
+4. Revisa cualquier Page Rule personalizada que pueda anular la excepción del firewall.
+
+<div id="example-working-configuration">
+  ### Ejemplo de configuración en funcionamiento
+</div>
+
+```
+Rule: Allow Mintlify assets
+Status: Enabled
+
+When incoming requests match:
+  (http.host eq "docs.yourdomain.com" and (starts_with(http.request.uri.path, "/_mintlify/") or starts_with(http.request.uri.path, "/mintlify-assets/")))
+
+Then:
+  Skip: All remaining custom rules, Managed rules, Super Bot Fight Mode
+  Log: Enabled
+```

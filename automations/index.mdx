@@ -1,0 +1,82 @@
+---
+title: "Automations overview"
+sidebarTitle: "Overview"
+description: "Automate content maintenance with Mintlify automations by running the agent on a schedule, on repository pushes, or on connected integration events."
+keywords: ["automation", "automate", "cron", "agent", "automations"]
+boost: 5
+---
+
+<Info>
+  Automations require an [Enterprise plan](https://mintlify.com/pricing?ref=automations).
+</Info>
+
+Automations run the agent automatically on a schedule, in response to pushes to a repository, or when an event occurs in a connected integration. Each automation defines a prompt for the agent and a trigger for when to run it. Automations support GitHub, GitHub Enterprise Server, and GitLab repositories with the same triggers, predefined automations, and update modes. Throughout this guide, "pull request" also refers to GitLab merge requests unless noted otherwise.
+
+When an automation runs, the agent reads your project content and any connected repositories, then follows the prompt to make updates.
+
+To have an agent decide what to update without writing prompts or configuring triggers, use [Autopilot](/autopilot).
+
+<Tip>
+  Use automations that run on a schedule for recurring tasks, like publishing changelogs or improving content based on users' conversations with the [assistant](/assistant).
+
+  Use automations that trigger on content or code changes for reactive maintenance, like translations or updating content when source code changes.
+</Tip>
+
+## Trigger types
+
+Automations support five trigger types.
+
+- **Content update**: Runs when content changes push to your Mintlify project repository, including pull request merges and direct pushes.
+- **Code change**: Runs when a pull request merges in one or more connected source code repositories. You can exclude a specific author or limit the trigger to pull requests with changes under a specific path for each repository.
+- **Custom schedule**: Runs on a recurring schedule. Automations queue within 10 minutes of the scheduled time.
+- **Integration**: Runs when a selected event occurs in a connected shared integration or when a new message posts to a selected Slack channel.
+- **Webhook**: Runs when an authenticated request hits the automation's webhook endpoint. Available for [custom automations](/automations/create) only. See [Trigger automation webhook](/api/automations/webhook).
+
+Each automation has exactly one trigger. You cannot combine trigger types in a single automation.
+
+## Pull request grouping
+
+Automations group related changes into a single pull request instead of opening a separate one for every change. When a later run produces more changes that belong with an open pull request, the agent appends them to that pull request rather than opening a duplicate. Grouping behavior depends on the automation. See [Predefined automations](/automations/reference) for each automation's behavior.
+
+<Note>
+  Draft changelog, Fill gaps from assistant conversations, Improve docs from user feedback, and Update from support feedback do not group or append. Each run opens its own pull request with the changes from that run. Update from support feedback can open up to three pull requests per run, one for each distinct theme it identifies.
+</Note>
+
+Custom automations open a new pull request by default. A single run can open several pull requests when the work splits into independent changes. To add changes to an open pull request from an earlier run, tell the agent to do so in your instructions. See [Open multiple pull requests or append to open ones](/automations/create#open-multiple-pull-requests-or-append-to-open-ones).
+
+## Reviewing automation pull requests
+
+When an automation opens or updates a pull request, Mintlify adds context directly to it so you can review without leaving GitHub or GitLab.
+
+- **PR title** includes the name of the automation that generated it, so you can identify automation PRs at a glance when scanning an open PR list.
+- **PR description** summarizes what changed and why. Each time a run appends new changes to an existing PR, the description updates to show a running timeline of what each run contributed.
+- **PR comments** explain the changes from any runs that append to the pull request and which source code pull requests the agent used as context.
+- **Reviewers** come from the authors of the source code changes that triggered the update. Applies to automations that use source code repositories as context on GitHub. GitLab does not support automatic reviewer assignment, so assign reviewers manually on merge requests. To stop an automation from requesting reviewers, connect the [admin MCP](/ai/mintlify-mcp) to your AI tool and ask it to turn off reviewer assignment for that automation. You can't change this setting in the dashboard.
+
+## Usage limits
+
+Automation runs count toward your credit usage. Each run that updates your docs costs 250 credits, regardless of how much content the agent reads or how many files it changes. Runs that find nothing to update cost nothing. See [Credit pricing](/credits) for more information.
+
+See your credit usage, set overages, and manage your credit package on the [Usage](https://app.mintlify.com/settings/organization/usage) page of your dashboard.
+
+Each automation can run up to 500 times per day. Runs that fail do not count toward this limit.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Predefined automations" icon="list" href="/automations/reference">
+    Reference for all predefined automations: triggers, update modes, and required configuration.
+  </Card>
+
+  <Card title="Manage automations" icon="toggle-right" href="/automations/manage">
+    Enable predefined automations and configure triggers, update mode, and context.
+  </Card>
+
+  <Card title="Create a custom automation" icon="plus" href="/automations/create">
+    Build an automation with your own trigger, instructions, and context repositories.
+  </Card>
+
+  <Card title="Learn best practices" icon="book-open" href="/guides/use-automations">
+    Choose the right trigger, write effective instructions, and review results.
+  </Card>
+</CardGroup>

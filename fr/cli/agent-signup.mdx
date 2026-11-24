@@ -1,0 +1,112 @@
+---
+title: "Inscription par un agent"
+description: "Laissez un agent IA créer un site Mintlify sans compte, puis revendiquez le site depuis votre propre compte."
+keywords: ["mint deploy", "mint claim", "auth.md", "claim", "GitHub Actions"]
+---
+
+Un agent IA peut créer et déployer un site Mintlify sans avoir à créer de compte au préalable. Vous pouvez ensuite revendiquer le site qu'un agent a créé pour vous depuis votre propre compte Mintlify.
+
+Utilisez ce processus de création de site et d'inscription lorsque vous souhaitez qu'un agent travaille sur un site en autonomie ou que vous voulez présenter un site en ligne avant de créer un compte. Si vous avez déjà un compte ou êtes prêt à vous inscrire, utilisez plutôt le [workflow de configuration par agent](/fr/quickstart).
+
+<div id="deploy-a-site">
+  ## Déployer un site
+</div>
+
+Exécutez `mint deploy` depuis le répertoire de documentation. Le répertoire doit contenir un fichier `docs.json`.
+
+```bash
+npm i -g mint
+mint deploy --subdomain <subdomain>
+```
+
+La commande provisionne un site à l'adresse `https://<subdomain>.mintlify.site` et affiche l'URL d'un dépôt Git hébergé ainsi qu'un jeton d'écriture de courte durée. Elle n'envoie aucun fichier. L'agent effectue ensuite les étapes suivantes :
+
+1. Il clone le dépôt hébergé dans un répertoire distinct, en transmettant le jeton d'écriture via un en-tête `Authorization: Bearer` uniquement pour ce processus Git.
+2. Il copie `docs.json`, les pages et les ressources à la racine du dépôt.
+3. Il crée un commit et pousse vers `main`. Le push lance un build.
+
+La sortie inclut des commandes Git prêtes à l'emploi. Exécutez à nouveau `mint deploy` depuis le même répertoire pour obtenir un nouveau jeton d'écriture, ou passez `--new --subdomain <name>` pour créer un autre site.
+
+<Warning>
+  Le jeton d'écriture donne un accès en push au site. Ne le collez pas dans des logs publics, ne le commitez pas et ne l'enregistrez pas dans l'URL d'un remote Git.
+</Warning>
+
+<div id="deploy-on-every-push-from-github">
+  ## Déployer à chaque push depuis GitHub
+</div>
+
+Si votre documentation se trouve dans un dépôt GitHub, `mint deploy --github` configure un workflow qui déploie le site à chaque push sur la branche par défaut du dépôt. Le workflow s'authentifie avec le jeton d'identité OIDC de GitHub, de sorte que le dépôt ne stocke aucun secret.
+
+`--github` nécessite un remote GitHub `origin` et la [CLI GitHub](https://cli.github.com) connectée avec un accès au dépôt.
+
+```bash
+mint deploy --github --subdomain <subdomain>
+```
+
+La commande :
+
+1. Provisionne le site, ou réutilise le site issu d'un précédent `mint deploy` dans le même répertoire.
+2. Autorise le dépôt et sa branche par défaut à déployer le site.
+3. Écrit `.github/workflows/mintlify.yml` à la racine du dépôt.
+
+Commitez et poussez le fichier de workflow sur la branche par défaut. Chaque push ultérieur sur cette branche exécute `mint deploy` dans GitHub Actions, qui pousse le commit extrait vers le site.
+
+Si votre documentation se trouve dans un sous-répertoire, exécutez la commande depuis la racine du dépôt et passez le sous-répertoire avec `--directory`. Le sous-répertoire devient la racine du site, et le workflow ne s'exécute que lorsque des fichiers de ce sous-répertoire ou le workflow lui-même sont modifiés.
+
+```bash
+mint deploy --github --subdomain <subdomain> --directory docs
+```
+
+Si `.github/workflows/mintlify.yml` existe déjà avec un contenu différent, la commande s'arrête. Passez `--force` pour l'écraser.
+
+<Note>
+  `--github` ne fonctionne que pour les sites non revendiqués. Pour déployer un site revendiqué depuis GitHub, connectez le dépôt depuis le [tableau de bord](https://app.mintlify.com).
+</Note>
+
+<div id="claim-the-site">
+  ## Revendiquer le site
+</div>
+
+Un site créé avec `mint deploy` expire 24 heures après sa création par l'agent si personne ne le revendique. La ligne `Expires` dans la sortie de `mint deploy` indique l'heure exacte. Lorsqu'un site non revendiqué expire, Mintlify le supprime.
+
+Lorsque vous revendiquez un site, il est déplacé dans une nouvelle organisation de votre compte et vous en devenez l'administrateur : vous pouvez donc le gérer depuis le [tableau de bord](https://app.mintlify.com).
+
+1. L'agent exécute :
+
+   ```bash
+   mint claim
+   ```
+
+   L'agent n'a pas besoin de votre adresse e-mail. S'il connaît déjà l'adresse e-mail de votre compte Mintlify, il peut passer `--email <email>` pour préremplir la connexion.
+2. Ouvrez le lien de revendication.
+3. Connectez-vous à Mintlify avec n'importe quel compte, ou créez-en un.
+4. Cliquez sur **Confirm**. Aucun code n'est à renvoyer à l'agent.
+
+Exécutez `mint claim` depuis le même répertoire que `mint deploy`, ou passez `--directory`. La CLI stocke les identifiants de l'agent et les lit pendant la revendication : les agents ne doivent donc pas les lire ni les afficher.
+
+Une fois la confirmation effectuée, la page de revendication ouvre la nouvelle organisation dans le tableau de bord.
+
+<div id="check-that-the-claim-finished">
+  ### Vérifier que la revendication est terminée
+</div>
+
+`mint claim` n'attend pas votre confirmation, et l'agent n'a aucun code de revendication à soumettre. Pour vérifier si vous avez confirmé, l'agent exécute de nouveau `mint deploy` depuis le même répertoire :
+
+- Si vous avez confirmé, la commande affiche `This site has been claimed. Manage it in the Mintlify dashboard.` et n'émet pas de jeton d'écriture.
+- Si le site n'est pas encore revendiqué, la commande affiche un nouveau jeton d'écriture comme d'habitude. Attendez que vous cliquiez sur **Confirm**, puis exécutez-la de nouveau.
+
+Exécuter de nouveau `mint claim` avant votre confirmation affiche un nouveau lien de revendication. La commande n'indique pas l'état de la revendication.
+
+<div id="use-authmd-without-the-cli">
+  ## Utiliser auth.md sans la CLI
+</div>
+
+Les agents qui ne peuvent pas installer la CLI peuvent suivre [`https://mintlify.com/auth.md`](https://mintlify.com/auth.md). Ce document décrit le même processus sous forme de requêtes HTTP brutes : enregistrer une identité d'agent anonyme, provisionner un site et transmettre le compte à une personne via la page de revendication.
+
+<div id="add-a-custom-domain">
+  ### Ajouter un domaine personnalisé
+</div>
+
+Après avoir revendiqué le site, un agent qui suit auth.md peut ajouter un [domaine personnalisé](/fr/customize/custom-domain) que vous lui demandez, à la racine du domaine ou sous `/docs`. L'agent vous indique les enregistrements DNS à ajouter : d'abord les enregistrements `TXT`, puis un `CNAME` vers `cname.mintlify.builders` une fois qu'ils sont validés.
+
+Si vous hébergez la documentation sous `/docs` et que votre domaine sert un autre site, ignorez le `CNAME`, car il envoie tous les chemins du domaine vers Mintlify. Configurez plutôt un [proxy inverse](/fr/deploy/docs-subpath) pour `/docs`.

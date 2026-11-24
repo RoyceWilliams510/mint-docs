@@ -1,0 +1,267 @@
+---
+title: "Configuración del editor para IA y publicación"
+sidebarTitle: "Configuración"
+description: "Configure apariencia, instrucciones de IA y valores por defecto de publicación del editor para controlar commits y merges en Mintlify."
+keywords: ["editor", "settings", "ai", "instructions", "publishing", "pull request", "merge", "appearance", "preferences"]
+---
+
+La [página de configuración](https://app.mintlify.com/settings/project/editor) del editor controla la apariencia, el comportamiento de publicación y el comportamiento del agente.
+
+- **Appearance**: Preferencias personales sobre cómo se ve y se comporta el editor. Se aplican solo a usted.
+- **Publishing**: Valores predeterminados a nivel de proyecto sobre cómo el editor hace commit de los cambios y abre pull requests. Se aplican a todas las personas que publican. Los admins y editors pueden actualizar el comportamiento de publicación. En los planes Enterprise, solo los admins pueden cambiar **Auto publish**. Solo los admins pueden cambiar **Auto-create branches**.
+- **Reviewing**: Si los cambios necesitan aprobación antes de publicarse y las reglas para las aprobaciones. Solo los admins pueden cambiar los ajustes de revisión.
+- **Chat**: Instrucciones persistentes para el agente de IA del editor.
+- **Danger zone**: Acciones que no se pueden deshacer.
+
+<div id="appearance">
+
+## Appearance
+
+</div>
+
+Los ajustes de apariencia son preferencias personales. Cambian el editor solo para usted y no afectan a sus compañeros de equipo ni a su sitio publicado. Todos los ajustes de apariencia están desactivados de forma predeterminada.
+
+- **Fit editor to full width**: Extiende el lienzo de edición de borde a borde en lugar de usar la columna predeterminada de 768px.
+- **Show breadcrumbs**: Muestra la ubicación de la página en la navegación del sitio encima del lienzo de edición.
+- **Open live preview in new tab**: Al previsualizar, abre la página representada en una pestaña nueva del navegador.
+
+<div id="pr-merge-method">
+
+## Método de merge de PR
+
+</div>
+
+Seleccione cómo hace merge el editor de las pull requests cuando hace clic en **Merge and publish**:
+
+- **Merge**: Crea un commit de merge que conserva el historial completo de la branch. Es la opción predeterminada.
+- **Squash**: Combina todos los commits de la branch en un único commit en su deployment branch.
+- **Rebase**: Reaplica cada commit de la branch sobre su deployment branch sin un commit de merge.
+
+<Tip>
+  Haga coincidir su método de merge con las reglas de protección de branch de su proveedor de Git. Si su deployment branch solo admite squash merges, elija **Squash** para evitar merges fallidos desde el editor.
+</Tip>
+
+<div id="auto-publish">
+
+## Publicación automática
+
+</div>
+
+La publicación automática hace commit de los cambios en su deployment branch automáticamente, aproximadamente un minuto después de que deje de editar. Si activa este ajuste, el editor oculta las branches y el paso de publicación para todos los usuarios de su sitio. La publicación automática está desactivada de forma predeterminada.
+
+<Warning>
+  Con la publicación automática activada, no hay estado pendiente ni posibilidad de revisar. Cada edición llega a su sitio publicado poco después de que deje de escribir.
+</Warning>
+
+Activar la publicación automática desactiva [Requerir revisión antes de publicar](#require-review-before-publishing) y [Crear branches automáticamente](#auto-create-branches).
+
+<div id="auto-create-branches">
+
+## Crear branches automáticamente
+
+</div>
+
+Si su deployment branch está protegida o Mintlify exige branches, por ejemplo con [Always require branches](#always-require-branches), su primer cambio de cualquier tipo en la deployment branch, incluido uno que haga el [agente](/es/editor/agent), lo traslada a usted y sus cambios a una branch nueva. Un mensaje le indica en qué branch están sus cambios.
+
+Crear branches automáticamente está en beta y puede cambiar. Está desactivado de forma predeterminada, solo los admins pueden cambiarlo y no hace nada mientras la publicación automática está activada. No puede activarlo mientras su deployment branch tenga cambios sin publicar. Publíquelos o descártelos primero.
+
+Abrir páginas, mover el cursor, seleccionar texto y añadir comentarios no inician una branch.
+
+Si el editor no puede crear la branch o comprobar su protección de branch, conserva sus cambios en el navegador y no los guarda en la deployment branch. Haga clic en **Try again** en el mensaje. Si recarga la misma pestaña, sus ediciones de página vuelven. Si crea una branch usted mismo, sus cambios retenidos se trasladan a ella.
+
+Las branches nuevas empiezan con los [hilos de comentarios](/es/editor/collaborate#comments) sin resolver de la branch en la que empezó.
+
+<div id="create-draft-pull-requests-by-default">
+
+## Crear pull requests como borrador de forma predeterminada
+
+</div>
+
+Cuando este ajuste está activado, las pull requests creadas desde el editor se abren como borradores, incluida la pull request que se abre tras el primer commit en una branch nueva. Los autores hacen clic en **Request review** para marcarlas como listas cuando terminan de editar. Este ajuste está activado de forma predeterminada.
+
+Si quiere que las pull requests del editor se abran listas para revisión de inmediato, desactive las pull requests en borrador.
+
+<div id="add-co-authors-to-commits">
+
+## Agregar coautores a los commits
+
+</div>
+
+Cuando esta configuración está activada, cada commit que realiza el editor incluye como coautores a todas las personas que hicieron cambios en ese commit. Esto incluye a la persona que publica y a cada compañero cuyos cambios incluye el commit. Los proveedores de Git como GitHub atribuyen entonces el commit a esas personas junto con el bot de Mintlify. Esta configuración está desactivada de forma predeterminada.
+
+El nombre y el correo electrónico de cada coautor son visibles para cualquier persona que pueda ver el repositorio. Los coautores no necesitan conectar una cuenta de GitHub. El editor usa el nombre de la cuenta de Mintlify de cada persona. Para el correo electrónico, usa su dirección de correo electrónico no-reply de GitHub si conectó una cuenta de GitHub a Mintlify y, de lo contrario, la dirección de correo electrónico de su cuenta de Mintlify.
+
+Los commits no incluyen como coautores a los miembros desactivados.
+
+<div id="show-teammates-changes">
+
+## Mostrar los cambios de los compañeros
+
+</div>
+
+Show teammates' changes controla si el menú **Publish** enumera los cambios pendientes de sus compañeros en su deployment branch.
+
+<Note>
+  Este ajuste se llamaba anteriormente **Granular publishing**.
+</Note>
+
+- **Desactivado (predeterminado)**: El menú **Publish** enumera solo sus propios cambios. Seleccione cuáles de ellos publicar. Los cambios hechos solo por sus compañeros no aparecen.
+- **Activado**: El menú **Publish** también enumera los cambios pendientes de sus compañeros, divididos en **Your changes** y **Modified by others**, para que también pueda publicarlos.
+
+Este ajuste solo tiene efecto mientras trabaja en su deployment branch y esa branch no tiene protecciones de branch. Consulte [Publicar cambios concretos](/es/editor/publish#publish-specific-changes) para más información.
+
+<div id="show-all-branches">
+
+## Mostrar todas las branches
+
+</div>
+
+Mostrar todas las branches controla qué branches enumera el menú de branches antes de que busque.
+
+- **Desactivado (predeterminado)**: El menú de branches enumera su deployment branch, las branches creadas en el editor y las branches con pull requests abiertas o en borrador. Las branches fusionadas o cerradas y otras branches de su repositorio solo aparecen cuando las busca por nombre.
+- **Activado**: El menú de branches enumera todas las branches, incluidas las creadas fuera del editor y las fusionadas o cerradas.
+
+Consulte [Gestionar branches](/es/editor/publish#manage-branches) para más información.
+
+<div id="reviewing">
+
+## Revisión
+
+</div>
+
+<Info>
+  Los ajustes de revisión están en beta y requieren un [plan Enterprise](https://mintlify.com/pricing?ref=review) y un repositorio en GitHub o GitLab.
+</Info>
+
+Solo los admins pueden cambiar los ajustes de revisión. Los demás ajustes de revisión solo tienen efecto mientras **Require review before publishing** está activado, y los admins solo pueden cambiarlos mientras está activado.
+
+<div id="require-review-before-publishing">
+
+### Requerir revisión antes de publicar
+
+</div>
+
+Cuando requiere revisión antes de publicar, solo los admins pueden publicar cambios directamente en su deployment branch. Todos los demás deben solicitar una revisión, y los revisores deben aprobar los cambios antes de que un admin o publisher pueda publicarlos. Consulte [Requerir revisión antes de publicar](/es/editor/review#require-review-before-publishing) para ver cómo funcionan las solicitudes y las aprobaciones. Este ajuste está desactivado de forma predeterminada.
+
+- Requerir revisiones antes de publicar desactiva la [publicación automática](#auto-publish).
+- Si su deployment branch tiene protección de branch en GitHub, las revisiones se hacen en branches y los admins no pueden publicar sin revisión. Consulte [Revisar con una deployment branch protegida](/es/editor/review#review-with-a-protected-deployment-branch).
+- Las revisiones funcionan en su deployment branch y en las branches que crea en el editor. En una branch, un admin o publisher puede publicar una vez que los revisores aprueban todas las páginas modificadas. Consulte [Revisar cambios en una branch](/es/editor/review#review-changes-on-a-branch).
+- En GitLab, sus reglas de fusión de GitLab siguen aplicándose al publicar.
+- Desactivar este ajuste cierra todas las solicitudes de revisión abiertas.
+
+<div id="sync-settings-with-github">
+
+### Sincronizar ajustes con GitHub
+
+</div>
+
+Cuando este ajuste está activado, Mintlify copia **Required approvals**, **Dismiss approvals on new changes** y **Always require branches** de las reglas de protección de branch y los rulesets de su deployment branch en GitHub. Esos ajustes muestran los valores de GitHub y no puede cambiarlos en Mintlify. Cuando cambia la protección de branch en GitHub, Mintlify detecta el cambio automáticamente. En GitLab, este ajuste está desactivado y bloqueado, y usted configura los demás ajustes de revisión.
+
+Este ajuste está activado de forma predeterminada para los repositorios en GitHub. Mintlify lo activa cuando conecta un repositorio de GitHub, o cuando activa por primera vez **Require review before publishing**, a menos que configure usted mismo uno de esos tres ajustes al mismo tiempo. Si lo desactiva, permanece desactivado cuando vuelve a conectar o reemplaza su repositorio.
+
+Cuando activa este ajuste, Mintlify lee su protección de branch de inmediato. Si no puede, el ajuste permanece desactivado y puede intentarlo de nuevo. Si más adelante Mintlify no puede leer su protección de branch, conserva los últimos valores que leyó y el ajuste lo indica.
+
+Si desactiva **Sync settings with GitHub**, puede volver a cambiar los ajustes. Conservan los últimos valores copiados de GitHub.
+
+Cuando configura las aprobaciones usted mismo, no pueden ser menos estrictas que la protección de branch de su deployment branch en GitHub. **Required approvals** debe ser al menos la cantidad de aprobaciones que exige GitHub. Si GitHub descarta las aprobaciones obsoletas, **Dismiss approvals on new changes** debe estar activado. Estos ajustes muestran los mínimos de GitHub y no bajan de ellos. Si sus ajustes guardados quedan por debajo de los requisitos actuales de GitHub, haga clic en **Apply GitHub minimums** para subirlos. Esto no aplica cuando [Requerir una cuenta de GitHub conectada para los revisores](#require-connected-github-account-for-reviewers) está desactivado, porque en ese caso la GitHub app de Mintlify hace merge de los cambios aprobados saltándose su protección de branch.
+
+Si Mintlify no puede leer su protección de branch al guardar, no guarda el cambio. Inténtelo de nuevo o pida a un admin del repositorio de GitHub que compruebe que Mintlify tiene acceso al repositorio.
+
+<div id="required-approvals">
+
+### Aprobaciones requeridas
+
+</div>
+
+Defina cuántos revisores deben aprobar un cambio antes de que pueda publicarse, de 1 a 10. El valor predeterminado es 1. Cada página necesita esa cantidad de aprobaciones de los revisores de la solicitud. La aprobación de quien hace la solicitud no cuenta, y cada revisor cuenta una sola vez. Los banners de revisión y la lista de revisores del menú **Publish** muestran el progreso, por ejemplo **1 of 2 approvals**.
+
+<div id="dismiss-approvals-on-new-changes">
+
+### Descartar aprobaciones con cambios nuevos
+
+</div>
+
+Cuando este ajuste está activado, editar una página aprobada elimina su aprobación, y la página necesita otra revisión antes de poder publicarse. Este ajuste está desactivado de forma predeterminada. Se aplica a las solicitudes de revisión en su deployment branch y en las branches.
+
+Cuando está desactivado, las páginas aprobadas siguen aprobadas después de ediciones posteriores en el editor. Las páginas agregadas a una solicitud después de la aprobación siguen necesitando aprobación. En su deployment branch, las páginas que cambian en Git fuera del editor siguen necesitando otra revisión. En una branch, la aprobación también se mantiene después de envíos en Git, siempre que el pull request de la branch siga abierto.
+
+<div id="always-require-branches">
+
+### Requerir siempre branches
+
+</div>
+
+Cuando este ajuste está activado, los editors y publishers deben crear una branch antes de publicar cambios, aunque su deployment branch no tenga protección de branch. Pueden seguir editando la deployment branch, pero el menú **Publish** muestra **Publish from a branch** y les pide crear una branch para solicitar una revisión y publicar. Los admins pueden seguir publicando directamente en la deployment branch. Este ajuste está desactivado de forma predeterminada.
+
+<div id="require-connected-github-account-for-reviewers">
+
+### Requerir una cuenta de GitHub conectada para los revisores
+
+</div>
+
+Cuando este ajuste está activado, los revisores deben [conectar su cuenta de GitHub](/es/dashboard/profile#connect-github) para aprobar cambios en branches. Este ajuste está activado de forma predeterminada.
+
+Cuando este ajuste está desactivado, los revisores aprueban en Mintlify sin conectar GitHub, y la GitHub app de Mintlify hace merge de los cambios aprobados saltándose su protección de branch.
+
+En GitHub Enterprise Server, este ajuste está desactivado y bloqueado: las aprobaciones siempre pasan por la GitHub app de Mintlify. En GitLab, este ajuste no aparece.
+
+Antes de desactivar este ajuste, agregue la GitHub app de Mintlify a la lista de bypass de la protección de su deployment branch en GitHub. Consulte [Configurar automerge](/es/guides/configure-automerge) para ver los pasos. En la protección de branch clásica, agregue la app en **Allow specified actors to bypass required pull requests**.
+
+Solo puede desactivar este ajuste cuando se cumplen todas las condiciones siguientes:
+
+- **Require review before publishing** está activado.
+- Su repositorio está en GitHub.com.
+- Su deployment branch tiene protección de branch.
+- La GitHub app de Mintlify está en la lista de bypass de la branch.
+
+Para desactivar el ajuste, haga clic en su interruptor y luego en **Turn off** en el diálogo **Stop requiring GitHub accounts?**. Si más adelante la app pierde su lugar en la lista de bypass, la publicación de cambios aprobados falla hasta que un admin la vuelva a agregar.
+
+<div id="ai-instructions">
+
+## Instrucciones de IA
+
+</div>
+
+Las instrucciones de IA son directrices persistentes que el editor envía a la IA junto con su solicitud. Úselas para recoger reglas de estilo y tono que no quiere repetir cada vez, como la voz, la terminología o las convenciones de formato.
+
+Sus instrucciones se aplican a:
+
+- Las **sesiones del agente** iniciadas desde el editor.
+- Las respuestas de **@mintlify** en los [hilos de comentarios](/es/editor/collaborate).
+
+Cada compañero mantiene sus propias instrucciones, vinculadas a su cuenta de usuario. Las instrucciones tienen un límite de 20.000 caracteres.
+
+Añada instrucciones de IA cuando se dé cuenta de que repite las mismas directrices en los prompts, por ejemplo:
+
+- Exigir la segunda persona o títulos en formato de frase.
+- Preferir nombres de producto o terminología concretos.
+- Prohibir el lenguaje de marketing o las frases de relleno.
+- Exigir determinados componentes, como usar siempre `<Note>` para las llamadas de atención.
+
+Mantenga las instrucciones breves y concretas. La IA las sigue en cada solicitud, así que las reglas vagas o contradictorias empeoran los resultados.
+
+Ejemplo:
+
+```text
+- Use second person ("you") and active voice.
+- Use sentence case for all headings.
+- Refer to the product as "Acme"—never "Acme Inc." or "the platform".
+- Wrap notes and warnings in <Note> or <Warning> components.
+- Do not add introductory filler like "In this guide" or "Let's explore".
+```
+
+Deje el campo vacío para eliminar sus instrucciones.
+
+<div id="reset-editor">
+
+## Restablecer editor
+
+</div>
+
+**Reset editor** obliga al editor a descartar su estado local y sincronizarse con su repositorio de Git. Después de confirmar, el editor se recarga. Los admins y editors pueden restablecer el editor.
+
+Restablezca el editor si se queda desincronizado con su repositorio, por ejemplo si el árbol de archivos está vacío o muestra errores como `Unable to find docs.json`. Esto puede ocurrir aunque el archivo exista en su deployment branch y su sitio se compile con normalidad.
+
+<Warning>
+  Si restablece el editor, descarta cualquier cambio sin publicar que no haya confirmado en Git. Si tiene ediciones pendientes que quiere conservar, publíquelas primero.
+</Warning>

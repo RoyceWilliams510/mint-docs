@@ -1,0 +1,186 @@
+---
+title: "GitLab"
+description: "将 GitLab 仓库连接到 Mintlify，实现自动化文档部署、合并请求预览和持续同步。"
+keywords: ["GitLab 集成", "访问令牌", "合并请求预览", "自托管", "实例"]
+boost: 3
+---
+
+Mintlify 使用访问令牌和 webhook 在 GitLab 与 Mintlify 之间进行身份验证并同步变更。
+
+- Mintlify 使用访问令牌从 GitLab 拉取信息。
+- GitLab 使用 webhook 在你进行变更时通知 Mintlify，从而为合并请求启用预览部署。连接项目时，Mintlify 会将 webhook 添加到你的项目中。
+
+<div id="features-available-for-gitlab-repositories">
+  ## GitLab 仓库可用的功能
+</div>
+
+Mintlify 支持 gitlab.com 和自托管 GitLab 实例。连接项目后，以下功能可在 GitLab 上使用：
+
+- 推送到部署分支时的部署，以及合并请求的[预览部署](/zh/deploy/preview-deployments)。
+- [编辑器](/zh/editor/publish)，包括分支、审阅、评论和发布。
+- 通过 GitLab OAuth 连接项目后，可使用 [Autopilot](/zh/autopilot) 和[自动化](/zh/automations)。
+- 在一个项目中使用[多个仓库](/zh/deploy/multi-repo)，前提是所有仓库都在 GitLab 上。
+
+部分功能在 GitLab 上的工作方式不同或不可用：
+
+| 功能 | 在 GitLab 上 |
+| --- | --- |
+| [CI 检查](/zh/deploy/ci) | 不可用。CI 检查仅在 GitHub 仓库上运行。 |
+| [Git LFS](/zh/create/files#large-files-with-git-lfs) | 不可用。Mintlify 仅从 GitHub 仓库下载 Git LFS 文件。 |
+| [Autopilot](/zh/autopilot#review-suggestions) | Autopilot 不会回复合并请求中的评论。要请求更改，请在 Autopilot 页面的建议中发送消息。 |
+| [自动化](/zh/automations) | 自动化需要付费的 GitLab 套餐。Mintlify 不会为合并请求分配审阅者，因此请自行分配。 |
+| [自托管 GitLab](/zh/deploy/gitlab-self-hosted) | Autopilot 和自动化需要你在实例上注册 OAuth 应用。 |
+
+<div id="set-up-the-connection">
+  ## 设置连接
+</div>
+
+当你首次打开 [Git Settings](https://app.mintlify.com/settings/project/git-settings) 时，设置向导将引导你完成 GitLab 存储库的连接。
+
+<Steps>
+  <Step title="选择 GitLab 作为提供商">
+    在 [Git Settings](https://app.mintlify.com/settings/project/git-settings) 页面，选择 **Connect to GitLab** 并点击 **Continue**。
+  </Step>
+  <Step title="下载你的内容">
+    <Tip>
+      如果你已经有一个包含文档的 GitLab 存储库，可以跳过下载，直接点击 **Continue setup**。
+    </Tip>
+    
+    如果你的文档由 Mintlify 托管，请将其下载为 zip 文件。
+    * 在 GitLab 中创建一个新存储库。
+    * 解压 zip 文件内容。
+    * 将内容推送到你的存储库。
+
+    点击 **Continue setup** 继续。
+  </Step>
+  <Step title="查找项目 ID">
+    在你的 GitLab 项目中，依次进入 **Settings** > **General**，找到 **Project ID**。
+  </Step>
+  <Step title="生成访问令牌">
+    前往 **Settings** > **Access Tokens**，选择 **Add new token**。
+    
+    按以下设置配置令牌：
+    - **Name**：Mintlify
+    - **Role**：Maintainer
+    - **Scopes**：`api` 和 `read_api`
+    
+    点击 **Create project access token** 并复制该令牌。
+
+    保存新令牌时，Mintlify 会先检查该令牌。如果令牌没有 `api` scope，或无法发布到你的部署分支，Mintlify 会拒绝该令牌，并显示消息“此 GitLab 令牌无法发布更改。请使用具有 Maintainer 角色和 api scope 的项目访问令牌。”
+
+    <Note>
+      如果无法使用 Project Access Tokens，可改用 Personal Access Token。请注意，Personal Access Token 会过期，需要定期更新。
+    </Note>
+  </Step>
+  <Step title="连接你的存储库">
+    回到设置向导，填写以下字段：
+
+    - **Project ID**：来自 GitLab 项目设置的项目 ID。
+    - **Branch**：选择用于部署文档的分支。
+    - **Deployment token**：你生成的访问令牌。
+    - **Self-hosted GitLab instance**：如果使用 `gitlab.com`，请保持关闭。对于自托管实例，请将其打开，并在 **GitLab instance URL** 中输入你的实例 URL，例如 `https://gitlab.example.com`。你的实例必须可公开访问，以便 Mintlify 能够连接。URL 必须使用 `https://` 和默认端口 443，且不能包含用户名或密码。
+
+    点击 **Connect**。
+    <Frame>
+      <img src="/images/gitlab/gitlab-config-light.png" alt="Mintlify 控制台 Git Settings 页面中的 GitLab 配置面板。" className="block dark:hidden" />
+      <img src="/images/gitlab/gitlab-config-dark.png" alt="Mintlify 控制台 Git Settings 页面中的 GitLab 配置面板。" className="hidden dark:block" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="update-an-existing-connection">
+  ## 更新现有连接
+</div>
+
+要在初始设置后修改你的 GitLab 连接设置，请前往 [Git Settings](https://app.mintlify.com/settings/project/git-settings) 直接更新项目 ID、访问令牌、分支或实例 URL。
+
+<div id="revalidate-git-settings">
+  ## 重新验证 Git 设置
+</div>
+
+如果你的项目出现异常情况（例如缺少分支选项或配置过时），可以强制 Mintlify 刷新你的 Git 源。
+
+<Steps>
+  <Step title="前往 Git Settings">
+    前往控制台中的 [Git Settings](https://app.mintlify.com/settings/project/git-settings)。
+  </Step>
+  <Step title="重新验证设置">
+    点击 GitLab 设置卡片右上角的绿色 **Active** 徽章以重新验证你的 Git 源。
+  </Step>
+</Steps>
+
+<div id="create-the-webhook">
+  ## 创建 webhook
+</div>
+
+Webhook 会在你推送更改时通知 Mintlify，以便自动触发部署。
+
+保存 GitLab 连接时，Mintlify 会使用你的访问令牌自动将 webhook 添加到你的项目中。如果有多个 Mintlify 组织连接同一个 GitLab 项目，每个组织都有自己的 webhook。
+
+再次保存连接时，Mintlify 会保留它添加的 webhook。如果该 webhook 已被删除或其 URL 已更改，Mintlify 会添加一个新的 webhook。
+
+如果 Mintlify 无法添加 webhook（例如令牌没有 Maintainer 角色），控制台会打开 **Add the GitLab webhook** 对话框。该对话框会显示可供复制的 webhook URL 和密钥令牌，以及指向项目 webhook 设置的 **Open GitLab webhooks** 链接。
+
+你可以使用具有 Maintainer 角色和 `api` scope 的令牌再次保存连接，也可以按照以下步骤，使用对话框中的值手动创建 webhook。
+
+<Steps>
+  <Step title="添加新 webhook">
+  1. 在 GitLab 中，依次前往 **Settings** > **Webhooks**。
+  2. 点击 **Add new webhook**。
+  </Step>
+  <Step title="设置 URL 和 webhook">
+    将该 webhook 命名为 **Mintlify**。
+
+    在 **URL** 字段中，输入端点 `https://leaves.mintlify.com/gitlab-webhook`。
+  </Step>
+  <Step title="获取 webhook 令牌">
+    在 Mintlify 控制台中，点击 **Show webhook token**，然后复制该 webhook 令牌。
+  </Step>
+  <Step title="粘贴 webhook 令牌">
+    在 GitLab 中，将来自 Mintlify 控制台的 webhook 令牌粘贴到 **Secret token** 字段中。
+  </Step>
+  <Step title="选择事件">
+    选择以下事件来触发该 webhook：
+    - **Push events**（All branches）
+    - **Merge requests events**
+  </Step>
+  <Step title="验证 webhook">
+    配置 webhook 后，你应该看到以下设置：
+    
+    - **Name**：Mintlify
+    - **URL**：`https://leaves.mintlify.com/gitlab-webhook`
+    - **Secret token**：来自 Mintlify 控制台的 webhook 令牌
+    - **Events**：**Push events**（All branches）和 **Merge requests events**
+
+    添加该 webhook。
+  </Step>
+  <Step title="测试 webhook">
+    创建 webhook 之后，点击 **Test** 下拉菜单。点击 **Push events** 以发送示例负载。如果测试返回 `Hook executed successfully: HTTP 200`，则说明你已正确配置 webhook。
+
+  </Step>
+</Steps>
+
+<div id="fix-connection-warnings">
+  ## 修复连接警告
+</div>
+
+当你打开 [Git Settings](https://app.mintlify.com/settings/project/git-settings) 时，Mintlify 会检查你的访问令牌和 webhook。如果其中任一项失效，Git Settings 会在 GitLab 设置顶部显示警告，并且在你修复之前推送不会触发部署。只有可以编辑 Git 设置的成员才能看到该警告。
+
+| 警告 | 修复方法 |
+| --- | --- |
+| 你的访问令牌已过期、已被他人撤销、GitLab 不再接受，或已无法打开该项目 | 创建一个具有 Maintainer 角色和 `api` scope 的新令牌，将其填入 **Deployment token** 并保存。 |
+| 项目中缺少 Mintlify webhook | 点击 **Set up webhook** 打开 **Add the GitLab webhook** 对话框，然后使用对话框中的值在 GitLab 中[创建 webhook](#create-the-webhook)。 |
+| GitLab 在多次投递失败后停用了 Mintlify webhook | 点击 **Open GitLab webhooks**，在 GitLab 中重新启用该 webhook。 |
+| Mintlify webhook 关闭了推送事件 | 点击 **Open GitLab webhooks**，在 GitLab 中为该 webhook 开启 **Push events**。 |
+
+webhook 警告还会显示 Mintlify 最近一次从你的项目收到 webhook 的时间。在你保存设置后，以及你返回已打开 Git Settings 的浏览器标签页时，Mintlify 会再次检查连接，因此问题修复后警告就会消失。
+
+<div id="deployment-status-in-gitlab">
+  ## GitLab 中的部署状态
+</div>
+
+Mintlify 会在 GitLab 中报告部署状态，让你无需打开 dashboard 即可查看构建是否成功。
+
+当你针对部署分支打开合并请求时，Mintlify 会在其中发表评论，说明其[预览部署](/zh/deploy/preview-deployments)的状态。如果预览失败，评论中会包含失败原因。
+
+当你推送到部署分支时，Mintlify 会为推送的提交添加 **Mintlify Deployment (`<subdomain>`)** 提交状态。该状态会显示生产部署是正在运行、已成功还是已失败，并链接到你的文档站点。其描述会说明结果，例如部署失败的原因。

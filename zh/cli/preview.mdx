@@ -1,0 +1,145 @@
+---
+title: "本地预览"
+description: "使用 mint dev 运行 Mintlify 文档站点的本地预览，支持实时重载、全文搜索和 AI 助手。"
+keywords: ["mint dev", "本地预览", "localhost", "mint login", "搜索", "助手"]
+---
+
+<div id="prerequisites">
+  ## 前提条件
+</div>
+
+- 已全局安装 [Mintlify CLI](/zh/cli/install)，或使用 `npx mint` 运行命令。
+
+<div id="start-the-local-preview">
+  ## 启动本地预览
+</div>
+
+导航到你的文档目录，然后运行：
+
+```bash
+mint dev
+```
+
+本地预览在 `http://localhost:3000` 启动。编辑时，更改会实时显示。
+
+默认情况下，预览会自动在浏览器中打开。要阻止浏览器打开，请使用 `--no-open` 选项：
+
+```bash
+mint dev --no-open
+```
+
+要在不全局安装 CLI 的情况下生成预览，请运行：
+
+```bash
+npx mint dev
+```
+
+<div id="preview-a-directory-without-a-docsjson-file">
+  ### 预览没有 `docs.json` 文件的目录
+</div>
+
+如果你在没有 `docs.json` 文件的目录中运行 `mint dev`，CLI 会根据你的目录结构生成一个 `docs.json` 文件。生成的导航遵循以下规则：
+
+- 为目录根级的 Markdown 和 MDX 文件创建一个名为 **Introduction** 的分组。
+- 为每个顶级子目录创建一个分组，嵌套的子目录会成为子分组。
+- 名为 `index` 或 `readme` 的页面在其分组中排在最前面。其他页面和文件夹按字母顺序排序；如果标题包含数字，则按数字顺序排序。
+- 分组名称使用子目录名称，并去掉开头的数字前缀。例如，名为 `01-getting-started` 的文件夹会成为名为 **Getting started** 的分组。
+- CLI 会跳过以 `.` 或 `_` 开头的文件和文件夹、`node_modules` 和 `snippets` 文件夹，以及 [`.mintignore`](/zh/organize/mintignore) 文件中列出的路径。
+
+站点名称取自该目录或其父目录中 `package.json` 文件的 `name` 字段。如果没有 `package.json` 文件，CLI 会使用目录名称。编辑生成的 `docs.json` 文件以自定义你的导航、主题和颜色。
+
+<Tip>
+  如果你在 VS Code 或 Cursor 中写作，[Mintlify MDX 扩展](/zh/cli/mdx-extension)会在编辑器旁的面板中运行此预览，并滚动到与你正在编辑的页面相匹配的位置。
+</Tip>
+
+<div id="sign-in-for-search-and-assistant">
+  ## 登录以启用搜索和助手
+</div>
+
+你需要使用 Mintlify 账户对 CLI 进行身份验证，才能启用搜索和 [AI 助手](/zh/assistant/index)。
+
+```bash
+mint login
+```
+
+使用 `mint login` 命令完成身份验证后，CLI 会将你的凭据存储在操作系统的凭据存储中，以便你在各会话之间保持登录状态。CLI 还会提示你选择一个默认项目。
+
+登录后，运行 `mint dev` 启动带有搜索和助手功能的本地预览。助手使用与已部署文档站点相同的索引内容。
+
+要检查你的身份验证状态，请运行：
+
+```bash
+mint status
+```
+
+要注销，请运行：
+
+```bash
+mint logout
+```
+
+<div id="custom-ports">
+  ## 自定义端口
+</div>
+
+默认情况下，CLI 使用端口 3000。要使用不同的端口，请使用 `--port` 选项：
+
+```bash
+mint dev --port 3333
+```
+
+如果端口已被占用，CLI 会自动尝试下一个可用端口。
+
+<div id="preview-on-other-devices">
+  ## 在其他设备上预览
+</div>
+
+默认情况下，本地预览仅接受来自你本机 `localhost` 的连接。要在手机或网络中的其他电脑上打开预览，请使用 `--host` 选项：
+
+```bash
+mint dev --host
+```
+
+随后 CLI 会输出一个网络 URL，同一网络中的其他设备可以打开该地址。
+
+<div id="skip-openapi-processing">
+  ## 跳过 OpenAPI 处理
+</div>
+
+如果你有大量 OpenAPI 文件，可以在本地开发时使用 `--disable-openapi` 选项跳过 OpenAPI 处理以提高性能：
+
+```bash
+mint dev --disable-openapi
+```
+
+<div id="disable-navigation-prefetching">
+  ## 禁用导航预加载
+</div>
+
+默认情况下，本地预览会预加载附近的页面，让页面之间的导航感觉是瞬时的。对于非常大的站点，这可能会拖慢你当前正在查看的页面，因为许多页面同时在后台编译。
+
+如果你有数千个页面，并且注意到本地预览时页面加载缓慢，可以使用 `--disable-prefetch` 选项禁用预加载：
+
+```bash
+mint dev --disable-prefetch
+```
+
+禁用预加载后，页面只会在你导航到它们时才会编译。单个页面加载时间会比预加载的页面更长，但你请求的页面不会与后台编译争抢资源。
+
+<div id="preview-as-a-specific-group">
+  ## 以特定组预览
+</div>
+
+如果你使用基于组的访问控制，可以使用 `--groups` 选项以特定身份验证组进行预览：
+
+```bash
+mint dev --groups admin
+```
+
+默认情况下，本地预览以未登录读者的身份显示内容。要检查 [`<Visibility for="signed-in">`](/zh/components/visibility#show-content-by-sign-in-state-or-group) 内容，请使用 `--signed-in` 选项以不属于任何组的已登录读者身份预览。`--groups` 选项同样以已登录读者身份预览。
+
+```bash
+mint dev --signed-in
+```
+
+有关组的更多信息，请参阅[身份验证设置](/zh/deploy/authentication-setup#control-access-with-groups)。

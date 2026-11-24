@@ -1,0 +1,125 @@
+---
+title: "Solucionar problemas de las páginas de API"
+sidebarTitle: "Solución de problemas"
+description: "Corrige errores de compilación de OpenAPI, páginas de endpoints en blanco o faltantes y solicitudes del playground de API que fallan."
+keywords: ["solución de problemas de API", "OpenAPI no válido", "Failed to load OpenAPI file", "Failed to fetch OpenAPI file", "página de API en blanco", "endpoints faltantes", "fallan las solicitudes del playground"]
+boost: 3
+---
+
+Si tus páginas de API no se compilan o no se muestran correctamente, ejecuta primero `mint validate` localmente. Comprueba tus especificaciones, páginas y navegación, y a menudo muestra un error más específico que el despliegue. Después, revisa estos problemas comunes.
+
+<AccordionGroup>
+  <Accordion title='Mi build falla con "Failed to load OpenAPI file"'>
+    El error indica la especificación que falló, los elementos de navegación que hacen referencia a ella y el motivo subyacente:
+
+    ```text
+    Failed to load OpenAPI file "https://example.com/openapi.json" referenced by tab "API reference": fetch failed (ENOTFOUND)
+    ```
+
+    Cuando el motivo es una descarga fallida, Mintlify no pudo obtener el documento desde la URL de tu campo `openapi` en `docs.json` durante la build. Causas comunes:
+
+    - El host no es accesible o solo se resuelve desde una red privada.
+    - La URL requiere autenticación (un token, una cookie de sesión o una IP en la lista de permitidos).
+    - El certificado no es válido o el dominio tiene un problema de DNS.
+    - El origen devolvió un `5xx` transitorio o superó el tiempo de espera.
+    - La especificación se estaba republicando en el momento en que corrió la build, por lo que la URL sirvió una respuesta parcial o vacía.
+
+    El mismo error, con un motivo diferente, puede aparecer cuando una página hace referencia a un endpoint que ya no está en la especificación, o cuando la especificación tiene errores de validación. Si Mintlify no puede determinar qué especificación falló, la build falla con `Failed to generate OpenAPI pages for navigation` en su lugar. En cualquier caso, ejecuta `mint validate` localmente para ver el error subyacente.
+
+    Las builds descargan la URL desde la Internet pública sin credenciales, así que confirma que el documento se descarga con `curl` desde una máquina fuera de tu red. Para resolver el error, cambia a uno de estos patrones:
+
+    - **Sube la especificación a tu repositorio de documentación.** Es el patrón recomendado cuando la URL de origen está detrás de autenticación. Apunta el campo `openapi` a la ruta relativa del repositorio (por ejemplo, `"openapi": "openapi.json"`) y actualiza el archivo en el mismo commit que cambia tu API.
+    - **Sirve la especificación desde una URL pública HTTPS estable.** Aloja el archivo en un CDN o en un bucket de almacenamiento de objetos que no requiera autenticación, tenga un certificado TLS válido y devuelva el documento completo en cada solicitud.
+
+    Para un recorrido de diagnóstico completo, incluidos los fallos intermitentes causados por CI que publica la especificación después de disparar la build, consulta [Corregir el error "Failed to load OpenAPI file"](/es/help-center/openapi-url-fetch-fails-during-build).
+  </Accordion>
+  <Accordion title="Todas mis páginas de OpenAPI están completamente en blanco">
+    Mintlify no encuentra tu documento OpenAPI o el documento no es válido.
+
+    - Ejecuta `mint validate` para comprobar el documento.
+    - Comprueba que la ruta o la URL de `openapi` en tu `docs.json` apunte al documento.
+    - Comprueba que el documento use OpenAPI 3.0 o posterior. Mintlify no es compatible con OpenAPI 2.0. Para convertir un documento 2.0, ábrelo en [Swagger Editor](https://editor.swagger.io/) y haz clic en **Edit** > **Convert to OpenAPI 3**.
+  </Accordion>
+  <Accordion title="Una de mis páginas de OpenAPI está completamente en blanco">
+    Esto suele deberse a un campo `openapi` mal escrito en la metadata de la página. Asegúrate de que
+    el método HTTP y la ruta coincidan con el método HTTP y la ruta del documento de OpenAPI.
+
+    <Note>
+      Mintlify resuelve automáticamente las diferencias de barra final entre tu referencia `openapi`
+      y la especificación de OpenAPI. Por ejemplo, `GET /users/{id}/` coincide con una ruta de la especificación `/users/{id}`.
+    </Note>
+
+    Aquí tienes un ejemplo de cómo puede salir mal:
+
+    ```mdx get-user.mdx
+    ---
+    openapi: "GET /user/{id}"
+    ---
+    ```
+
+    ```yaml openapi.yaml
+    paths:
+      "/users/{id}":
+        get: ...
+    ```
+
+    Observa que la ruta en el campo `openapi` dice `/user/{id}` (singular), mientras que la ruta en el documento de OpenAPI es `/users/{id}` (plural).
+
+    Otro problema común es un nombre de archivo mal escrito. Si especificas un documento de OpenAPI en particular en el campo `openapi`, asegúrate de que el nombre del archivo sea correcto. Por ejemplo, si tienes dos documentos de OpenAPI `openapi/v1.json` y `openapi/v2.json`, tu metadata podría verse así:
+
+    ```mdx api-reference/v1/users/get-user.mdx
+    ---
+    openapi: "v1 GET /users/{id}"
+    ---
+    ```
+  </Accordion>
+  <Accordion title="Las solicitudes del área de pruebas de la API no funcionan">
+    Si tienes un domain personalizado configurado, esto podría deberse a un problema con tu proxy inverso. De forma predeterminada,
+    las solicitudes realizadas a través del área de pruebas de la API comienzan con una solicitud `POST` a la
+    ruta `/_mintlify/api/request` en el sitio de documentación. Si configuras tu proxy inverso para permitir únicamente solicitudes `GET`
+    entonces todas estas solicitudes fallarán. Para solucionarlo, configura tu proxy inverso para
+    permitir solicitudes `POST` a la ruta `/_mintlify/api/request`.
+
+    Como alternativa, si tu proxy inverso no puede aceptar solicitudes `POST`, configura `api.playground.proxy` como `false`
+    para enviar las solicitudes directamente desde los navegadores de los lectores a tu API. En ese caso, tu API debe permitir solicitudes cross-origin.
+    Consulta [Enviar solicitudes a través del proxy](/es/api-playground/configure-playground#send-requests-through-the-proxy).
+  </Accordion>
+  <Accordion title="Las entradas de navigation de OpenAPI no generan páginas">
+    Si usas una configuración de navigation de OpenAPI, pero las páginas no se generan, revisa estos problemas comunes:
+
+    1. **Falta la especificación de OpenAPI predeterminada**: Asegúrate de tener definido un campo `openapi` en el elemento de navigation:
+
+    ```json {5}
+    "navigation": {
+      "groups": [
+        {
+          "group": "Referencia de API",
+          "openapi": "/path/to/openapi.json",
+          "pages": [
+            "GET /users",
+            "POST /users"
+          ]
+        }
+      ]
+    }
+    ```
+
+    2. **Más de una especificación en un array**: Si `openapi` es un array, solo la primera especificación genera páginas. Coloca cada especificación en su propio elemento de navegación. Consulta [Usar varias especificaciones](/es/api-playground/organize-endpoints#use-multiple-specifications).
+
+    3. **Herencia de la especificación OpenAPI**: Si usas navigation anidada, asegúrate de que los grupos hijos hereden la especificación OpenAPI correcta o definan la suya propia.
+
+    4. **Problemas de validación**: Usa `mint validate` para verificar que tu documento OpenAPI sea válido.
+  </Accordion>
+  <Accordion title="Algunas operaciones de OpenAPI aparecen en navigation, pero otras no">
+    1. **Operaciones ocultas**: Las operaciones marcadas con `x-hidden: true` en tu especificación de OpenAPI no aparecerán en la navigation generada automáticamente.
+    2. **Operaciones no válidas**: Las operaciones con errores de validación en la especificación de OpenAPI pueden omitirse. Revisa tu documento de OpenAPI para detectar errores de sintaxis.
+    3. **Inclusión manual vs. automática**: Si haces referencia a endpoints de una especificación de OpenAPI, solo las operaciones referenciadas explícitamente aparecen en la navigation. No se agregan otras páginas automáticamente. Esto incluye operaciones referenciadas en elementos secundarios de la navigation.
+  </Accordion>
+  <Accordion title="La navigation combinada (páginas de OpenAPI y MDX) no funciona correctamente">
+    Al combinar operaciones de OpenAPI con páginas de documentación estándar en navigation:
+
+    1. **Conflictos de archivos**: No puedes tener a la vez un archivo `MDX` y una entrada en navigation para la misma operación. Por ejemplo, si tienes `get-users.mdx`, no incluyas también `"GET /users"` en tu navigation. Si necesitas un archivo que comparta nombre con una operación, usa la extensión `x-mint` del endpoint para que el href apunte a otra ubicación.
+    2. **Resolución de rutas**: Las entradas en navigation que no coincidan con operaciones de OpenAPI se tratan como rutas de archivo. Asegúrate de que tus archivos `MDX` existan en las ubicaciones esperadas.
+    3. **Distinción entre mayúsculas y minúsculas**: La coincidencia de operaciones de OpenAPI distingue mayúsculas y minúsculas. Asegúrate de que los métodos HTTP estén en mayúsculas en las entradas de navigation.
+  </Accordion>
+</AccordionGroup>

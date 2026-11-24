@@ -1,0 +1,33 @@
+---
+title: "Google Tag Manager"
+description: "Intégrez Google Tag Manager à votre documentation Mintlify pour gérer les balises d'analyse, le suivi des conversions et les événements marketing."
+keywords: ["intégration GTM", "gestion des balises", "ID de balise", "consentement aux cookies"]
+---
+
+Ajoutez votre ID de balise dans le fichier `docs.json` et nous injecterons le script Google Tag Manager sur toutes vos pages.
+
+Votre ID de balise est l'ID du conteneur affiché dans votre espace de travail Google Tag Manager, au format `GTM-XXXXXXX`.
+
+Vous êtes responsable de la mise en place des bandeaux de consentement aux cookies avec Google Tag Manager si nécessaire.
+
+Après avoir publié vos modifications, utilisez le mode aperçu de Google Tag Manager pour confirmer que votre conteneur se charge sur votre site de documentation.
+
+<CodeGroup>
+
+```json Options d’Analytics dans docs.json
+"integrations": {
+    "gtm": {
+        "tagId": "required"
+    }
+}
+```
+
+```json Exemple
+"integrations": {
+    "gtm": {
+        "tagId": "GTM-MGBL4PW"
+    }
+}
+```
+
+</CodeGroup>

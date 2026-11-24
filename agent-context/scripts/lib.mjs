@@ -1,0 +1,397 @@
+import { execFileSync } from 'node:child_process';
+import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+
+const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
+export const repositoryRoot = path.resolve(scriptsDirectory, '..');
+
+const contextDirectory = path.join(repositoryRoot, 'context', 'skills', 'mintlify');
+const mcpServersPath = path.join(repositoryRoot, 'context', 'mcp-servers.json');
+// The docs site serves this file at /skill.md.
+export const siteSkillPath = path.resolve(repositoryRoot, '..', 'skill.md');
+const targetsDirectory = path.join(repositoryRoot, 'targets');
+const agentPluginsSchemaDirectory = path.join(
+  repositoryRoot,
+  'schemas',
+  'agent-plugins',
+  '1.0.0',
+);
+
+const ajv = new Ajv2020({ allErrors: true });
+const agentPluginValidators = {
+  mcp: ajv.compile(
+    JSON.parse(await readFile(path.join(agentPluginsSchemaDirectory, 'mcp.schema.json'), 'utf8')),
+  ),
+  plugin: ajv.compile(
+    JSON.parse(
+      await readFile(path.join(agentPluginsSchemaDirectory, 'plugin.schema.json'), 'utf8'),
+    ),
+  ),
+};
+
+export function validateAgentPluginArtifact(kind, value, targetId) {
+  const validate = agentPluginValidators[kind];
+  if (validate === undefined) {
+    throw new Error(`Unknown Agent Plugins artifact kind: ${kind}`);
+  }
+  if (!validate(value)) {
+    throw new Error(
+      `${targetId}: invalid Agent Plugins ${kind} artifact: ${ajv.errorsText(validate.errors, {
+        separator: '; ',
+      })}`,
+    );
+  }
+}
+
+export async function loadTargets(selectedIds = []) {
+  const entries = (await readdir(targetsDirectory))
+    .filter((entry) => entry.endsWith('.json'))
+    .sort();
+  const targets = await Promise.all(
+    entries.map(async (entry) =>
+      JSON.parse(await readFile(path.join(targetsDirectory, entry), 'utf8')),
+    ),
+  );
+
+  for (const target of targets) {
+    if (
+      typeof target.id !== 'string' ||
+      typeof target.repository !== 'string' ||
+      !['.mcp.json', 'mcp.json'].includes(target.mcpConfigFile) ||
+      !['mcp_servers', 'mcpServers'].includes(target.mcpConfigKey) ||
+      (target.skillReferenceDirectory !== undefined &&
+        !['reference', 'references'].includes(target.skillReferenceDirectory)) ||
+      (target.mcpSchema !== undefined && typeof target.mcpSchema !== 'string') ||
+      (target.pluginManifestFile !== undefined &&
+        !['plugin.json', '.claude-plugin/plugin.json'].includes(target.pluginManifestFile)) ||
+      (target.mcpTypeOverrides !== undefined &&
+        (target.mcpTypeOverrides === null ||
+          typeof target.mcpTypeOverrides !== 'object' ||
+          Object.values(target.mcpTypeOverrides).some((value) => typeof value !== 'string')))
+    ) {
+      throw new Error(`Invalid target configuration: ${JSON.stringify(target)}`);
+    }
+
+  }
+
+  const ids = new Set(targets.map((target) => target.id));
+  for (const id of selectedIds) {
+    if (!ids.has(id)) {
+      throw new Error(`Unknown target: ${id}`);
+    }
+  }
+
+  return selectedIds.length === 0
+    ? targets
+    : targets.filter((target) => selectedIds.includes(target.id));
+}
+
+// Where the target's client reads its plugin manifest, relative to the plugin root.
+function manifestFile(target) {
+  return target.pluginManifestFile ?? 'plugin.json';
+}
+
+function markGenerated(skill) {
+  const frontmatterEnd = skill.indexOf('\n---\n', 4);
+  if (frontmatterEnd === -1) {
+    throw new Error('SKILL.md frontmatter is not closed');
+  }
+
+  const insertionPoint = frontmatterEnd + '\n---\n'.length;
+  return `${skill.slice(0, insertionPoint)}\n<!-- Generated from mintlify/docs/agent-context. Edit the canonical source, not this copy. -->\n${skill.slice(insertionPoint)}`;
+}
+
+export function sourceCommit() {
+  if (process.env.GITHUB_SHA) {
+    return process.env.GITHUB_SHA;
+  }
+
+  try {
+    const changes = execFileSync('git', ['status', '--porcelain', '--', '.'], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (changes) {
+      return 'working-tree';
+    }
+
+    return execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return 'working-tree';
+  }
+}
+
+function validateSkill(skill, target) {
+  if (!skill.startsWith('---\n')) {
+    throw new Error(`${target.id}: SKILL.md must start with YAML frontmatter`);
+  }
+  if (!/^name: mintlify$/m.test(skill) || !/^description: .+$/m.test(skill)) {
+    throw new Error(`${target.id}: SKILL.md requires name and description fields`);
+  }
+}
+
+export async function buildTarget(target, outputRoot) {
+  const targetRoot = path.join(outputRoot, target.id);
+  const skillOutput = path.join(targetRoot, 'skills', 'mintlify');
+  const referenceDirectory = target.skillReferenceDirectory ?? 'reference';
+  await rm(targetRoot, { recursive: true, force: true });
+  await mkdir(skillOutput, { recursive: true });
+
+  const skillTemplate = await readFile(path.join(contextDirectory, 'SKILL.md'), 'utf8');
+  const skill = markGenerated(skillTemplate).replaceAll(
+    'reference/',
+    `${referenceDirectory}/`,
+  );
+  validateSkill(skill, target);
+  await writeFile(path.join(skillOutput, 'SKILL.md'), skill);
+  await cp(
+    path.join(contextDirectory, 'reference'),
+    path.join(skillOutput, referenceDirectory),
+    { recursive: true },
+  );
+
+  const canonicalMcpServers = JSON.parse(await readFile(mcpServersPath, 'utf8'));
+  const mcpServers = Object.fromEntries(
+    Object.entries(canonicalMcpServers).map(([name, server]) => [
+      name,
+      target.mcpTypeOverrides?.[server.type] === undefined
+        ? server
+        : { ...server, type: target.mcpTypeOverrides[server.type] },
+    ]),
+  );
+  const mcpConfig = {
+    ...(target.mcpSchema === undefined ? {} : { $schema: target.mcpSchema }),
+    [target.mcpConfigKey]: mcpServers,
+  };
+  if (target.mcpSchema !== undefined) {
+    validateAgentPluginArtifact('mcp', mcpConfig, target.id);
+  }
+  if (target.pluginManifest !== undefined) {
+    validateAgentPluginArtifact('plugin', target.pluginManifest, target.id);
+  }
+  await writeFile(
+    path.join(targetRoot, target.mcpConfigFile),
+    `${JSON.stringify(mcpConfig, null, 2)}\n`,
+  );
+
+  if (target.pluginManifest !== undefined) {
+    const manifestPath = path.join(targetRoot, manifestFile(target));
+    await mkdir(path.dirname(manifestPath), { recursive: true });
+    await writeFile(manifestPath, `${JSON.stringify(target.pluginManifest, null, 2)}\n`);
+  }
+
+  const provenance = {
+    schemaVersion: 1,
+    sourceRepository: 'mintlify/docs',
+    sourcePath: 'agent-context',
+    sourceCommit: sourceCommit(),
+    target: target.id,
+  };
+  await writeFile(
+    path.join(targetRoot, '.mintlify-agent-context.json'),
+    `${JSON.stringify(provenance, null, 2)}\n`,
+  );
+
+  return { targetRoot, provenance };
+}
+
+// The docs site serves skill.md as a single file, so reference files become links: the docs page
+// that covers the topic, or the canonical file on GitHub for agent workflow guidance with no page.
+const canonicalSourceUrl =
+  'https://raw.githubusercontent.com/mintlify/docs/main/agent-context/context/skills/mintlify';
+export const siteReferenceLinks = {
+  'reference/api-docs.md': ['API playground', 'https://mintlify.com/docs/api-playground/overview.md'],
+  'reference/cli.md': ['CLI commands', 'https://mintlify.com/docs/cli/commands.md'],
+  'reference/components.md': ['Components', 'https://mintlify.com/docs/components.md'],
+  'reference/configuration.md': ['Global settings', 'https://mintlify.com/docs/organize/settings.md'],
+  'reference/customization/index.md': [
+    'Custom scripts',
+    'https://mintlify.com/docs/customize/custom-scripts.md',
+  ],
+  'reference/navigation.md': ['Navigation', 'https://mintlify.com/docs/organize/navigation.md'],
+  'reference/product-context.md': [
+    'Product context',
+    `${canonicalSourceUrl}/reference/product-context.md`,
+  ],
+  'reference/project-settings.md': [
+    'Project settings',
+    `${canonicalSourceUrl}/reference/project-settings.md`,
+  ],
+  'reference/publishing-and-review.md': [
+    'Publishing and review',
+    `${canonicalSourceUrl}/reference/publishing-and-review.md`,
+  ],
+  'reference/site-building.md': [
+    'Site building',
+    `${canonicalSourceUrl}/reference/site-building.md`,
+  ],
+  'reference/widgets.md': ['Widgets', `${canonicalSourceUrl}/reference/widgets.md`],
+  'reference/writing.md': ['Writing pages', `${canonicalSourceUrl}/reference/writing.md`],
+};
+// Text that only makes sense next to local reference files, or that a per-file link would send to
+// the wrong page. Applied before siteReferenceLinks.
+const siteRewrites = [
+  [
+    'Read these files **only when your task requires them**. They are in the `reference/` directory next to this file.',
+    'Read these **only when your task requires them**. Each links to a Mintlify documentation page or, for agent workflow guidance, the source file on GitHub.',
+  ],
+  ['| File | When to read |', '| Reference | When to read |'],
+  [
+    'and more, read `reference/configuration.md`.',
+    'and more, read [Pages](https://mintlify.com/docs/organize/pages.md).',
+  ],
+];
+
+export async function renderSiteSkill() {
+  const template = await readFile(path.join(contextDirectory, 'SKILL.md'), 'utf8');
+  // The docs build parses skill.md as MDX, which rejects HTML comments, so the generated notice
+  // goes in the frontmatter metadata instead of markGenerated's comment.
+  const frontmatterEnd = template.indexOf('\n---\n', 4);
+  if (frontmatterEnd === -1) {
+    throw new Error('SKILL.md frontmatter is not closed');
+  }
+  let skill = `${template.slice(0, frontmatterEnd)}\nmetadata:\n  generated-from: "mintlify/docs/agent-context. Edit the canonical source, not this copy."${template.slice(frontmatterEnd)}`;
+  for (const [from, to] of siteRewrites) {
+    if (!skill.includes(from)) {
+      throw new Error(`site: SKILL.md no longer contains "${from}"; update siteRewrites in lib.mjs`);
+    }
+    skill = skill.replace(from, to);
+  }
+  for (const [file, [title, url]] of Object.entries(siteReferenceLinks)) {
+    skill = skill.replaceAll(`\`${file}\``, `[${title}](${url})`);
+  }
+  const unlinked = skill.match(/`reference\/[^`]*`/g);
+  if (unlinked !== null) {
+    throw new Error(`site: add siteReferenceLinks entries for ${unlinked.join(', ')}`);
+  }
+  validateSkill(skill, { id: 'site' });
+  return skill;
+}
+
+export async function buildAll({ outputRoot, selectedIds = [] } = {}) {
+  const resolvedOutput = outputRoot ?? path.join(repositoryRoot, 'dist');
+  await mkdir(resolvedOutput, { recursive: true });
+  const targets = await loadTargets(selectedIds);
+  return Promise.all(targets.map((target) => buildTarget(target, resolvedOutput)));
+}
+
+function parseVersion(version) {
+  const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version);
+  if (match === null) {
+    throw new Error(`Plugin manifest version must be MAJOR.MINOR.PATCH: ${version}`);
+  }
+  return match.slice(1).map(Number);
+}
+
+function compareVersions(a, b) {
+  const [left, right] = [parseVersion(a), parseVersion(b)];
+  for (let index = 0; index < 3; index += 1) {
+    if (left[index] !== right[index]) {
+      return left[index] - right[index];
+    }
+  }
+  return 0;
+}
+
+async function readTree(root, prefix = '') {
+  const files = new Map();
+  let entries;
+  try {
+    entries = await readdir(path.join(root, prefix), { withFileTypes: true });
+  } catch {
+    return files;
+  }
+  for (const entry of entries) {
+    const relativePath = path.join(prefix, entry.name);
+    if (entry.isDirectory()) {
+      for (const [file, contents] of await readTree(root, relativePath)) {
+        files.set(file, contents);
+      }
+    } else {
+      files.set(relativePath, await readFile(path.join(root, relativePath), 'utf8'));
+    }
+  }
+  return files;
+}
+
+async function readOptional(file) {
+  try {
+    return await readFile(file, 'utf8');
+  } catch {
+    return undefined;
+  }
+}
+
+// Snapshot of everything a manifest version describes, excluding the version itself.
+async function releaseSnapshot(root, target) {
+  const skill = await readTree(path.join(root, 'skills', 'mintlify'));
+  const manifest = await readOptional(path.join(root, manifestFile(target)));
+  const { version, ...manifestWithoutVersion } = manifest === undefined ? {} : JSON.parse(manifest);
+  return JSON.stringify({
+    skill: [...skill].sort(([a], [b]) => a.localeCompare(b)),
+    mcp: await readOptional(path.join(root, target.mcpConfigFile)),
+    manifest: manifestWithoutVersion,
+  });
+}
+
+// Kiro uses the manifest version to detect updates. Bump the patch version whenever the released
+// content changes; a higher version set in the target configuration wins. The Claude target has no
+// pluginManifest on purpose: a version in .claude-plugin/plugin.json pins installs until it changes.
+export async function resolveManifestVersion(target, sourceRoot, destination) {
+  const configuredVersion = target.pluginManifest.version;
+  const existingManifest = await readOptional(path.join(destination, manifestFile(target)));
+  if (existingManifest === undefined) {
+    return configuredVersion;
+  }
+
+  const existingVersion = JSON.parse(existingManifest).version;
+  if (compareVersions(configuredVersion, existingVersion) > 0) {
+    return configuredVersion;
+  }
+
+  const changed =
+    (await releaseSnapshot(sourceRoot, target)) !== (await releaseSnapshot(destination, target));
+  if (!changed) {
+    return existingVersion;
+  }
+  const [major, minor, patch] = parseVersion(existingVersion);
+  return `${major}.${minor}.${patch + 1}`;
+}
+
+export async function copyTargetToRepository(targetId, destination, outputRoot) {
+  const [target] = await loadTargets([targetId]);
+  const sourceRoot = path.join(outputRoot, targetId);
+  const sourceSkill = path.join(sourceRoot, 'skills', 'mintlify');
+  const destinationSkill = path.join(destination, 'skills', 'mintlify');
+
+  await stat(sourceSkill);
+  const manifestVersion =
+    target.pluginManifest === undefined
+      ? undefined
+      : await resolveManifestVersion(target, sourceRoot, destination);
+  await rm(destinationSkill, { recursive: true, force: true });
+  await mkdir(path.dirname(destinationSkill), { recursive: true });
+  await cp(sourceSkill, destinationSkill, { recursive: true });
+  await cp(
+    path.join(sourceRoot, target.mcpConfigFile),
+    path.join(destination, target.mcpConfigFile),
+  );
+  if (target.pluginManifest !== undefined) {
+    const manifest = { ...target.pluginManifest, version: manifestVersion };
+    validateAgentPluginArtifact('plugin', manifest, target.id);
+    const manifestPath = path.join(destination, manifestFile(target));
+    await mkdir(path.dirname(manifestPath), { recursive: true });
+    await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  }
+  await cp(
+    path.join(sourceRoot, '.mintlify-agent-context.json'),
+    path.join(destination, '.mintlify-agent-context.json'),
+  );
+}

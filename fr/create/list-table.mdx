@@ -1,0 +1,208 @@
+---
+title: "Listes et tableaux"
+description: "Mettez en forme des données structurées dans votre documentation avec tableaux Markdown, listes ordonnées et non ordonnées, structures imbriquées et cases."
+keywords: ["ordonnées", "non ordonnées", "tableaux Markdown", "formatage des tableaux"]
+---
+
+<div id="lists">
+  ## Listes
+</div>
+
+Les listes suivent la [syntaxe Markdown](https://www.markdownguide.org/basic-syntax/#lists-1) officielle.
+
+<div id="ordered-list">
+  ### Liste numérotée
+</div>
+
+Pour créer une liste numérotée, ajoutez des nombres suivis d’un point devant les éléments de la liste.
+
+1. Premier élément
+2. Deuxième élément
+3. Troisième élément
+4. Quatrième élément
+
+```mdx
+1. Premier élément
+2. Deuxième élément
+3. Troisième élément
+4. Quatrième élément
+```
+
+
+<div id="unordered-list">
+  ### Liste à puces
+</div>
+
+Pour créer une liste à puces, ajoutez des tirets (`-`), des astérisques (`*`) ou des signes plus (`+`) avant chaque élément.
+
+* Premier élément
+* Deuxième élément
+* Troisième élément
+* Quatrième élément
+
+```mdx
+- Premier élément
+- Deuxième élément
+- Troisième élément
+- Quatrième élément
+```
+
+
+<div id="nested-list">
+  ### Liste imbriquée
+</div>
+
+Indentez les éléments de la liste pour les imbriquer.
+
+* Premier élément
+* Deuxième élément
+  * Élément supplémentaire
+  * Élément supplémentaire
+* Troisième élément
+
+```mdx
+- Premier élément
+- Deuxième élément
+  - Élément supplémentaire
+  - Élément supplémentaire
+- Troisième élément
+```
+
+
+<div id="task-list">
+  ### Liste de tâches
+</div>
+
+Pour créer une liste de tâches, ajoutez `[ ]` pour une case à cocher décochée ou `[x]` pour une case à cocher cochée après les marqueurs de liste à puces.
+
+- [x] Élément terminé
+- [ ] Élément non terminé
+
+```mdx
+- [x] Élément terminé
+- [ ] Élément non terminé
+```
+
+
+<div id="tables">
+  ## Tables
+</div>
+
+Les tableaux suivent la [syntaxe Markdown officielle](https://www.markdownguide.org/extended-syntax/#tables).
+
+Pour ajouter un tableau, utilisez trois tirets ou plus (`---`) pour créer l’en-tête de chaque colonne, et des barres verticales (`|`) pour séparer les colonnes. Pour des raisons de compatibilité, ajoutez également une barre verticale au début et à la fin de chaque ligne.
+
+| Propriété | Description                           |
+| --------- | ------------------------------------- |
+| Nom       | Nom complet de l’utilisateur          |
+| Âge       | Âge indiqué                           |
+| Inscription | Indique si l’utilisateur a rejoint la communauté |
+
+```mdx
+| Propriété | Description                                    |
+| --------- | ---------------------------------------------- |
+| Nom       | Nom complet de l'utilisateur                  |
+| Âge       | Âge déclaré                                    |
+| Rejoint   | Si l'utilisateur a rejoint la communauté      |
+```
+
+
+<div id="escape-pipe-characters">
+  ### Échapper les caractères barre verticale
+</div>
+
+Pour inclure un caractère barre verticale littéral (`|`) dans une cellule de tableau, faites-le précéder d'une barre oblique inverse (`\|`). Échappez les caractères barre verticale même lorsqu'ils apparaissent dans du code en ligne. Sinon, la barre verticale est interprétée comme un séparateur de colonnes et peut provoquer des erreurs d'analyse lors de la prévisualisation ou de la validation.
+
+| Valeur        | Description                                            |
+| ------------- | ------------------------------------------------------ |
+| `read\|write` | Une valeur contenant une barre verticale littérale     |
+
+```mdx
+| Value         | Description                       |
+| ------------- | --------------------------------- |
+| `read\|write` | A value containing a literal pipe |
+```
+
+<div id="column-alignment">
+  ### Alignement des colonnes
+</div>
+
+Utilisez les deux-points dans la ligne de séparation pour définir l’alignement du contenu des colonnes :
+
+| Aligné à gauche | Centré | Aligné à droite |
+| :-------------- | :----: | --------------: |
+| Gauche          | Centre |          Droite |
+| Texte           |  Texte |           Texte |
+
+```mdx
+| Left aligned | Center aligned | Right aligned |
+| :----------- | :------------: | ------------: |
+| Left         | Center         | Right         |
+| Text         | Text           | Text          |
+```
+
+<div id="column-widths">
+  ### Largeur des colonnes
+</div>
+
+Les tableaux Markdown dimensionnent leurs colonnes automatiquement selon le contenu. Pour contrôler la largeur des colonnes, écrivez le tableau en HTML et ajoutez un élément `<colgroup>` qui définit une largeur sur chaque `<col>`.
+
+Dans le mode visuel de l'[éditeur](/fr/editor), faites glisser la bordure d'une colonne pour la redimensionner. L'éditeur convertit le tableau en HTML et écrit les largeurs du `<colgroup>` pour vous.
+
+Lorsque chaque `<col>` déclare une largeur, via l'attribut `width` ou un style en ligne, le tableau applique vos largeurs et fait passer le contenu long à la ligne dans chaque colonne. Si une `<col>` n'a pas de largeur, Mintlify ignore les largeurs déclarées et dimensionne les colonnes selon le contenu. Les tableaux trop larges pour la page continuent de défiler horizontalement.
+
+<table>
+  <colgroup>
+    <col width="25%" />
+    <col width="15%" />
+    <col width="60%" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Paramètre</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>name</td>
+      <td>string</td>
+      <td>Nom complet de l'utilisateur</td>
+    </tr>
+    <tr>
+      <td>age</td>
+      <td>number</td>
+      <td>Âge déclaré de l'utilisateur</td>
+    </tr>
+  </tbody>
+</table>
+
+```html
+<table>
+  <colgroup>
+    <col width="25%" />
+    <col width="15%" />
+    <col width="60%" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>name</td>
+      <td>string</td>
+      <td>Full name of the user</td>
+    </tr>
+    <tr>
+      <td>age</td>
+      <td>number</td>
+      <td>Reported age of the user</td>
+    </tr>
+  </tbody>
+</table>
+```

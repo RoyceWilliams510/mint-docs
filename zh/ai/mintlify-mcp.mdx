@@ -1,0 +1,195 @@
+---
+title: "管理员 Model Context Protocol (MCP) 服务器"
+sidebarTitle: "管理员 MCP"
+description: "让 Claude、ChatGPT 和 Cursor 等 AI 工具获得对你的 Mintlify 内容和控制台的写入权限，从而编辑页面、更新设置并提交 PR。"
+keywords: ["MCP", "写入权限", "AI", "编辑", "Claude", "ChatGPT", "Cursor", "branch", "pull request"]
+boost: 3
+---
+
+import AdminMcpClaude from "/snippets/zh/admin-mcp-claude.mdx";
+import AdminMcpClaudeCode from "/snippets/zh/admin-mcp-claude-code.mdx";
+import AdminMcpChatgpt from "/snippets/zh/admin-mcp-chatgpt.mdx";
+import AdminMcpCursor from "/snippets/zh/admin-mcp-cursor.mdx";
+import AdminMcpCodex from "/snippets/zh/admin-mcp-codex.mdx";
+
+<div id="about-the-admin-mcp">
+  ## 关于管理员 MCP
+</div>
+
+管理员 MCP 服务器赋予 AI 工具对你的 Mintlify 内容和设置的写入权限。可使用它来更新内容并访问你的控制台。借助管理员 MCP，你可以使用你常用的 AI 工具来编辑页面、调整导航结构、更新 `docs.json`、提交拉取请求、修改设置、创建自动化等等。
+
+将任意 MCP 客户端 (例如 Claude、Claude Code、ChatGPT 或 Cursor) 连接到管理员 MCP 服务器。连接后，你可以使用与编写代码相同的工具协同处理你的 Mintlify 内容和设置。每次内容工具调用都会指定其操作的 branch。对部署 branch 的编辑会作为未发布的更改落在该 branch 上，对其他任何 branch 的编辑则通过拉取请求进行。你调用 `publish` 或合并拉取请求时，这些编辑才会交付。[项目管理](/zh/ai/admin-mcp-tools#project-management)更改 (例如自动化和设置更新) 会立即应用到线上项目。如果你的组织有多个项目，单个管理员 MCP 连接即可访问所有这些项目并在它们之间切换。
+
+连接后，请参阅[使用管理员 MCP 编辑和发布](/zh/ai/admin-mcp-editing)，了解 AI 工具如何更改和发布你的内容；并参阅[管理员 MCP 工具](/zh/ai/admin-mcp-tools)，查看管理员 MCP 提供的所有工具。
+
+<Note>
+  管理员 MCP 服务器允许 AI 工具访问你的 Mintlify 控制台。请将其视为拥有写入权限的工具。仅从受信任的 AI 工具连接它，在合并前审查每一个拉取请求，并注意项目管理更改会在没有拉取请求的情况下立即生效。
+</Note>
+
+管理员 MCP 是由 Mintlify 托管的服务，地址为 `https://mcp.mintlify.com`。每个客户端都连接到同一个端点，并使用你的 Mintlify 账户进行身份认证。
+
+<div id="how-the-admin-mcp-differs-from-other-mintlify-mcp-servers">
+  ### 管理员 MCP 与其他 Mintlify MCP 服务器的区别
+</div>
+
+|  | 管理员 MCP | 搜索 MCP |
+| :-- | :-- | :-- |
+| **受众** | 你的团队 | 你的终端用户 |
+| **权限** | 读取、编辑、调整结构、发布、创建自动化、管理设置 | 读取并搜索某个站点的已发布页面 |
+| **端点** | `https://mcp.mintlify.com` | 位于你的站点域名上的 `/mcp` |
+| **输出** | 内容编辑、导航更改、拉取请求、自动化运行 | 你站点的搜索结果和页面内容 |
+
+<div id="prerequisites">
+  ## 前置条件
+</div>
+
+在连接管理员 MCP 之前，请确认以下事项：
+
+- **Mintlify 账户**：你需要一个 Mintlify 账户，并具有对你想要编辑的项目的访问权限。OAuth 会话会继承你的控制台权限。查看者只能使用读取工具，而仅限管理员的操作 (例如对受保护设置执行 `update_config`) 需要该项目上的管理员角色。
+- **Git 提供方访问权限**：为该项目安装的 GitHub、GitLab 或 Bitbucket 连接必须对部署 branch 所在的仓库具有写入权限。`publish` 会通过与常规部署相同的集成打开 PR。
+- **MCP 客户端**：一款支持 MCP 的 AI 工具，例如 Claude、Claude Code、ChatGPT、Cursor 或 Codex。
+
+<div id="connect-to-the-admin-mcp">
+  ## 连接到管理员 MCP
+</div>
+
+你必须通过 Mintlify 账户完成交互式 OAuth 登录才能连接到管理员 MCP。AI 工具会将该登录会话兑换为一个会话令牌，其作用域为一个或多个项目，具体取决于你授予访问权限的方式。限定到特定项目的连接只能访问这些项目。组织范围的连接可以访问你组织中你的角色所允许的项目。Mintlify 会检查你在每个项目上的角色，包括任何[项目角色](/zh/dashboard/roles#project-roles)，并排除你为 **No access** 的项目。
+
+你可以在[控制台](https://app.mintlify.com/products/mcp)中将工具连接到管理员 MCP，或按照以下步骤为你偏好的工具完成连接。
+
+<Tip>
+  要从终端配置 Claude Code、Codex 或 Cursor，请运行 [`mint agent setup`](/zh/cli/commands#mint-agent-setup)。该命令会将管理员 MCP 添加到每个代理的配置中，并安装 Mintlify 技能。你仍需在每个代理中完成 OAuth 登录。
+</Tip>
+
+<Tabs>
+  <Tab title="Claude">
+    <AdminMcpClaude />
+  </Tab>
+  <Tab title="Claude Code">
+    <AdminMcpClaudeCode />
+  </Tab>
+  <Tab title="ChatGPT">
+    <AdminMcpChatgpt />
+  </Tab>
+  <Tab title="Cursor">
+    <AdminMcpCursor />
+  </Tab>
+  <Tab title="Codex">
+    <AdminMcpCodex />
+  </Tab>
+</Tabs>
+
+<div id="limit-a-connection-to-search-and-read-tools">
+  ### 将连接限制为搜索和读取工具
+</div>
+
+如果要连接的 AI 工具只需要在你的内容中查找信息，请在添加管理员 MCP 时发送 `x-mintlify-toolset: knowledge` 请求头。之后，该连接只会列出以下工具：`search`、`read`、`read_comments`、`read_page_history`、`list_nodes`、`list_branches` 和 `list_deployments`。该连接上的 AI 工具无法编辑内容、发布或更改设置。
+
+管理员 MCP 还会为 AI 工具提供更简短的说明，专注于搜索和读取页面。
+
+例如，使用 Claude Code 时：
+
+```bash
+claude mcp add --transport http mintlify-knowledge https://mcp.mintlify.com --header "x-mintlify-toolset: knowledge"
+```
+
+<div id="redirect-uris">
+  ## 重定向 URI
+</div>
+
+Claude、ChatGPT 和 Cursor 等常用 MCP 客户端始终可以完成 OAuth 登录。要允许其他客户端连接，请在 **MCP → Settings** 的 **Redirect URIs** 部分添加它们的重定向域名。在 **Allowed domains** 字段中输入域名或自定义 scheme（例如 `myapp://callback`），然后点击 **Add domain**。
+
+允许的域名同时适用于管理员 MCP 和你的 [Search MCP 服务器](/zh/ai/model-context-protocol#enable-authenticated-mcp)。
+
+<div id="credentials">
+  ## 凭据
+</div>
+
+凭据让 AI 应用和网关无需交互式登录即可连接到管理员 MCP。在用户无法完成 OAuth 登录的环境中使用凭据。
+
+1. 在控制台侧边栏中，点击 **MCP**，然后点击 **Credentials**。
+2. 点击 **Create credential**。
+3. 复制密钥。控制台只会显示一次该密钥。
+
+凭据可以读取内容，但不能更改内容。编辑、评论、创建 branch、发布或丢弃内容的工具以及 `read_inbox` 需要 OAuth 登录，使用凭据调用时会返回 `user_principal_required`。
+
+要撤销凭据，请点击其旁边的删除图标。
+
+<div id="example-prompts">
+  ## 示例提示词
+</div>
+
+连接管理员 MCP 后，你可以使用自然语言提示词来驱动它。例如：
+
+- _“创建一个标题为 'Add billing FAQ' 的 branch，并在 FAQ 组下创建一个名为 'Billing' 的新页面。为这个 Linear 工单中的五个问题草拟答案。”_
+- _“找出每一个提到已废弃的 `legacy_token` 字段的页面，并将示例更新为使用 `api_key`。发布为一个标题为 'docs: replace legacy\_token references' 的 PR。”_
+- _“重新组织 API 参考：将 webhooks 页面移入名为 'Webhooks' 的新组，并更新图标以与该部分其他内容保持一致。”_
+- _“读取快速入门页面上未解决的评论，完成所要求的编辑，并回复每个线程，处理完毕后将其解决。”_
+
+<div id="best-practices">
+  ## 最佳实践
+</div>
+
+<AccordionGroup>
+  <Accordion title="打开编辑器 URL">
+    `create_branch` 会返回 branch 的 `editorUrl`。`create_node` 和 `publish` 会返回已更改页面的 `editorUrl`。在单独的标签页中打开这些链接，这样你就可以在提示时实时观察 AI 的更改在控制台编辑器中渲染。
+  </Accordion>
+
+  <Accordion title="审查每一个 PR">
+    管理员 MCP 可以在一次会话中重写数百个页面。在合并之前，请阅读 PR 差异并大致浏览渲染预览。不要对大量更改做盲目通过。
+  </Accordion>
+
+  <Accordion title="保持 branch 聚焦">
+    让每个 branch 专注于一项更改。更小的 branch 能生成更易审查的拉取请求，并能节省代理的上下文窗口。再次调用 `create_branch` 以开始无关的工作。
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  如果你放弃了通过 `create_branch` 创建的 branch 而没有丢弃它，该 branch 及其拉取请求会保留在你的仓库中。调用 `discard` 可删除不再需要的 branch，你也可以关闭其拉取请求。
+</Note>
+
+<div id="disconnect-or-revoke-access">
+  ## 断开或撤销访问权限
+</div>
+
+当你不再希望某个 AI 工具编辑你的项目，或想要强制重新完成 OAuth 登录时，请断开管理员 MCP。
+
+- **撤销 OAuth 授权**：在你的 Mintlify 控制台中，前往 [MCP 设置](https://app.mintlify.com/products/mcp)，然后撤销你所连接的 AI 工具对应的条目。撤销会在 30 秒内使该工具的访问令牌失效。此后工具调用会失败，工具在下次调用时必须完成新的 OAuth 登录。
+- **删除凭据**：要撤销使用[凭据](#credentials)的 AI 应用或网关的访问权限，请前往 MCP 设置中的 [Credentials](https://app.mintlify.com/products/mcp/admin-credentials) 页面并将其删除。
+- **在客户端中移除连接器**：管理员 MCP 条目的 URL 为 `https://mcp.mintlify.com`。其名称取决于你添加它的方式，例如 `mintlify-admin` 或 `mintlify`。
+  - Claude：**Settings → Connectors**，然后移除 Mintlify 条目。
+  - Claude Code：运行 `claude mcp list` 查找该条目的名称，然后运行 `claude mcp remove <name>`。
+  - ChatGPT：**Settings → Connectors**，然后移除 Mintlify 条目。
+  - Cursor：卸载 Mintlify 插件，或从 `mcp.json` 中删除该条目并重新加载。
+  - Codex：从 `~/.codex/config.toml` 或项目中的 `.codex/config.toml` 中删除该条目的 `[mcp_servers.<name>]` 代码块。
+
+撤销 OAuth 授权不会影响 MCP 已经打开的拉取请求。若要撤销待处理的更改，请在你的 Git 提供方中关闭或还原这些 PR。
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+<Accordion title="登录时打开的是此故障排除部分，而不是你的 AI 工具">
+  由于你的 Mintlify 连接器是在 Mintlify 更新登录系统之前添加的，或者你的控制台会话是在此之前开始的，Mintlify 无法完成登录。
+
+  1. [重新安装连接器](#stale-registration-error)：先从你的 AI 工具中将其移除，然后重新添加。
+  2. 如果登录后仍然打开此部分，请[退出控制台并重新登录](#fails-after-reinstalling)，然后再次连接你的 AI 工具。
+</Accordion>
+
+<Accordion title="连接失败并提示注册已过期错误" id="stale-registration-error">
+  你的 AI 工具中的 Mintlify 连接器是在 Mintlify 更新登录系统之前添加的。请重新安装连接器：先从你的 AI 工具中将其移除，然后重新添加。各工具的具体步骤请参阅[断开或撤销访问权限](#disconnect-or-revoke-access)。
+</Accordion>
+
+<Accordion title="重新安装连接器后连接仍然失败" id="fails-after-reinstalling">
+  退出[控制台](https://app.mintlify.com)，重新登录，然后再次连接你的 AI 工具。这会替换在登录系统更新之前开始的控制台会话。
+</Accordion>
+
+<Accordion title="工具调用返回 insufficient_scope" id="insufficient-scope">
+  你的连接没有执行此操作的权限。你连接时的[控制台角色](/zh/dashboard/roles)决定了连接可以执行的操作。Mintlify 还会在每次调用时检查你在该项目上的当前角色。查看者只能使用读取工具，因此 `edit_page` 等编辑工具会返回 `insufficient_scope`。
+
+  如果管理员为你分配了可以编辑的角色，请从你的 AI 工具中移除 Mintlify 连接器，然后重新添加。新的连接会包含你当前角色允许的写入权限。各工具的具体步骤请参阅[断开或撤销访问权限](#disconnect-or-revoke-access)。
+</Accordion>
+
+<Accordion title="管理员 MCP 工具出现两次">
+  你的 AI 工具中有多个指向 `https://mcp.mintlify.com` 的条目。当你通过多种方式连接管理员 MCP 时就可能出现这种情况，例如先手动添加，然后又运行了 [`mint agent setup`](/zh/cli/commands#mint-agent-setup)，或者安装了 Cursor 插件后又运行了 setup。保留一个条目并移除其他条目。各工具的具体步骤请参阅[断开或撤销访问权限](#disconnect-or-revoke-access)。
+</Accordion>

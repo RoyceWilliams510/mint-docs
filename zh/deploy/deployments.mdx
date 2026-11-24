@@ -1,0 +1,101 @@
+---
+title: "部署"
+description: "在 Mintlify 控制台中管理文档部署，包括查看部署历史、监控构建状态、故障排查以及删除项目。"
+keywords: ["manual deployment", "deployment history", "deployment triggers", "delete project", "delete deployment", "terminated deployment"]
+boost: 3
+---
+
+当你将更改推送到已连接的存储库时，你的文档站点会自动部署。如果你的存储库位于 GitHub 上，你必须安装并连接 Mintlify GitHub 应用。如果你的存储库位于 GitLab 或 Bitbucket 上，请参阅 [GitLab](/zh/deploy/gitlab) 或 [Bitbucket](/zh/deploy/bitbucket) 了解连接设置。
+
+如果你的最新更改没有显示在在线站点上，且你的存储库位于 GitHub 上，首先检查 GitHub 应用的安装情况。拥有你文档存储库的 GitHub 账户或组织必须已安装该 GitHub 应用。参见 [GitHub 故障排查](/zh/deploy/github#troubleshooting) 以获取更多信息。
+
+如果你的存储库已连接，但更改仍未部署，请在控制台手动触发一次部署。
+
+<div id="manually-trigger-a-deployment">
+  ## 手动触发部署
+</div>
+
+<Steps>
+  <Step title="确认你的最新提交已成功。">
+    检查你的最新提交是否已出现在文档存储库中，并确认未出现任何错误。你可以在[部署历史](#view-deployment-history)中确认该提交是否已成功构建。
+  </Step>
+
+  <Step title="手动触发部署。">
+    前往你的[控制台](https://dashboard.mintlify.com)，点击“部署”按钮。
+
+    <Frame>
+      <img src="/images/deployments/manual-update-light.png" alt="用橙色矩形标注的“手动更新”按钮。" className="block dark:hidden" />
+
+      <img src="/images/deployments/manual-update-dark.png" alt="用橙色矩形标注的“手动更新”按钮。" className="hidden dark:block" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="view-deployment-history">
+  ## 查看部署历史
+</div>
+
+前往控制台中的 [Publishes](https://app.mintlify.com/publishes) 页面，查看你的部署历史并确认每次发布是否成功。点击某次发布即可展开并查看详细信息，包括提交消息和作者。
+
+<div id="search-indexing-status">
+  ### 搜索索引状态
+</div>
+
+每次发布后，Mintlify 都会更新你站点的搜索索引。当索引仍在进行、跳过了部分页面或失败时，发布状态旁会显示一个 **Search** 徽章。将鼠标悬停在徽章上即可查看结果。
+
+| 徽章 | 含义 |
+| :--- | :--- |
+| 灰色并带有加载图标 | 索引正在进行。索引完成后，搜索会显示你的更改。 |
+| 橙色 | 搜索已更新，但 Mintlify 无法解析部分页面以进行搜索索引。这些页面不会出现在搜索结果中。 |
+| 红色 | 索引失败。搜索仍显示你文档的上一个版本。 |
+
+要查看 Mintlify 从搜索中排除了哪些页面，请点击该发布并查看 **Details** 标签页。其中最多列出 10 个页面路径。被跳过的页面会一直不出现在搜索中，直到你修改它并再次发布。
+
+<div id="pages-that-fail-to-build">
+  ### 构建失败的页面
+</div>
+
+某些错误（例如页面中无效的 MDX 语法或 frontmatter）可能会导致单个页面无法构建。发生这种情况时，Mintlify 仍可以发布站点的其余部分。该发布会显示 **Partially failed** 状态。
+
+要查看哪些页面失败，请点击该发布并查看 **Details** 标签页。其中最多列出 10 个错误，以及每个错误影响的页面。修复这些错误后再次推送。
+
+如果你的仓库托管在 GitHub 上，**Mintlify Deployment** 检查也会以中性结果完成，并列出构建失败的页面。
+
+<div id="roll-back-a-deployment">
+  ## 回滚部署
+</div>
+
+如果有变更进入在线站点、需要立即移除，请直接服务之前的一次成功构建，而不是回退提交并等待新的构建。参见[回滚](/zh/deploy/rollbacks)。
+
+<div id="delete-a-project">
+  ## 删除项目
+</div>
+
+你可以在组织设置的[General](https://app.mintlify.com/settings/organization/general)页面的**危险区域**部分永久删除某个项目。该操作不可撤销，将移除所有项目数据，包括任何关联的预览部署。
+
+<Steps>
+  <Step title="导航到危险区域。">
+    前往组织设置的[General](https://app.mintlify.com/settings/organization/general)页面的**危险区域**部分。
+  </Step>
+  <Step title="删除项目。">
+    1. 在 **Delete project** 一行中，点击 **Delete…**。
+    2. 填写删除原因。
+    3. 点击 **Delete project** 进行确认。
+  </Step>
+</Steps>
+
+<Warning>
+  删除项目是永久性的且无法撤销。如果你有有效订阅，你将在当前计费周期内对剩余未使用时间获得按比例折算的抵扣额度。
+</Warning>
+
+删除项目后，Mintlify 会为你的组织保留其子域名。在保留期间，只有你的组织可以使用该子域名创建项目。
+
+如果你有多个项目，删除后你会被重定向到另一个项目。如果你删除了唯一的项目，你会被重定向到 Mintlify 首页。当你删除某个项目时，组织管理员会收到一封确认删除的电子邮件通知。
+
+<div id="terminated-deployments">
+  ## 已终止的部署
+</div>
+
+Mintlify 可能会终止违反[服务条款](https://www.mintlify.com/legal/terms)的部署。已终止的部署将下线，你的组织成员会收到一封列出受影响子域名的电子邮件。
+
+如需对终止提出异议，请发送电子邮件至 [support@mintlify.com](mailto:support@mintlify.com)，并注明你的组织名称和受影响的子域名。

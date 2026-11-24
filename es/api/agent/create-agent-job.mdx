@@ -1,0 +1,26 @@
+---
+title: "Crear tarea de agente (v1)"
+openapi: /es/admin-openapi.json POST /v1/agent/{projectId}/job
+keywords: [ "trabajo del agente", "crear", "automatización", "automatizar" ]
+tag: "deprecated"
+---
+
+<Warning>Este endpoint está en desuso. Usa una [automatización personalizada con un disparador de webhook](/es/api/automations/webhook) en su lugar.</Warning>
+
+Este endpoint crea una tarea de agente a partir de los mensajes proporcionados y la información de la branch. La tarea se ejecuta de forma asíncrona y devuelve una respuesta en streaming con los detalles de la ejecución y los resultados.
+
+Si no existe una branch, el agente crea una. Si el agente edita los archivos correctamente, crea automáticamente una solicitud de extracción al finalizar la tarea.
+
+<div id="rate-limits">
+  ## Límites de tasa
+</div>
+
+La API del agente tiene los siguientes límites:
+
+* 100 usos por organización por hora
+
+<div id="suggested-usage">
+  ## Uso recomendado
+</div>
+
+Para obtener mejores resultados, utiliza el [hook useChat de ai-sdk](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat#usechat) para enviar solicitudes y gestionar las respuestas.

@@ -1,0 +1,54 @@
+---
+title: "Authentification unique (SSO)"
+description: "Configurez l'authentification unique SAML pour votre dashboard Mintlify avec votre fournisseur d'identité, comme Okta ou Microsoft Entra, et vérifiez vos domaines de messagerie."
+keywords: ["SSO", "authentification SAML", "intégration Okta", "Microsoft Entra", "fournisseur d'identité", "JIT", "provisionnement", "domaines vérifiés", "portail d'administration"]
+---
+
+<Info>
+  Le SSO nécessite un [forfait Enterprise](https://mintlify.com/pricing?ref=sso).
+</Info>
+
+Les administrateurs configurent le SSO depuis la page [Security](https://app.mintlify.com/settings/organization/access) du dashboard. Chaque bouton de configuration ouvre le portail d'administration, qui vous guide dans la configuration de votre fournisseur d'identité.
+
+Pour configurer le SSO, vérifiez d'abord votre domaine de messagerie, puis connectez votre fournisseur d'identité.
+
+<div id="verify-your-domain">
+  ## Vérifier votre domaine
+</div>
+
+Avant de configurer le SSO, vérifiez la propriété de vos domaines de messagerie. Une fois le SSO connecté, toute personne qui se connecte avec une adresse e-mail d'un domaine vérifié est redirigée vers votre fournisseur d'identité.
+
+1. Accédez à la page [Security](https://app.mintlify.com/settings/organization/access) de votre dashboard.
+2. Dans la section **SSO**, cliquez sur **Verify email domains**.
+3. Dans le portail d'administration, ajoutez votre domaine. Le portail d'administration affiche un enregistrement DNS.
+4. Ajoutez l'enregistrement DNS du portail d'administration auprès de votre fournisseur DNS.
+
+Une fois l'enregistrement DNS propagé, **Verified email domains** affiche un badge **Verified** sur la page **Security**.
+
+<div id="connect-your-identity-provider">
+  ## Connecter votre fournisseur d'identité
+</div>
+
+1. Accédez à la page [Security](https://app.mintlify.com/settings/organization/access) de votre dashboard.
+2. Dans la section **SSO**, cliquez sur **Set up SSO**. Le bouton n'est pas disponible tant que vous n'avez pas vérifié un domaine de messagerie.
+3. Dans le portail d'administration, suivez les étapes correspondant à votre fournisseur d'identité.
+
+Lorsque la connexion est active, la section **SSO** affiche **SAML SSO** avec un badge **Connected**.
+
+Pour modifier ultérieurement votre configuration SSO, cliquez sur **Manage SSO** pour rouvrir le portail d'administration.
+
+<div id="sign-in-with-sso">
+  ## Se connecter avec le SSO
+</div>
+
+Les membres peuvent se connecter depuis la [page de connexion Mintlify](https://app.mintlify.com/login) avec une adresse e-mail d'un domaine vérifié, ou depuis le catalogue d'applications de votre fournisseur d'identité.
+
+Une fois le SSO connecté, testez les deux parcours de connexion dans une fenêtre de navigation privée avant de demander à votre équipe d'utiliser le SSO.
+
+<div id="automatic-member-provisioning">
+  ## Provisionnement automatique des membres
+</div>
+
+Lorsqu'une personne se connecte via le SSO pour la première fois, Mintlify l'ajoute à votre organisation. Les nouveaux membres reçoivent le [rôle](/fr/dashboard/roles) que votre fournisseur d'identité leur attribue. Si votre fournisseur d'identité n'attribue pas de rôle, ils rejoignent l'organisation en tant qu'éditeurs.
+
+Pour provisionner et déprovisionner des membres avant qu'ils ne se connectent, configurez le [SCIM](/fr/dashboard/scim).

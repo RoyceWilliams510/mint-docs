@@ -1,0 +1,729 @@
+---
+title: "Scripts personalizados"
+description: "Agrega JavaScript y CSS personalizados a tu documentación para analíticas, widgets, estilos, integraciones y variables de servidor del API Playground."
+keywords: ["CSS", "JavaScript", "Tailwind CSS", "personalización de estilo", "API Playground", "variables de servidor"]
+---
+
+Usa CSS para dar estilo a los elementos HTML o agrega CSS y JavaScript personalizados para adaptar por completo el aspecto y la experiencia de tu documentación.
+
+<div id="style-with-tailwind-css">
+  ## Estiliza con Tailwind CSS
+</div>
+
+Usa Tailwind CSS v3 para dar estilo a elementos HTML y componentes. Puedes controlar el diseño, el espaciado, los colores y otras propiedades visuales. Algunas clases comunes son:
+
+* `w-full` - Ancho completo
+* `aspect-video` - Relación de aspecto 16:9
+* `rounded-xl` - Esquinas redondeadas grandes
+* `block`, `hidden` - Control de visualización
+* `dark:hidden`, `dark:block` - Visibilidad en modo oscuro
+
+<div id="style-components-with-classname">
+  ### Estiliza componentes con `className`
+</div>
+
+Los componentes aceptan una prop `className`. Mintlify combina tus clases con los estilos propios del componente, por lo que puedes cambiar el estilo de una sola instancia sin envolverla en marcado adicional ni escribir una regla CSS que lo anule.
+
+```mdx className example
+<Note className="mt-0">This callout has no top margin.</Note>
+
+<Card title="Quickstart" href="/quickstart" className="border-2 border-blue-500">
+  Deploy your first documentation site.
+</Card>
+```
+
+Tres componentes no aceptan `className`: [Banner](/es/components/banner), [MDX](/es/components/mdx) y [Visibility](/es/components/visibility).
+
+<div id="arbitrary-values-and-variants">
+  ### Valores arbitrarios y variantes
+</div>
+
+Usa valores arbitrarios cuando ninguna clase utilitaria cubra el valor que necesitas.
+
+```mdx Arbitrary value examples
+<img src="/images/diagram.png" alt="System architecture diagram" className="w-[450px]" />
+
+<Frame className="lg:w-[calc(100%-2rem)] bg-[#0f172a]">
+  <img src="/images/hero.png" alt="Product hero image" />
+</Frame>
+```
+
+Las variantes funcionan como en cualquier proyecto de Tailwind, incluidos los prefijos responsivos (`sm:`, `md:`, `lg:`), las variantes de estado (`hover:`, `focus:`), `dark:`, las variantes de atributos de datos (`data-[state=open]:`), los modificadores de opacidad (`bg-black/50`) y el modificador de importancia `!`.
+
+Mintlify genera CSS para las clases de Tailwind que encuentra en el código fuente de tu página, así que escribe los nombres de clase completos.
+
+```mdx Write class names in full
+{/* Generates CSS: the full class name appears in the page source. */}
+<div className="bg-blue-500" />
+
+{/* Generates no CSS: the class name is assembled at runtime. */}
+<div className={`bg-${color}-500`} />
+```
+
+<Note>
+  La vista previa en vivo del editor web no genera CSS para las clases de Tailwind específicas de una página, por lo que una página con estilos puede verse sin estilo mientras la editas. Consulta [Las clases de Tailwind no se aplican en la vista previa en vivo del editor](/es/help-center/tailwind-classes-not-applying-in-editor-preview).
+</Note>
+
+<Warning>
+  Evita la prop `style`. Puede causar un desplazamiento del diseño al cargar la página, especialmente en páginas en modo personalizado. En su lugar, usa clases de Tailwind CSS o archivos CSS personalizados.
+</Warning>
+
+<div id="add-custom-css">
+  ## Añadir CSS personalizado
+</div>
+
+Mintlify incluye automáticamente cualquier archivo `.css` dentro de tu directorio de contenido en todas las páginas de tu sitio de documentación, del mismo modo que incluye los archivos `.js` personalizados. El directorio de contenido es la carpeta de tu repositorio que contiene tu archivo `docs.json` y tus páginas MDX. No necesitas importar ni referenciar el archivo desde `docs.json` ni desde tus archivos MDX.
+
+Para añadir estilos personalizados, crea un archivo `.css` (por ejemplo, `style.css`) en cualquier nivel de tu directorio de contenido. Cualquier nombre de clase, selector de ID o selector de elemento que definas quedará disponible en todos tus archivos MDX.
+
+Por ejemplo, define una clase en `style.css`:
+
+```css
+.my-callout {
+  border-radius: 1rem;
+  background: #f0f9ff;
+  padding: 1rem;
+}
+```
+
+Luego úsala en cualquier archivo MDX con la prop `className`:
+
+```mdx
+<div className="my-callout">
+  Contenido aquí.
+</div>
+```
+
+Puedes combinar nombres de clase personalizados con clases de [Tailwind CSS](/es/customize/custom-scripts#style-with-tailwind-css) en el mismo elemento.
+
+El CSS personalizado se aplica a todas las páginas de tu sitio, incluidas las páginas en modo personalizado y las páginas de aterrizaje. Para limitar los estilos a una página o sección específica, usa el selector de atributo `html[data-current-path="..."]` descrito en [Atributos de datos](#data-attributes).
+
+Las referencias y el estilo de los elementos comunes están sujetos a cambios. Usa estilos personalizados con precaución, ya que pueden producirse cambios incompatibles en futuras actualizaciones.
+
+Por ejemplo, puedes agregar el siguiente archivo `style.css` para personalizar los estilos de la barra de navegación y el pie de página.
+
+```css
+#navbar {
+  background: #fffff2;
+  padding: 1rem;
+}
+
+footer {
+  margin-top: 2rem;
+}
+```
+
+Los hooks CSS para segmentación usan una sintaxis diferente:
+
+- **Selectores de ID**: elementos únicos a nivel de página que se apuntan con `#value { }` en CSS
+- **Selectores de clase**: clases de componente y diseño que se apuntan con `.value { }` en CSS, como `.card`.
+- **Selectores de elemento**: etiquetas HTML que se apuntan con `value { }` en CSS, como `footer`.
+- **Selectores de atributo**: partes o estados de componentes que se apuntan con corchetes, como `[data-component-part="card-icon"]`.
+
+Estos selectores no son intercambiables. Por ejemplo, `.card` apunta a una clase, mientras que `card` apunta a una etiqueta llamada `<card>`. Los hooks dependen del tema, el componente, la configuración y el estado renderizados. Consulta la [skill de personalización](/es/customize/agent-skill) para ver referencias exactas de sintaxis, disponibilidad, ciclo de vida y compatibilidad.
+
+<Tip>
+  Usa Inspeccionar elemento para encontrar referencias a los elementos que quieres personalizar.
+</Tip>
+
+<div id="id-selectors">
+  ### Selectores de ID
+</div>
+
+Úsalos como `#value` en CSS. Por ejemplo, `#navbar { background: red; }`. Un hook solo existe cuando se renderiza el elemento al que pertenece; inspecciona el diseño montado activo durante las transiciones de navegación.
+
+<AccordionGroup>
+<Accordion title="Diseño de página">
+  - `#body-content`—Contenedor exterior del cuerpo de la página.
+  - `#content-area`—Área de contenido principal, excluyendo la barra lateral y la tabla de contenidos.
+  - `#content`—Elemento de contenido interno dentro del área de contenido.
+  - `#header`—Elemento de encabezado a nivel de página.
+  - `#banner`—Banner de anuncios que se muestra sobre la barra de navegación.
+  - `#footer`—Pie de página. También se puede apuntar como selector de elemento: `footer`.
+  - `#page-title`—El encabezado `<h1>` en la parte superior de cada página.
+  - `#pagination`—Barra de paginación inferior con enlaces a la página anterior y siguiente.
+  - `#panel`—Panel flotante superpuesto. También se puede apuntar como selector de elemento: `panel`.
+  - `#background-color`—Elemento de color de fondo de la página.
+</Accordion>
+<Accordion title="Navegación">
+  - `#navbar`—Barra de navegación superior.
+  - `#topbar-cta-button`—Botón de llamada a la acción en la barra superior.
+  - `#mobile-nav`—Superposición de navegación móvil.
+  - `#mobile-nav-content`—Área de contenido dentro de la superposición de navegación móvil.
+</Accordion>
+<Accordion title="Barra lateral">
+  - `#sidebar`—Panel de navegación de la barra lateral.
+  - `#sidebar-content`—Área de contenido con desplazamiento dentro de la barra lateral.
+</Accordion>
+<Accordion title="Tabla de contenidos">
+  - `#table-of-contents`—Panel de tabla de contenidos en el lado derecho de la página.
+  - `#table-of-contents-layout`—Contenedor de diseño para la tabla de contenidos.
+  - `#table-of-contents-content`—Contenido con desplazamiento dentro de la tabla de contenidos.
+</Accordion>
+<Accordion title="Búsqueda">
+  - `#search-bar-entry`—Disparador de la barra de búsqueda en la barra superior.
+  - `#search-bar-entry-mobile`—Disparador de la barra de búsqueda en móvil.
+  - `#search-input`—Campo de entrada de texto dentro del modal de búsqueda.
+</Accordion>
+<Accordion title="Asistente IA">
+  - `#assistant-entry`—Botón del asistente IA en la barra superior.
+  - `#assistant-entry-mobile`—Botón del asistente IA en móvil.
+  - `#chat-assistant-sheet`—Panel del chat del asistente IA.
+  - `#chat-assistant-textarea`—Entrada de texto dentro del panel del asistente IA.
+</Accordion>
+<Accordion title="Referencia de API">
+  - `#request-example`—Panel de ejemplo de solicitud en el playground de API.
+  - `#response-example`—Panel de ejemplo de respuesta en el playground de API.
+  - `#api-playground-input`—Sección de entrada del playground de API.
+  - `#endpoints-menu-trigger`—Botón que abre el desplegable del selector de endpoints.
+</Accordion>
+<Accordion title="Bloques de código">
+  - `#ask-assistant-code-block-button`—Botón "Preguntar al asistente" que aparece en los bloques de código.
+  - `#code-snippet-feedback-button`—Botón de retroalimentación en los fragmentos de código.
+  - `#code-snippet-feedback-textarea`—Área de texto dentro del formulario de retroalimentación de fragmentos de código.
+</Accordion>
+<Accordion title="Retroalimentación">
+  - `#feedback-thumbs-up`—Botón de pulgar arriba en la parte inferior de la página.
+  - `#feedback-thumbs-down`—Botón de pulgar abajo en la parte inferior de la página.
+  - `#feedback-form`—Formulario de retroalimentación mostrado después de una respuesta negativa.
+  - `#feedback-form-input`—Campo de texto dentro del formulario de retroalimentación.
+  - `#feedback-form-cancel`—Botón de cancelar dentro del formulario de retroalimentación.
+  - `#feedback-form-submit`—Botón de enviar dentro del formulario de retroalimentación.
+</Accordion>
+<Accordion title="Menú contextual de la página">
+  - `#page-context-menu`—Menú de opciones contextuales para la página actual.
+  - `#page-context-menu-button`—Botón que abre el menú contextual de la página.
+</Accordion>
+<Accordion title="Localización">
+  - `#localization-select-trigger`—Botón que abre el selector de idioma.
+  - `#localization-select-content`—Contenido del desplegable del selector de idioma.
+  - `#localization-select-item`—Opción individual de idioma dentro del selector.
+</Accordion>
+<Accordion title="Registro de cambios">
+  - `#changelog-filters`—Controles de filtro en una página de registro de cambios.
+  - `#changelog-filters-content`—Área de contenido dentro del panel de filtros del registro de cambios.
+</Accordion>
+<Accordion title="Multi-vista">
+  - `#multi-view-dropdown`—Desplegable para cambiar entre vistas de documentación.
+</Accordion>
+<Accordion title="Selección de texto">
+  - `#text-selection-tooltip`—Tooltip que aparece al seleccionar texto en la página.
+  - `#text-selection-tooltip-button`—Botón de acción dentro del tooltip de selección de texto.
+</Accordion>
+</AccordionGroup>
+
+<div id="class-and-element-hooks">
+  ### Hooks de clase y de elemento
+</div>
+
+Pueden aparecer múltiples instancias de estos hooks en una página. La lista indica los nombres de los hooks; inspecciona el elemento renderizado para determinar si el nombre es una clase o una etiqueta. Por ejemplo, usa `.accordion { border: 1px solid red; }` para la clase del acordeón y `footer { margin-top: 2rem; }` para el elemento HTML footer.
+
+<AccordionGroup>
+  <Accordion title="Componentes de contenido">
+    - `accordion`—Elemento de acordeón desplegable.
+    - `accordion-group`—Contenedor que agrupa múltiples acordeones.
+    - `callout`—Bloque de llamada de atención (Note, Warning, Tip, etc.).
+    - `card`—Elemento de tarjeta individual.
+    - `card-group`—Contenedor que agrupa múltiples tarjetas. Obsoleto a favor de `columns`, pero conservado por compatibilidad.
+    - `columns`—Contenedor de diseño multicolumna.
+    - `code-block`—Elemento de bloque de código.
+    - `code-block-icon`—Icono mostrado en el encabezado de un bloque de código.
+    - `code-block-copy-button`—Botón de copia mostrado en un bloque de código. Ocúltalo con `.code-block-copy-button { display: none; }`.
+    - `code-block-fade-overlay`—Superposición de desvanecimiento mostrada en la parte inferior de un bloque de código contraído.
+    - `code-group`—Grupo con pestañas de bloques de código.
+    - `expandable`—Elemento de sección expandible.
+    - `frame`—Contenedor de marco para imágenes o contenido incrustado.
+    - `icon`—Elemento de icono en línea.
+    - `mermaid`—Contenedor de diagrama Mermaid.
+    - `step`—Paso individual dentro de una secuencia de pasos.
+    - `steps`—Contenedor de pasos numerados.
+    - `tab-icon`—Icono mostrado dentro de una pestaña.
+    - `tabs`—Contenedor de contenido con pestañas.
+    - `tile`—Elemento de componente tile.
+    - `tooltip`—Elemento de tooltip.
+    - `update`—Entrada de actualización del registro de cambios.
+  </Accordion>
+  <Accordion title="Diseño de página">
+    - `mdx-content`—Área de contenido MDX renderizado.
+    - `panel`—Componente de panel flotante. También se puede apuntar como selector de ID: `#panel`.
+    - `eyebrow`—Pequeña etiqueta que se muestra sobre el título de la página.
+    - `link`—Elemento de enlace anchor.
+    - `breadcrumb-list`—Lista de navegación por migas de pan.
+    - `breadcrumb-item`—Elemento individual de miga de pan.
+  </Accordion>
+  <Accordion title="Navegación de la barra superior">
+    - `nav-logo`—Imagen del logo en la barra de navegación. Para anular sus utilidades de tamaño predeterminadas, apunta a `img.nav-logo` y usa `!important`.
+
+      ```css
+      img.nav-logo {
+        height: 3.75rem !important;
+        width: auto !important;
+      }
+      ```
+    - `navbar-link`—Elemento de enlace dentro de la barra de navegación.
+    - `nav-anchors`—Contenedor de enlaces de anclaje en la barra superior.
+    - `nav-anchor`—Enlace de anclaje individual en la barra superior.
+    - `nav-tabs`—Barra de pestañas en la navegación superior.
+    - `nav-tabs-item`—Elemento de pestaña individual en la barra de pestañas de la navegación superior.
+    - `mobile-nav-tabs-item`—Elemento de pestaña en la barra de pestañas de la navegación móvil.
+    - `topbar-right-container`—Sección derecha de la barra superior.
+    - `nav-tag-pill`—Etiqueta tipo píldora en la navegación.
+    - `nav-tag-pill-text`—Texto dentro de una etiqueta tipo píldora de navegación.
+  </Accordion>
+  <Accordion title="Desplegable de la barra superior">
+    - `nav-dropdown-trigger`—Botón que abre un desplegable de navegación.
+    - `nav-dropdown-content`—Contenedor de contenido de un desplegable de navegación.
+    - `nav-dropdown-item`—Elemento individual dentro de un desplegable de navegación.
+    - `nav-dropdown-item-text-container`—Contenedor de texto dentro de un elemento del desplegable.
+    - `nav-dropdown-item-title`—Texto del título dentro de un elemento del desplegable.
+    - `nav-dropdown-item-description`—Texto de descripción dentro de un elemento del desplegable.
+    - `nav-dropdown-item-icon`—Icono dentro de un elemento del desplegable.
+  </Accordion>
+  <Accordion title="Selector de productos">
+    - `nav-dropdown-products-selector-trigger`—Botón que abre el desplegable del selector de productos.
+    - `nav-dropdown-products-selector-content`—Contenedor de contenido del selector de productos.
+    - `nav-dropdown-products-selector-item`—Producto individual en el selector.
+    - `nav-dropdown-products-selector-item-title`—Título de un elemento del selector de productos.
+    - `nav-dropdown-products-selector-item-description`—Descripción de un elemento del selector de productos.
+    - `nav-dropdown-products-selector-item-icon`—Icono de un elemento del selector de productos.
+  </Accordion>
+  <Accordion title="Barra lateral">
+    - `sidebar-group`—Grupo de enlaces relacionados en la barra lateral.
+    - `sidebar-group-icon`—Icono de un grupo de la barra lateral.
+    - `sidebar-group-header`—Etiqueta de encabezado de un grupo de la barra lateral.
+    - `sidebar-title`—Título de nivel superior en la barra lateral.
+    - `sidebar-nav-group-divider`—Divisor entre grupos de navegación de la barra lateral.
+    - `login-link`—Enlace de inicio de sesión en sitios con autenticación. Aparece tanto en la versión del enlace de la barra de navegación como en la de la barra lateral. En la barra lateral, la clase está en el elemento `li`, así que usa `event.target.closest('.login-link')` para detectar clics en JavaScript personalizado.
+    - `logout-link`—Enlace de cierre de sesión en sitios con autenticación. Aparece tanto en la versión del enlace de la barra de navegación como en la de la barra lateral. En la barra lateral, la clase está en el elemento `li`.
+  </Accordion>
+  <Accordion title="Tabla de contenidos">
+    - `toc`—Contenedor de la tabla de contenidos.
+    - `toc-item`—Entrada individual de encabezado en la tabla de contenidos.
+  </Accordion>
+  <Accordion title="Pie de página">
+    - `footer`—Pie de página estándar. También se puede apuntar como selector de ID: `#footer`.
+    - `advanced-footer`—Pie de página extendido con columnas o contenido adicional.
+  </Accordion>
+  <Accordion title="Paginación">
+    - `pagination-prev`—Enlace a la página anterior en la barra de paginación.
+    - `pagination-next`—Enlace a la página siguiente en la barra de paginación.
+    - `pagination-title`—Título de página que se muestra en la barra de paginación.
+  </Accordion>
+  <Accordion title="Referencia de API">
+    - `api-section`—Sección completa para un endpoint de API.
+    - `api-section-heading`—Área de encabezado de una sección de endpoint de API.
+    - `api-section-heading-title`—Título dentro del encabezado de una sección de endpoint de API.
+    - `api-section-heading-subtitle`—Subtítulo dentro del encabezado de una sección de endpoint de API.
+    - `field`—Campo de parámetro o propiedad en la referencia de API.
+    - `option-dropdown`—Desplegable para seleccionar entre opciones de API.
+    - `tryit-button`—Botón "Try it" que abre el playground de API.
+    - `method-pill`—Insignia de método HTTP (GET, POST, etc.) en un endpoint.
+    - `method-nav-pill`—Insignia de método HTTP que se muestra en la navegación de la barra lateral.
+    - `prompt`—Componente de prompt en la referencia de API.
+  </Accordion>
+  <Accordion title="Asistente IA">
+    - `chat-assistant-sheet`—Contenedor del panel del asistente IA.
+    - `chat-assistant-sheet-header`—Encabezado del panel del asistente IA.
+    - `chat-assistant-sheet-content`—Área de contenido del panel del asistente IA.
+    - `chat-assistant-input`—Entrada de texto dentro del panel del asistente IA.
+    - `chat-assistant-floating-input`—Variante de entrada flotante del asistente IA.
+    - `chat-assistant-send-button`—Botón de enviar en el panel del asistente IA.
+    - `chat-assistant-disclaimer-text`—Texto de descargo de responsabilidad en el panel del asistente IA.
+    - `chat-assistant-payload-item`—Mensaje o resultado individual en el panel del asistente.
+    - `starter-question-text`—Pregunta sugerida de inicio mostrada en un panel de asistente vacío.
+    - `chat-assistant-contact-form`—Formulario de contacto en el panel del asistente de IA. Consulta [Aplicar estilo al formulario de contacto](/es/assistant/use#style-the-contact-form) para ver las clases de sus campos, etiquetas y botones.
+  </Accordion>
+  <Accordion title="Retroalimentación">
+    - `feedback-toolbar`—Barra de herramientas que contiene controles de retroalimentación de la página.
+    - `contextual-feedback-container`—Contenedor para retroalimentación contextual en línea.
+    - `contextual-feedback-form`—Formulario de retroalimentación contextual en línea.
+    - `contextual-feedback-form-title`—Título del formulario de retroalimentación contextual.
+    - `contextual-feedback-input`—Campo de texto dentro del formulario de retroalimentación contextual.
+    - `contextual-feedback-button`—Botón de acción dentro del formulario de retroalimentación contextual.
+    - `contextual-feedback-form-submit-button`—Botón de envío del formulario de retroalimentación contextual.
+  </Accordion>
+  <Accordion title="Retroalimentación de fragmentos de código">
+    - `code-snippet-feedback-popover-content`—Contenido del popover para retroalimentación de fragmentos de código.
+    - `code-snippet-feedback-form`—Formulario de retroalimentación para un fragmento de código.
+    - `code-snippet-feedback-textarea`—Área de texto dentro del formulario de retroalimentación del fragmento de código.
+    - `code-snippet-feedback-form-title`—Título del formulario de retroalimentación del fragmento de código.
+    - `code-snippet-feedback-form-description`—Texto descriptivo en el formulario de retroalimentación del fragmento de código.
+    - `code-snippet-feedback-form-submit-button`—Botón de envío del formulario de retroalimentación del fragmento de código.
+  </Accordion>
+  <Accordion title="Autenticación">
+    - `login-link`—Enlace que inicia el flujo de inicio de sesión.
+    - `logout-link`—Enlace que inicia el flujo de cierre de sesión.
+  </Accordion>
+  <Accordion title="Multi-vista">
+    - `multi-view-item`—Opción de vista individual en un conmutador de multi-vista.
+    - `multi-view-dropdown`—Desplegable para seleccionar entre múltiples vistas.
+    - `multi-view-dropdown-trigger`—Botón que abre el desplegable de multi-vista.
+    - `multi-view-dropdown-content`—Área de contenido del desplegable de multi-vista.
+    - `multi-view-dropdown-item`—Elemento individual dentro del desplegable de multi-vista.
+  </Accordion>
+  <Accordion title="Directorio">
+    - `directory`—Contenedor raíz para una página de directorio.
+    - `directory-group`—Grupo de páginas relacionadas dentro de un directorio.
+    - `directory-page`—Entrada de página individual en un directorio.
+    - `directory-card`—Entrada de página tipo tarjeta en un directorio.
+  </Accordion>
+  <Accordion title="Página 404">
+    - `not-found-container`—Contenedor raíz de la página 404.
+    - `not-found-status-code`—Visualización del código de estado en la página 404.
+    - `not-found-title`—Encabezado del título en la página 404.
+    - `not-found-description`—Texto descriptivo en la página 404.
+    - `not-found-recommended-pages-list`—Lista de páginas recomendadas mostradas en la página 404.
+    - `not-found-recommended-page-link`—Enlace individual en la lista de páginas recomendadas.
+  </Accordion>
+  <Accordion title="Color">
+    - `color`—Elemento de muestra de color.
+    - `color-row`—Fila que agrupa muestras de color.
+    - `color-item`—Elemento de color individual dentro de una fila de colores.
+  </Accordion>
+  <Accordion title="Árbol">
+    - `tree`—Contenedor de árbol de archivos.
+    - `tree-folder`—Entrada de carpeta dentro de un árbol de archivos.
+    - `tree-file`—Entrada de archivo dentro de un árbol de archivos.
+  </Accordion>
+  <Accordion title="Atributos de datos">
+    Algunos elementos exponen atributos de datos que puedes usar como selectores CSS.
+
+    Estado activo (`data-active`):
+
+    - `nav-dropdown-item[data-active]`—Elemento activo en un desplegable de navegación.
+    - `mobile-nav-tabs-item[data-active]`—Pestaña activa en la navegación móvil.
+    - `.sidebar-group:has(> li[data-active])`—Grupo de la barra lateral que contiene la página actual. El grupo en sí no tiene `data-active`; sus elementos de página y de grupos anidados sí lo tienen.
+    - `#sidebar-content li[data-active]`—Enlace activo de la barra lateral.
+    - `.nav-tabs-item[data-active]`—Pestaña activa de la navegación superior. Solo se aplica a pestañas simples; las pestañas con menús desplegables no reciben `data-active`. Nota el `.` inicial: esto apunta a una clase en un elemento `<a>` estándar, a diferencia de la mayoría de los otros componentes que usan nombres de elementos personalizados.
+    - `toc-item[data-active]`—Elemento activo de la tabla de contenidos.
+    - `toc-item[data-active-deepest]`—Elemento más profundo activo de la tabla de contenidos. Solo presente en el encabezado exacto actualmente visible, a diferencia de `data-active` que también se establece en sus encabezados padres.
+
+    Regiones de diseño (`data-layout-item`):
+
+    Usa `data-layout-item` para apuntar a las regiones principales de tu sitio con un único selector que funciona igual en todos los temas. Los ID de algunas regiones difieren entre temas. Por ejemplo, `#sidebar-content` es la barra lateral externa en algunos temas y el área de desplazamiento interna en otros, mientras que `[data-layout-item="sidebar"]` siempre es la barra lateral externa.
+
+    - `[data-layout-item="banner"]`—Banner de anuncios.
+    - `[data-layout-item="topbar"]`—Barra de navegación superior.
+    - `[data-layout-item="mobile-nav"]`—Panel de navegación en móvil.
+    - `[data-layout-item="sidebar"]`—Panel de navegación de la barra lateral externa.
+    - `[data-layout-item="content"]`—Área de contenido principal.
+    - `[data-layout-item="page-header"]`—Encabezado de página con el título y la descripción.
+    - `[data-layout-item="side-panel"]`—Panel lateral derecho que contiene la tabla de contenidos.
+    - `[data-layout-item="toc"]`—Tabla de contenidos.
+    - `[data-layout-item="pagination"]`—Enlaces a la página anterior y siguiente en la parte inferior de una página.
+    - `[data-layout-item="footer"]`—Pie de página.
+    - `[data-layout-item="search-entry"]`—Barra de búsqueda o botón que abre la búsqueda, en escritorio y móvil.
+    - `[data-layout-item="assistant-entry"]`—Botón que abre el asistente de IA, en escritorio y móvil.
+
+    ```css style.css
+    [data-layout-item="sidebar"] {
+      border-right: 1px solid #e5e7eb;
+    }
+    ```
+
+    Nombre de componente (`data-component-name`):
+
+    Usa `data-component-name` para apuntar a componentes de interfaz específicos con un selector estable que persiste si los nombres de clases internos cambian.
+
+    - `[data-component-name="mermaid-container"]`—Contenedor de diagrama Mermaid, incluyendo la superposición de controles de zoom.
+    - `[data-component-name="mermaid-controls-wrapper"]`—Controles de zoom y desplazamiento de Mermaid.
+    - `[data-component-name="primary-header-button"]`—Botón principal del encabezado. Solo en el tema Sequoia.
+    - `[data-component-name="theme-toggle"]`—Interruptor de tema.
+
+    Parte de componente (`data-component-part`):
+
+    Usa `data-component-part` para apuntar a sub-elementos dentro de un componente.
+
+    Partes de tarjeta:
+
+    - `[data-component-part="card-content-container"]`—Contenedor interno alrededor del contenido de una tarjeta.
+    - `[data-component-part="card-icon"]`—Icono dentro de una tarjeta. Úsalo para dar estilo a los iconos de las tarjetas, ya que el selector de elemento `icon` no coincide con los iconos dentro de las tarjetas.
+    - `[data-component-part="card-title"]`—Texto del título dentro de una tarjeta.
+    - `[data-component-part="card-content"]`—Contenido de la descripción dentro de una tarjeta.
+    - `[data-component-part="card-image"]`—Imagen mostrada en la parte superior de una tarjeta.
+    - `[data-component-part="card-cta"]`—Etiqueta de llamada a la acción dentro de una tarjeta.
+
+    Partes del panel del asistente:
+
+    - `[data-component-part="contact-support-button"]`—El wrapper `<a>` alrededor del enlace de contacto de soporte en el panel del asistente.
+    - `[data-component-part="contact-support-icon"]`—El `<span>` que envuelve el icono.
+    - `[data-component-part="contact-support-text"]`—El elemento `<p>` que contiene la etiqueta.
+
+    Atributos de Badge:
+
+    - `[data-badge]`—Cualquier elemento de badge.
+    - `[data-badge][data-color="blue"]`—Badge filtrado por color.
+    - `[data-badge][data-size="sm"]`—Badge filtrado por tamaño.
+
+    Partes de la búsqueda (`data-search-item`):
+
+    Usa `data-search-item` para aplicar estilos a la barra de búsqueda y al cuadro de diálogo de búsqueda con selectores estables que se mantienen aunque cambien los nombres de clase internos. Los valores siguen el patrón `<block>` o `<block>-<part>`, y los estados usan atributos independientes.
+
+    - `[data-search-item="trigger"]`—Barra de búsqueda en la barra de navegación que abre el cuadro de diálogo de búsqueda. Contiene `trigger-icon`, `trigger-label` y `trigger-hint` (el atajo de teclado).
+    - `[data-search-item="backdrop"]`—Capa superpuesta detrás del cuadro de diálogo de búsqueda.
+    - `[data-search-item="dialog"]`—Contenedor del cuadro de diálogo de búsqueda.
+    - `[data-search-item="header"]`—Área de entrada de búsqueda. Contiene `header-icon`, `input`, `header-button` (el botón que envía la consulta al asistente de IA) y `header-hint`. Tiene `data-disabled` cuando la búsqueda no está disponible, por ejemplo en vistas previas locales antes de iniciar sesión en la CLI.
+    - `[data-search-item="filter-list"]`—Fila de filtros de búsqueda. Cada filtro tiene un `filter-trigger` con `filter-label`, además de una flecha `filter-indicator` o un `filter-button` que borra la selección. El menú abierto es `filter-content`, con entradas `filter-item` y `filter-item-label`.
+    - `[data-search-item="list"]`—Lista de resultados. Tiene `data-loading` mientras se cargan los resultados. La barra de desplazamiento es `list-scrollbar`.
+    - `[data-search-item="group"]`—Grupo de resultados. `data-variant` es `recent`, `results` o `ask-ai`. El encabezado del grupo es `group-title`.
+    - `[data-search-item="item"]`—Resultado individual. Contiene `item-icon`, `item-title`, `item-badge` (el método HTTP en los resultados de API), `item-breadcrumbs`, `item-breadcrumb`, `item-breadcrumb-separator` y `item-description`. La fila que pregunta al asistente de IA tiene `data-variant="assistant"`.
+    - `[data-search-item="footer"]`—Indicaciones de teclado en la parte inferior del cuadro de diálogo. Contiene `footer-hint` y `footer-icon`.
+
+    Atributos de estado y variante en las partes de la búsqueda:
+
+    - `[data-search-item="item"][data-highlighted]`—Resultado resaltado actualmente con el teclado o el puntero.
+    - `[data-search-item="item-icon"][data-variant="section"]`—Icono del resultado según su tipo. Los valores son `page`, `section` y `api-playground`.
+    - `[data-search-item="item-badge"][data-method="post"]`—Resultado de API según su método HTTP, en minúsculas.
+    - `[data-search-item="filter-trigger"][data-variant="version"]`—Filtro según su tipo. Los valores son `product`, `version` y `tab`.
+    - `[data-search-item="filter-trigger"][data-open]`—Filtro cuyo menú está abierto. `filter-indicator` también tiene `data-open`.
+    - `[data-search-item="filter-trigger"][data-active]`—Filtro con un valor seleccionado.
+    - `[data-search-item="filter-item"][data-selected]`—Opción seleccionada en un menú de filtro.
+
+    ```css style.css
+    [data-search-item="dialog"] {
+      border-radius: 0.5rem;
+    }
+
+    [data-search-item="item"][data-highlighted] [data-search-item="item-title"] {
+      color: #0D9373;
+    }
+    ```
+
+    Ruta actual (`data-current-path`):
+
+    Usa `data-current-path` para aplicar CSS personalizado en páginas o subrutas específicas.
+
+    - `html[data-current-path="/"]`—Coincide con la página raíz.
+    - `html[data-current-path="/quickstart"]`—Coincide con una página específica.
+    - `html[data-current-path^="/api-reference/"]`—Coincide con cualquier página dentro de una sección.
+  </Accordion>
+</AccordionGroup>
+
+<div id="change-the-sidebar-width">
+  ### Cambiar el ancho de la barra lateral
+</div>
+
+Define la variable CSS `--sidebar-width` para cambiar el ancho de la barra lateral en escritorio. El área de contenido, el encabezado y el pie de página se ajustan al nuevo ancho, así que no necesitas sobrescribir `#sidebar` ni desplazar otros elementos tú mismo.
+
+```css style.css
+:root {
+  --sidebar-width: 20rem;
+}
+```
+
+Si no defines la variable, cada tema usa su ancho de barra lateral predeterminado:
+
+| Tema | Ancho predeterminado |
+| :--- | :--- |
+| Mint, Linden, Willow, Aspen, Sequoia | `18rem` |
+| Maple, Palm | `19rem` |
+| Almond | `16.5rem` |
+| Luma | `14rem` |
+
+En el tema Palm, la variable define el ancho de la barra lateral expandida. La barra lateral contraída mantiene su ancho fijo.
+
+<div id="change-the-content-width">
+  ### Cambiar el ancho del contenido
+</div>
+
+Define la variable CSS `--content-width` para cambiar el ancho máximo de la columna de texto en las páginas que usan el [modo de página](/es/organize/pages#page-mode) predeterminado. El valor define el ancho del texto en sí. Cada tema añade su propio relleno alrededor del texto, así que el mismo valor produce el mismo ancho de texto en todos los temas.
+
+```css style.css
+:root {
+  --content-width: 768px;
+}
+```
+
+La columna de texto nunca es más ancha que el espacio entre la barra lateral y la tabla de contenido. Si defines un valor grande, la columna ocupa el espacio disponible sin superponerse a otros elementos.
+
+Si no defines la variable, cada tema usa su ancho de contenido predeterminado:
+
+| Tema | Ancho predeterminado |
+| :--- | :--- |
+| Mint, Palm, Aspen | Sin máximo. El texto ocupa el espacio disponible. |
+| Linden | Sin máximo en pantallas más pequeñas. `35.75rem` en pantallas extragrandes. |
+| Maple | `36rem`. `42rem` en las pantallas más grandes. |
+| Willow | `600px` |
+| Almond | `36rem` |
+| Sequoia, Luma | `40.5rem` |
+
+`--content-width` no afecta a las páginas en modo `wide`, `center`, `custom` o `frame`.
+
+<div id="add-styles-to-a-single-page">
+  ### Añadir estilos a una sola página
+</div>
+
+Para aplicar estilos a una sola página sin añadir un archivo `.css` global, añade un bloque `<style>` a la página. Escribe el CSS dentro de una plantilla literal.
+
+```mdx Example page style
+<style>{`
+  .pricing-callout {
+    border-left: 4px solid #0D9373;
+    padding-left: 1rem;
+  }
+
+  @keyframes page-pulse {
+    from { opacity: 1; }
+    to { opacity: 0.3; }
+  }
+`}</style>
+
+<div className="pricing-callout">Prices shown in USD.</div>
+
+<span className="animate-[page-pulse_1s_ease-in-out_infinite_alternate]">Live</span>
+```
+
+Mintlify limita cada selector del bloque al área de contenido de la página, por lo que las reglas no afectan a la navegación, la barra lateral ni otras páginas. Los estilos de página se muestran en tu sitio publicado y en el editor web.
+
+Puedes usar estas reglas @ en un estilo de página:
+
+- `@media`, `@supports` y `@container`.
+- `@keyframes`, cuando el nombre empieza por `page-`. Haz referencia a la animación desde una propiedad `animation` o una clase de Tailwind como `animate-[page-pulse_1s_infinite]`. El prefijo impide que una página reemplace las animaciones que usa Mintlify.
+
+Mintlify elimina cualquier otra cosa del bloque:
+
+- Otras reglas @, como `@import` y `@font-face`.
+- Reglas cuyo selector empieza por un combinador (`>`, `+`, `~`) o usa el selector de anidamiento `&`.
+- Declaraciones que cargan recursos, como `url()` e `image-set()`.
+- `position: fixed`.
+- `!important` dentro de keyframes.
+
+Mintlify ignora los atributos de la etiqueta `<style>`. Elimina el bloque completo si el CSS no es una plantilla literal simple, por ejemplo, si contiene expresiones `${}` o una variable.
+
+<div id="custom-javascript">
+  ## JavaScript personalizado
+</div>
+
+El JavaScript personalizado te permite agregar código ejecutable a nivel global. Es equivalente a insertar una etiqueta `<script>` con código JS en cada página.
+
+Mintlify incluye cualquier archivo `.js` dentro de tu directorio de contenido en cada página de tu sitio de documentación, incluidas las páginas en modo personalizado y las páginas de aterrizaje. Los archivos JavaScript personalizados se ejecutan después de que la página se vuelve interactiva. No puedes limitarlos a páginas específicas y, cuando hay varios archivos `.js` presentes, todos se ejecutan sin un orden garantizado.
+
+Para cargar un script de terceros, inyecta un elemento `<script>` desde tu archivo JavaScript personalizado en lugar de agregar etiquetas `<script src="...">` directamente en MDX:
+
+```js
+const script = document.createElement('script');
+script.src = 'https://example.com/widget.js';
+script.async = true;
+document.head.appendChild(script);
+```
+
+Por ejemplo, puedes agregar el archivo `ga.js` siguiente para habilitar [Google Analytics](https://marketingplatform.google.com/about/analytics) en toda la documentación.
+
+```js
+window.dataLayer = window.dataLayer || [];
+function gtag() {
+  dataLayer.push(arguments);
+}
+gtag('js', new Date());
+
+gtag('config', 'TAG_ID');
+```
+
+<Warning>
+  Úsalo con precaución para no introducir vulnerabilidades de seguridad.
+</Warning>
+
+<div id="run-code-on-every-page">
+  ### Ejecuta código en cada página
+</div>
+
+El JavaScript personalizado se ejecuta una vez por visita. Cuando un lector pasa de una página a otra, Mintlify reemplaza el contenido de la página sin recargarla, por lo que el código que modifica el contenido de la página solo se ejecuta en la primera página. Escucha el evento `mintlify:navigate` para volver a ejecutarlo después de cada navegación. El evento se dispara en `window` una vez que se renderiza la nueva página, con `event.detail.path`, `event.detail.search` y `event.detail.hash`. `path` usa el mismo formato que `data-current-path`. No se dispara en la carga inicial, así que llama a tu función una vez por tu cuenta.
+
+```js Add a button to every heading
+function addCopyButtons() {
+  document.querySelectorAll('#content h2[id]').forEach((heading) => {
+    if (heading.querySelector('.copy-link')) return;
+
+    const button = document.createElement('button');
+    button.className = 'copy-link';
+    button.textContent = 'Copy link';
+    button.addEventListener('click', () => {
+      navigator.clipboard.writeText(`${location.origin}${location.pathname}#${heading.id}`);
+    });
+    heading.append(button);
+  });
+}
+
+addCopyButtons();
+window.addEventListener('mintlify:navigate', addCopyButtons);
+```
+
+Usa el evento en lugar de un `MutationObserver` en `document.body`, que se ejecuta con cada cambio del DOM y ralentiza las páginas grandes. Para registrar clics, usa en su lugar un único listener en `document`; sigue funcionando entre navegaciones sin el evento.
+
+<div id="navigate-to-another-page">
+  ### Navegar a otra página
+</div>
+
+Usa `window.mintlify.navigate` para enviar a los lectores a otra página desde JavaScript personalizado. Utiliza la navegación del lado del cliente, por lo que la página cambia sin una recarga completa y dispara el evento `mintlify:navigate`. En cambio, establecer `location.href` recarga toda la página.
+
+```js Navigate to a page
+window.mintlify.navigate('/quickstart');
+```
+
+Para reemplazar la entrada actual del historial del navegador en lugar de añadir una nueva, pasa `replace: true`. Los lectores no pueden usar el botón de retroceso para volver a la página que reemplazaste.
+
+```js Replace the current page
+window.mintlify.navigate('/quickstart', { replace: true });
+```
+
+Si tu sitio está alojado en una [subruta](/es/deploy/docs-subpath), Mintlify añade la subruta a las rutas relativas a la raíz que aún no la incluyen. Por ejemplo, en un sitio alojado en `/docs`, tanto `/quickstart` como `/docs/quickstart` llevan a `/docs/quickstart`.
+
+Las URL de otro dominio, las rutas fuera de tu subruta y las llamadas realizadas antes de que la página termine de cargarse usan una carga completa de la página.
+
+<div id="set-api-playground-server-variables">
+  ### Configura las variables de servidor del API Playground
+</div>
+
+Usa `window.mintlify.api.playground.setServerVariables` para rellenar previamente [las variables de servidor de OpenAPI](/es/api-playground/configure-playground#set-the-base-url) desde JavaScript personalizado. Úsalo cuando los valores estén disponibles después de cargar la página, por ejemplo, al inicializarse un SDK de autenticación o cambiar un inquilino. El método actualiza los API Playgrounds abiertos y se aplica a los que abras después.
+
+Pasa un objeto con valores de tipo string. Cada llamada reemplaza por completo la sobreescritura en tiempo de ejecución. Las claves omitidas se eliminan y los valores no válidos se ignoran. Los valores en tiempo de ejecución tienen prioridad sobre los valores predeterminados de OpenAPI y las variables de servidor guardadas.
+
+```js Set API Playground server variables
+window.mintlify.api.playground.setServerVariables({
+  tenantDomain: 'example.us.auth0.com',
+});
+```
+
+Llama a `window.mintlify.api.playground.clearServerVariables()` cuando los valores ya no se apliquen, por ejemplo, después de cerrar sesión. Después de borrarlos, el API Playground vuelve a sus otros valores configurados.
+
+```js Clear API Playground server variables
+window.mintlify.api.playground.clearServerVariables();
+```
+
+Las llamadas realizadas antes de que se inicialice el cliente se ponen en cola y se aplican cuando se inicializa. La sobreescritura se mantiene en memoria durante la sesión de la página. No escribe en `localStorage` ni en el almacenamiento de credenciales. Una actualización completa de la página la elimina.
+
+<Warning>
+  Configura únicamente valores que no sean secretos desde el código del cliente. No incluyas claves de API, tokens ni otras credenciales en las variables de servidor.
+</Warning>
+
+<div id="access-personalized-user-data">
+  ### Acceder a los datos personalizados del usuario
+</div>
+
+Si tu sitio utiliza [autenticación](/es/deploy/authentication-setup) o [personalización](/es/create/personalization), los scripts personalizados pueden leer el visitante identificado desde `window.mintlify.user`. Es el mismo objeto que se expone en las páginas MDX como la [variable `user`](/es/create/personalization#dynamic-mdx-content), por lo que refleja el campo `content` de tus datos de usuario.
+
+Como los scripts personalizados se ejecutan antes de que la información del usuario se resuelva, escucha el evento `mintlify:user` para reaccionar en cuanto el objeto de usuario esté disponible. El evento se dispara cuando la información del usuario se resuelve y también cada vez que cambia. Su `detail` es el objeto de usuario, o `null` cuando el visitante ha cerrado sesión o no está identificado.
+
+```js Read the user after it resolves
+window.addEventListener('mintlify:user', (event) => {
+  const user = event.detail;
+  if (!user) return; // Signed out or unidentified.
+
+  renderAppLauncher(user);
+});
+```
+
+Si el usuario ya se ha resuelto cuando se ejecuta tu script, lee `window.mintlify.user` directamente.
+
+```js Read the current user
+const user = window.mintlify?.user;
+if (user) {
+  renderAppLauncher(user);
+}
+```
+
+`window.mintlify.user` es `undefined` hasta que la información del usuario se resuelva y también cuando el visitante ha cerrado sesión o no está identificado. Utiliza el encadenamiento opcional al leer campos anidados.
+
+<Warning>
+  Todo lo que incluyas en el campo `content` del usuario queda expuesto a los scripts del lado del cliente. No incluyas secretos ni credenciales que no deban ser legibles en el navegador.
+</Warning>

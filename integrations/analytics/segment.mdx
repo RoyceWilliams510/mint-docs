@@ -1,0 +1,40 @@
+---
+title: "Segment"
+description: "Integrate Segment with your Mintlify documentation to route analytics events to downstream tools like warehouses, CRMs, and marketing platforms."
+keywords: ["Segment integration", "write key", "event streaming", "CDP integration"]
+boost: 3
+---
+
+Add your Segment write key to your `docs.json` file to send analytics to Segment.
+
+<CodeGroup>
+
+```json Analytics options in docs.json
+"integrations": {
+    "segment": {
+        "key": "required",
+        "cdnUrl": "optional"
+    }
+}
+```
+
+```json Example
+"integrations": {
+    "segment": {
+        "key": "nqJxiRG15Y6M594P8Sb8ESEciU3VC2",
+        "cdnUrl": "https://cdn.example.com"
+    }
+}
+```
+
+</CodeGroup>
+
+## Configuration options
+
+<ParamField path="key" type="string" required>
+  Your Segment write key.
+</ParamField>
+
+<ParamField path="cdnUrl" type="string">
+  A custom CDN URL for loading the Segment script. Use this if you configure a [custom domain](https://segment.com/docs/connections/custom-domain/) in Segment to serve analytics from your own subdomain, which helps avoid ad blockers that block `cdn.segment.com`. Must be an HTTPS URL without query parameters or fragments. Defaults to `https://cdn.segment.com`.
+</ParamField>

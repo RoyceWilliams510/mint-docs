@@ -1,0 +1,436 @@
+---
+title: "可复用片段"
+description: "创建带有变量的可复用内容片段，在文档页面间保持一致性并减少 MDX 文件中的重复内容。"
+keywords: ["content snippets", "reusable content", "variables"]
+---
+
+软件开发的核心原则之一是 DRY（Don't Repeat Yourself，避免重复），这同样适用于文档。如果你发现在多个位置重复相同的内容，可以为该内容创建一个自定义片段。片段包含的内容可以导入到其他文件中复用，你可以控制片段在页面上的具体展示位置。如果之后需要更新内容，只需编辑片段本身，而不必修改所有使用该片段的文件。
+
+<div id="how-snippets-work">
+  ## 片段的工作方式
+</div>
+
+片段是被导入到其他文件中的任意 `.mdx`、`.md`、`.js`、`.jsx` 或 `.tsx` 文件。你可以将片段文件放在项目中的任意位置。你的站点会在每个页面上将项目中的每个 `.js` 文件作为[自定义脚本](/zh/customize/custom-scripts#custom-javascript)加载，因此 `.js` 片段只应导出数据，而不应运行代码。
+
+在 [Markdown 页面视图](/zh/ai/markdown-export)中，`<Snippet>` 标签会被替换为片段文件的内容，并填入 `docs.json` 中的变量。插入的内容会与页面其余部分一起转换为 Markdown。
+
+当你在另一个文件中导入片段时，该片段只会在你导入它的地方出现，并不会渲染为独立页面。`/snippets/` 文件夹中的任何文件始终被视为片段，即使它没有被导入到其他文件中。
+
+<div id="create-snippets">
+  ## 创建片段
+</div>
+
+创建一个文件，写入你想要复用的内容。片段可以包含 Mintlify 支持的所有内容类型，也可以导入其他片段。请参阅[嵌套片段](#nested-snippets)以了解在嵌套时应在何处声明导入。
+
+<div id="import-snippets-into-pages">
+  ## 将代码片段导入到页面中
+</div>
+
+使用绝对路径或相对路径将代码片段导入到页面中。
+
+- **绝对导入**：从项目根目录导入时，以 `/` 开头。
+- **相对导入**：使用 `./` 或 `../` 从当前文件所在位置相对导入代码片段。
+
+将导入的代码片段渲染为 JSX 标签时，使用的名称应以大写字母开头，例如 `MySnippet`。MDX 会将 `<mySnippet />` 之类以小写字母开头的标签视为 HTML 元素或自定义元素的字面名称，而不是对导入代码片段的引用。按照惯例，代码片段名称应使用 PascalCase。
+
+<Tip>
+  相对导入支持 IDE 导航。在 IDE 中按住 <kbd>Cmd</kbd> 并单击代码片段名称即可直接跳转到该代码片段的定义。
+</Tip>
+
+<div id="insert-snippets-in-the-web-editor">
+  ### 在网页编辑器中插入片段
+</div>
+
+在[网页编辑器](/zh/editor)中，在 MDX 页面上输入 <kbd>/snippet</kbd> 并选择一个片段。编辑器会在页面顶部添加一个绝对导入，并在你插入的位置渲染该片段。
+
+片段列表包括 `snippets/` 文件夹中的文件，以及其他页面已作为片段导入的文件。
+
+在页面中，片段会显示为其内容的预览。若要更改内容，请从 **Files** 打开片段文件并在其中编辑。更改会出现在所有导入该片段的页面上。你可以对片段预览中的文本添加评论。
+
+<div id="import-text">
+  ### 导入文本
+</div>
+
+1. 在代码片段文件中添加需要复用的内容。
+
+    ```mdx shared/my-snippet.mdx wrap
+    Hello world! This is my content I want to reuse across pages.
+    ```
+
+2. 使用绝对路径或相对路径，将该片段导入目标文件中。
+
+    <CodeGroup>
+
+    ```mdx Absolute import
+    ---
+    title: "An example page"
+    description: "This is an example page that imports a snippet."
+    ---
+
+    import MySnippet from "/shared/my-snippet.mdx";
+
+    The snippet content displays beneath this sentence.
+
+    <MySnippet />
+    ```
+
+    ```mdx Relative import
+    ---
+    title: "An example page"
+    description: "This is an example page that imports a snippet."
+    ---
+
+    import MySnippet from "../shared/my-snippet.mdx";
+
+    The snippet content displays beneath this sentence.
+
+    <MySnippet />
+    ```
+
+    </CodeGroup>
+
+<div id="nested-snippets">
+  ### 嵌套片段
+</div>
+
+片段可以导入其他片段。请在使用嵌套片段的父级片段文件中声明该导入，而不是在导入父级片段的页面中声明。
+
+每个文件解析各自的导入。在页面中声明的导入不会应用于该页面导入的片段。依赖页面级导入的嵌套片段可能会渲染为空内容。
+
+1. 在父级片段文件中导入嵌套片段。请在需要使用嵌套片段的位置声明导入。
+
+    ```mdx shared/parent-snippet.mdx
+    import ChildSnippet from "/shared/child-snippet.mdx";
+
+    此片段会在这句话下方渲染另一个片段。
+
+    <ChildSnippet />
+    ```
+
+2. 在目标文件中只导入父级片段。你无需导入嵌套片段。
+
+    ```mdx destination-file.mdx
+    ---
+    title: "An example page"
+    description: "This is an example page that imports a snippet containing a nested snippet."
+    ---
+
+    import ParentSnippet from "/shared/parent-snippet.mdx";
+
+    <ParentSnippet />
+    ```
+
+避免循环导入，即某个代码片段通过一个或多个其他代码片段最终导入了自身。循环导入无法解析，并且在你移除该循环之前，本地预览会停止响应。
+
+<div id="import-variables">
+  ### 导入变量
+</div>
+
+在页面中引用代码片段（snippet）中的变量。
+
+1. 从代码片段（snippet）文件中导出变量。
+
+    ```mdx shared/custom-variables.mdx
+    export const myName = "Ronan";
+
+    export const myObject = { fruit: "strawberries" };
+
+    ;
+    ```
+
+2. 从目标文件中导入该代码片段并使用该变量。
+
+    ```mdx destination-file.mdx
+    ---
+    title: "示例页面"
+    description: "这是一个导入带有变量的代码片段的示例页面。"
+    ---
+
+    import { myName, myObject } from "/shared/custom-variables.mdx";
+
+    你好,我的名字是 {myName},我喜欢 {myObject.fruit}。
+    ```
+
+<Note>
+  浏览器会对 MDX 表达式求值，例如像 `{myName}` 这样的导入变量和像 `{1 + 1}` 这样的内联表达式。它们的值不会出现在页面的初始 HTML 或[离线导出](/zh/deploy/export)中，因此不运行 JavaScript 的爬虫、LLM 和其他工具只能看到它们周围的文本。如果这些值必须在上述场景中可见，请以纯文本形式书写。
+</Note>
+
+<div id="import-snippets-with-variables">
+  ### 使用变量导入代码片段
+</div>
+
+在导入代码片段时，可使用变量向其传递数据。
+
+1. 在代码片段中添加变量，并在导入时通过属性传入值。在此示例中，变量是 `{word}`。
+
+    ```mdx shared/my-snippet.mdx
+    我今天的关键词是 {word}。
+    ```
+
+2. 使用该变量将代码片段导入目标文件。传入的属性会替换代码片段定义中的变量。
+
+    ```mdx destination-file.mdx
+    ---
+    title: "示例页面"
+    description: "这是一个导入带有变量的代码片段的示例页面。"
+    ---
+
+    import MySnippet from "/shared/my-snippet.mdx";
+
+    <MySnippet word="bananas" />
+    ```
+
+变量也可以在围栏代码块内插值。这对于包含安装命令或其他因包名、版本或环境而异的代码示例的代码片段非常有用。
+
+````mdx shared/install-snippet.mdx
+export const InstallSnippet = ({ packageName }) => <></>;
+
+安装包：
+
+```bash
+npm install {packageName}
+```
+````
+
+```mdx destination-file.mdx
+import InstallSnippet from "/shared/install-snippet.mdx";
+
+<InstallSnippet packageName="@myorg/sdk" />
+```
+
+<div id="import-react-components">
+  ### 导入 React 组件
+</div>
+
+1. 创建一个包含 JSX 组件的代码片段。有关更多信息，请参见 [React 组件](/zh/customize/react-components)。
+
+    ```js components/my-jsx-snippet.jsx
+    export const MyJSXSnippet = () => {
+      return (
+        <div>
+          <h1>你好,世界!</h1>
+        </div>
+      );
+    };
+    ```
+
+<Note>
+  创建 JSX 代码片段时，请使用箭头函数语法（`=>`），而不要使用函数声明。在代码片段中不支持使用 `function` 关键字。
+</Note>
+
+2. 导入该代码片段。
+
+    ```mdx destination-file.mdx
+    ---
+    title: "示例页面"
+    description: "这是一个导入包含 React 组件的代码片段的示例页面。"
+    ---
+
+    import { MyJSXSnippet } from "/components/my-jsx-snippet.jsx";
+
+    <MyJSXSnippet />
+    ```
+
+<div id="use-global-variables">
+  ## 使用全局变量
+</div>
+
+全局变量会在内容中出现的所有位置替换简短的值，例如产品名称或版本号。
+
+在 `docs.json` 的 [`variables`](/zh/organize/settings-reference#variables) 对象中定义变量。
+
+```json docs.json
+"variables": {
+  "productName": "Acme",
+  "latestVersion": "2.4.0"
+}
+```
+
+在任意页面或 snippet 中使用 `{{variableName}}` 引用变量，包括代码块内部。
+
+```mdx destination-file.mdx
+Install {{productName}} version {{latestVersion}}.
+```
+
+Mintlify 仅在页面和 snippet 的内容中替换变量。变量不适用于 `title` 和 `description` 等 frontmatter 字段，因此请以纯文本形式写入这些值。
+
+请使用 camelCase 名称，例如 `productName`。`mint broken-links` 命令会在替换变量之前解析页面，因此对于每个使用带连字符变量名的页面，它都会报告解析错误。
+
+若要将变量保存在单独的文件中，请使用 [`$ref`](/zh/organize/settings#split-configuration-with-%24ref) 将 `variables` 键指向一个 JSON 文件。
+
+```json docs.json
+"variables": {
+  "$ref": "./config/variables.json"
+}
+```
+
+<div id="use-different-values-for-the-same-content">
+  ### 为相同内容使用不同的值
+</div>
+
+每个变量在整个站点中只有一个值。若要在不同页面上为相同文本设置不同的值，请改用[带 props 的 snippet](#import-snippets-with-variables)。
+
+若要将相同内容发布为两个使用不同值的站点（例如文档的白标版本），请为每个版本创建单独的站点。每个站点的 `docs.json` 定义自己的值。
+
+<div id="render-content-from-structured-data">
+  ## 从结构化数据渲染内容
+</div>
+
+将 SDK 组件列表、支持矩阵或套餐集合等数据集中存放在一个代码片段中，并在多个页面上渲染。当你修改这些数据时，基于它构建的每个表格、列表或卡片都会随之更新。
+
+将数据以纯 JSON 对象的形式存储在带有命名导出的 `.js` 代码片段中。然后编写一个 `.jsx` 代码片段，将数据转换为标记内容。
+
+<Note>
+  代码片段必须是 `.mdx`、`.md`、`.js`、`.jsx` 或 `.tsx` 文件。你无法直接导入 `.json` 或 `.yaml` 文件。请将数据存放在 `.js` 代码片段中，或者[从你的 JSON 或 YAML 源文件生成一个](#generate-snippets-and-pages-from-json-or-yaml)。
+</Note>
+
+<Steps>
+  <Step title="从代码片段中导出数据">
+    ```js snippets/sdk-components.js
+    export const sdkComponents = [
+      { "name": "CardForm", "version": "2.4.0", "status": "Stable", "docs": "/components/card-form" },
+      { "name": "PinReveal", "version": "1.9.2", "status": "Beta", "docs": "/components/pin-reveal" }
+    ];
+    ```
+  </Step>
+  <Step title="创建一个用于渲染数据的代码片段">
+    使用 `map()` 遍历数据，并返回 HTML 元素或 Mintlify 组件。
+
+    ```jsx snippets/components-table.jsx
+    export const ComponentsTable = ({ rows }) => (
+      <table>
+        <thead>
+          <tr>
+            <th>组件</th>
+            <th>版本</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.name}>
+              <td><a href={row.docs}>{row.name}</a></td>
+              <td><code>{row.version}</code></td>
+              <td>{row.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+    ```
+  </Step>
+  <Step title="导入两个代码片段并以属性方式传入数据">
+    在页面中筛选或排序数据，即可在不重复数据的情况下展示其子集。
+
+    ```mdx destination-file.mdx
+    ---
+    title: "SDK 组件"
+    description: "SDK 中的每个组件，及其当前版本与状态。"
+    ---
+
+    import { sdkComponents } from "/snippets/sdk-components.js";
+    import { ComponentsTable } from "/snippets/components-table.jsx";
+
+    该 SDK 包含 {sdkComponents.length} 个组件。
+
+    <ComponentsTable rows={sdkComponents} />
+
+    ## 稳定组件
+
+    <ComponentsTable rows={sdkComponents.filter((row) => row.status === "Stable")} />
+    ```
+  </Step>
+</Steps>
+
+<div id="generate-snippets-and-pages-from-json-or-yaml">
+  ### 从 JSON 或 YAML 生成代码片段和页面
+</div>
+
+如果你将数据存储在 JSON 或 YAML 文件中，可从该源数据生成代码片段。使用脚本生成数据代码片段，为每个条目生成一个页面，并创建对应的导航分组。每当源文件发生变更时，在 CI 中运行该脚本，并将生成结果提交。
+
+<Steps>
+  <Step title="编写生成脚本">
+    该脚本读取 `sdk-components.yaml`，写入上一个示例中的代码片段，为每个组件创建一个页面，并替换 `docs.json` 中名为 "Components" 的导航分组下的页面。
+
+    ```js scripts/generate-docs.mjs
+    import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+    import { parse } from "yaml";
+
+    const components = parse(readFileSync("sdk-components.yaml", "utf8"));
+    const slug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+    // One snippet with all the data, for tables and lists anywhere in the docs.
+    writeFileSync("snippets/sdk-components.js", `export const sdkComponents = ${JSON.stringify(components, null, 2)};\n`);
+
+    // One page per component.
+    mkdirSync("components", { recursive: true });
+    for (const component of components) {
+      const page = `---
+    title: ${JSON.stringify(component.name)}
+    description: ${JSON.stringify(component.description)}
+    ---
+
+    {/* Generated from sdk-components.yaml by scripts/generate-docs.mjs. Edit the YAML, not this file. */}
+
+    | Field | Value |
+    | --- | --- |
+    | Version | \`${component.version}\` |
+    | Status | ${component.status} |
+    `;
+      writeFileSync(`components/${slug(component.name)}.mdx`, page);
+    }
+
+    // Keep the navigation in sync: replace the pages of the group named "Components", wherever it sits.
+    const docs = JSON.parse(readFileSync("docs.json", "utf8"));
+    const findGroup = (node) => (Array.isArray(node) ? node.map(findGroup).find(Boolean) : node && typeof node === "object" ? (node.group === "Components" ? node : findGroup(Object.values(node))) : undefined);
+    const group = findGroup(docs.navigation);
+    if (group) {
+      group.pages = components.map((component) => `components/${slug(component.name)}`);
+      writeFileSync("docs.json", `${JSON.stringify(docs, null, 2)}\n`);
+    }
+    ```
+
+    对于 JSON 源文件，将 `parse()` 替换为 `JSON.parse()`，并省略 `yaml` 依赖。多次运行该脚本会生成完全相同的文件，因此可以放心地在每次推送时运行。
+  </Step>
+  <Step title="在 GitHub Action 中运行">
+    当源文件或脚本发生变更时，该工作流会触发运行，然后将脚本生成的任何内容提交。默认的 `GITHUB_TOKEN` 在推送时不会触发其他工作流，因此该任务不会形成循环。Mintlify 会像处理其他 commit 一样部署该次推送。
+
+    ```yaml .github/workflows/generate-docs.yml
+    name: Generate docs from YAML
+
+    on:
+      push:
+        paths:
+          - sdk-components.yaml
+          - scripts/generate-docs.mjs
+      workflow_dispatch:
+
+    permissions:
+      contents: write
+
+    jobs:
+      generate:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-node@v4
+            with:
+              node-version: 22
+          - run: npm install yaml
+          - run: node scripts/generate-docs.mjs
+          - name: Commit generated files
+            run: |
+              git add -A
+              if git diff --cached --quiet; then
+                echo "Nothing changed."
+                exit 0
+              fi
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git commit -m "docs: regenerate from sdk-components.yaml"
+              git push
+    ```
+
+    如果你将源文件存储在另一个仓库中，请改在该仓库中运行工作流。使用一个能够向文档仓库推送的令牌检出文档仓库，运行脚本并提交。
+  </Step>
+</Steps>

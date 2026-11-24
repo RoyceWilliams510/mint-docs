@@ -1,0 +1,131 @@
+---
+title: "在编辑器中协作"
+sidebarTitle: "协作"
+description: "在编辑器中发表评论、以建议的形式提出更改，并与团队成员实时共同编辑页面。"
+keywords: ["comments", "suggestions", "collaboration", "review", "mentions", "real time"]
+---
+
+你可以通过对页面发表评论、提出建议或同时协同编辑，来与团队一起处理页面。
+
+评论和建议不会阻止发布。如果要求 deployment branch 上的更改在上线前必须获得同事批准，请参阅[发布前要求审阅](/zh/editor/review#require-review-before-publishing)。
+
+<div id="comments">
+
+## 评论
+
+</div>
+
+<Info>
+  所有[角色](/zh/dashboard/roles)都可以评论、回复和解决线程。如果你的组织使用[扩展角色](/zh/dashboard/roles#expanded-roles)，viewers 可以阅读评论，但不能添加评论。要让某人只评论而不编辑，请为其分配 commenter 角色。
+</Info>
+
+评论让你可以针对特定文本或整个页面留下反馈，而无需修改内容。
+
+**评论永远不会进入你的仓库。** 它们仅存在于编辑器中，不会包含在已发布的站点里，也不会提交到 Git。如果你的仓库托管在 GitHub 或 GitLab 上，且你的分支有打开的 pull request，Mintlify 会在其描述中添加未解决线程的摘要，并附上指向每条评论的链接。该摘要会随线程的变化而更新。由[自动创建分支](/zh/editor/settings#auto-create-branches)从其他分支复制过来的线程，会在有人回复、编辑或解决它们后加入摘要。
+
+若要添加评论，请选中文本并点击工具栏中的 <Icon icon="message-square-text" /> **Comment** 图标，或按 <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd>（macOS）或 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd>（Windows）。
+
+若要对整个块（例如段落、代码块、图片、表格或组件）发表评论，请将鼠标悬停在该块上，点击 <Icon icon="grip-vertical" /> **Block actions**，然后选择 **Comment**。你也可以将光标放在该块中且不选中任何文本，然后按 <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd>（macOS）或 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd>（Windows）。如果有人删除了带有未解决评论的块，该线程会移到页面标题旁边，并附带一条说明，指出所评论的块已被删除。
+
+若要对整个页面而非特定文本发表评论，可使用以下两种方式之一：
+
+- 将鼠标悬停在页面标题上，然后点击 **Add comment**。
+- 在评论面板中，点击 **New comment**。
+
+页面评论显示在页面标题旁边。
+
+在评论中输入 `@` 即可提及同事。对方必须是你所在组织的成员，并且已经接受邀请。在评论中提及同事时，对方会收到电子邮件通知，其[收件箱](/zh/dashboard/inbox)中也会出现一条项目。你可以在仪表板的[通知](/zh/dashboard/notifications)页面管理接收哪些评论和建议邮件。
+
+你发起或被提及的讨论串中的回复，以及你所拥有页面上的新评论和建议，也会出现在你的收件箱中。
+
+评论线程在可视化模式和 source 模式下都可见。在 source 模式下，你可以阅读、回复和解决已有的线程，但要发起新评论则需要进入可视化模式。
+
+若要查看当前页面上的所有线程：
+
+1. 点击页面右上角的 <Icon icon="ellipsis" /> **More options**。
+2. 点击 **Comments**。
+
+对评论添加回应可以在不回复的情况下表示已读。将鼠标悬停在评论上，点击 **Add reaction** 按钮，然后选择一个表情符号。对他人的评论做出回应时会通知该评论的作者。
+
+{/* vale Vale.Terms = NO */}
+若要对页面上的文本做出回应，请选中文本，点击工具栏中的 **Add reaction**，然后选择一个表情符号。Mintlify 会在选中的文本上添加一条评论，内容为该表情符号。团队成员可以像处理其他评论一样对其进行回复、回应、解决或删除。对文本做出回应需要使用可视化模式。
+{/* vale Vale.Terms = YES */}
+
+若要编辑或删除你自己写的评论，请在该评论上点击 **More actions**。你只能编辑自己的评论。你可以删除自己的评论；如果你的组织使用[角色](/zh/dashboard/roles)，管理员可以删除任何评论或线程。删除线程中的第一条评论会删除整个线程。
+
+<div id="mentions-in-page-content">
+
+## 页面内容中的提及
+
+</div>
+
+编辑页面时输入 `@` 即可打开提及菜单。提及在可视化模式和源码模式下均可使用。
+
+- **提及队友**，在页面内容中引用对方。如果对方有权访问该页面，Mintlify 会向其发送电子邮件，并在其[收件箱](/zh/dashboard/inbox)中添加一条项目。
+- **提及页面**，插入指向该页面的链接。Mintlify 会使用该页面的标题作为链接文本。
+
+在控制台的[通知](/zh/dashboard/notifications)页面，通过 **Page @mention** 设置开启或关闭页面提及邮件。此设置不会影响你的收件箱。
+
+<div id="suggestions">
+
+## 建议
+
+</div>
+
+建议会在保留当前内容的前提下提出更改，便于同事接受或拒绝。
+
+Editors 和 admins 可以接受或拒绝任何建议，viewers 不能。
+
+若要提出建议，请选中文本并点击工具栏中的 **Switch to suggesting**，或按 <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd>（macOS）或 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd>（Windows）。在建议模式下，顶部栏会显示 **Suggesting** 标签，你的删除和插入会以高亮文本的形式显示，而不会直接修改内容。格式更改也会成为建议，包括粗体、斜体、下划线、删除线和行内代码。文本会预览建议的格式，但只有在有人接受该建议后，格式才会生效。点击该标签即可回到编辑状态。待处理的建议会显示在页面旁边和评论面板中。
+
+建议模式仅在可视化模式下可用。开启建议模式时，你无法切换到source 模式。关闭建议模式即可直接编辑 MDX。
+
+<Note>
+  [Viewers](/zh/dashboard/roles) 始终处于建议模式。viewer 打开编辑器时会自动进入建议模式，这样他们就可以在不直接修改内容的情况下提出更改。拥有 [commenter 角色](/zh/dashboard/roles#expanded-roles)的成员不会被切换到建议模式。他们可以对页面发表评论，但不能编辑页面。
+</Note>
+
+点击高亮显示的建议，然后点击 **Accept suggestion** 或 **Reject suggestion**。无论选择哪一项，该建议线程都会被解决。被接受的更改会成为当前分支的一部分，并在你下次[发布](/zh/editor/publish)时上线。
+
+<div id="ask-the-mintlify-agent">
+
+## 询问 Mintlify 智能体
+
+</div>
+
+在评论、建议或回复中提及 `@mintlify`，即可就当前页面向[编辑器智能体](/zh/editor/agent)提问。智能体会在后台运行，并以该页面、线程和分支作为上下文，然后把回答作为回复发布到同一线程中。
+
+```text
+@mintlify does this endpoint support pagination?
+@mintlify is this explanation clear for someone new to the API?
+```
+
+如需就特定文本提问，请选中该文本并点击工具栏中的 <Icon icon="square-sparkles" /> **Ask Mintlify**。Mintlify 会在选中的文本上新建一条已添加 `@mintlify` 的评论，你只需输入问题即可。
+
+如果你有编辑内容的权限，也可以在线程中让智能体修改页面。管理员和编辑者可以编辑内容。如果未启用[基于角色的访问控制](/zh/dashboard/roles)，所有成员都可以编辑。
+
+```text
+@mintlify fix the typo in this sentence
+```
+
+只有当你的评论明确要求修改时，智能体才会在该线程所在的分支上编辑页面。对于问题、反馈或建议，它会给出回答，并主动提出可以进行修改。编辑页面后，它的回复会说明修改了哪些内容。智能体不会发布更改，因此请自行审阅其修改并[发布](/zh/editor/publish)。
+
+对于[查看者](/zh/dashboard/roles)，智能体以只读模式回复。它可以阅读页面及其未解决的评论、查看图片、搜索和获取网页内容，以及搜索 Mintlify 的文档，但无法编辑内容。
+
+对于已有访问权限的成员，提及功能在私有页面上同样有效。
+
+<div id="real-time-editing">
+
+## 实时编辑
+
+</div>
+
+当多人在同一分支上打开同一页面时，他们会协同编辑。每个人的光标和编辑对所有人可见，工具栏中会显示头像。
+
+实时编辑在可视化模式和 source 模式下均可用。你可以在 source 模式下编辑 MDX，同时同事在同一页面上使用可视化模式工作。对方的光标和选区会出现在你的编辑器中，你的光标和选区也会出现在对方的编辑器中，包括标题和描述字段。
+
+- 所有协作者的更改会自动合并。两人编辑同一部分不会产生冲突。
+- 撤销只影响你自己的编辑。
+- 如果你断开连接，编辑会保存在本地，并在重新连接时同步。
+- 在 source 模式下，无效的 MDX 或 frontmatter YAML 会保留在你本地，直到你修复它。同事只会收到有效的内容，而无效的 MDX 会[阻止发布](/zh/editor/publish#invalid-mdx-blocks-publishing)，直到问题被修复。
+
+当 [Mintlify 智能体](/zh/agent)通过 API 或 MCP 编辑页面时，它会像其他协作者一样出现，带有头像和位于其最近编辑位置的实时光标。智能体完成后，光标会自动消失。

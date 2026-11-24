@@ -1,0 +1,136 @@
+---
+title: "Acerca de las bases de conocimiento"
+description: "Descubra qué es una base de conocimiento, en qué se diferencia de un sitio, y cómo usan las bases de conocimiento su equipo y sus agentes."
+keywords: ["base", "internal", "teamspace", "workspace", "private", "public link", "share to web"]
+tag: "Beta"
+---
+
+<Note>
+  Las bases de conocimiento están en beta y pueden cambiar.
+</Note>
+
+Una base de conocimiento es un tipo de proyecto en Mintlify para su equipo y los agentes con los que trabaja. Guarde en un solo lugar especificaciones, runbooks, guías de incorporación y otro conocimiento interno del equipo. Conecte su base de conocimiento a Claude, ChatGPT, Cursor y otras herramientas de IA mediante MCP para que los agentes trabajen con la misma información que su equipo.
+
+Una base de conocimiento usa el mismo [editor](/es/editor/index) y el mismo [agente](/es/editor/agent) que sus sitios. Los mismos flujos de trabajo se aplican a ambos tipos de proyecto.
+
+<div id="how-a-knowledge-base-differs-from-a-site">
+
+## En qué se diferencia una base de conocimiento de un sitio
+
+</div>
+
+Una base de conocimiento es uno de los dos [tipos de proyecto](/es/organize/projects#project-types). Como una base de conocimiento no tiene sitio publicado, las funciones que solo se aplican a un sitio, como la página **Publishes**, los dominios personalizados, el asistente, las exportaciones, las analíticas y las automatizaciones, no están disponibles para una base de conocimiento.
+
+Para usar [Autopilot](/es/autopilot) en una base de conocimiento, primero [conecte su propio repositorio](#where-your-pages-are-stored). Autopilot no se ejecuta en repositorios alojados por Mintlify.
+
+Una base de conocimiento se organiza solo con páginas y groups. No puede usar tabs, anchors, versions, languages ni otros elementos de navegación.
+
+{/* vale off */}
+
+<div id="where-your-pages-are-stored">
+
+## Dónde se almacenan sus páginas
+
+</div>
+
+{/* vale on */}
+
+La barra lateral del editor en una base de conocimiento contiene tres tipos de páginas.
+
+- **Navigation**: Páginas que comparte toda su organización. Mintlify almacena estas páginas como archivos MDX en un repositorio de Git y confirma sus ediciones automáticamente.
+- **Personal**: [Páginas privadas](/es/editor/pages#private-pages) para sus borradores o contenido que es solo para usted. Las páginas privadas no se almacenan en Git. Siguen siendo privadas a menos que las comparta con sus compañeros. Si quiere compartir una página privada, abra su menú de opciones, seleccione **Move** y elija **Navigation** o un group dentro de esta sección.
+- **Shared with me**: Páginas que sus compañeros [han compartido con usted](/es/editor/pages#share-a-private-page) directamente.
+
+Las bases de conocimiento nuevas usan un repositorio de Git que Mintlify aloja por usted. Para trabajar en su base de conocimiento localmente con sus propias herramientas, conecte un repositorio de GitHub, GitLab, Bitbucket o Azure Repos en su [configuración de Git](https://app.mintlify.com/settings/project/git-settings). Los commits que envíe al repositorio conectado actualizan su base de conocimiento.
+
+Mintlify cifra en reposo el contenido de su base de conocimiento, con una clave exclusiva de su base de conocimiento.
+
+<div id="how-people-and-agents-contribute">
+
+## Cómo contribuyen las personas y los agentes
+
+</div>
+
+Su equipo puede actualizar una base de conocimiento desde donde trabaje:
+
+- **Editor**: Escriba y organice páginas en su navegador o en la [aplicación de escritorio](/es/desktop), con ayuda del [agente](/es/editor/agent).
+- **MCP**: Conecte Claude, ChatGPT, Cursor u otra herramienta de IA al [admin MCP](/es/ai/mintlify-mcp) para leer, buscar y editar su base de conocimiento desde una conversación.
+- **Slack**: Haga preguntas al [agente de Mintlify en Slack](/es/agent/slack), que las responde a partir de su base de conocimiento, o pídale que actualice páginas.
+- **Git**: Clone el repositorio de su base de conocimiento y edite los archivos MDX con cualquier editor o agente de programación.
+
+<div id="share-a-page-to-the-web">
+
+## Compartir una página en la web
+
+</div>
+
+<Info>
+  Los enlaces públicos requieren un plan Pro o Enterprise para tu base de conocimiento.
+</Info>
+
+Puede compartir una página de una base de conocimiento con personas ajenas a su organización mediante un enlace público. Cualquier persona con el enlace puede ver la página sin iniciar sesión. No puede editarla.
+
+<div id="allow-public-links">
+
+### Permitir enlaces públicos
+
+</div>
+
+Los enlaces públicos están desactivados de forma predeterminada. Un administrador debe activarlos antes de que alguien pueda compartir una página.
+
+1. Vaya a su configuración de [Security](https://app.mintlify.com/settings/organization/access).
+2. En la sección **Sharing**, active **Allow public links**.
+
+Si un administrador desactiva **Allow public links**, todos los enlaces públicos dejan de funcionar hasta que un administrador vuelva a activar la opción.
+
+<div id="share-a-page">
+
+### Compartir una página
+
+</div>
+
+Puede compartir una página en **Navigation** si tiene el rol de editor o de administrador. Puede compartir una página privada si tiene **Full Access** a ella.
+
+1. Abra la página en el editor.
+2. Abra el menú <Icon icon="ellipsis" /> de opciones de la página.
+3. Active **Share to web**.
+4. Haga clic en **Copy public link**.
+
+<Frame>
+  <img
+    alt="Menú de opciones de la página."
+    className="block dark:hidden mx-auto max-w-xs"
+    src="/images/editor/page-menu-light.png"
+  />
+  <img
+    alt="Menú de opciones de la página."
+    className="hidden dark:block mx-auto max-w-xs"
+    src="/images/editor/page-menu-dark.png"
+  />
+</Frame>
+
+Cuando comparte una página, aparece un botón <Icon icon="globe" /> de globo en la barra superior. Haga clic en el icono para volver a copiar el enlace. La página pública muestra el contenido actual de la página.
+
+Cada página pública también tiene una versión en Markdown para herramientas de IA. Agregue `.md` al final del enlace público para verla o solicite el enlace con un encabezado `Accept: text/markdown`.
+
+<div id="stop-sharing-a-page">
+
+### Dejar de compartir una página
+
+</div>
+
+1. Abra el menú <Icon icon="ellipsis" /> de opciones de la página.
+2. Desactive **Share to web**.
+3. Haga clic en **Stop sharing** para confirmar.
+
+El enlace deja de funcionar de inmediato. Si vuelve a compartir la página, Mintlify genera un enlace nuevo.
+
+<div id="get-started">
+
+## Primeros pasos
+
+</div>
+
+<Card title="Configurar una base de conocimiento" icon="rocket" href="/es/base/setup" horizontal>
+  Cree una base de conocimiento, invite a su equipo y conecte sus herramientas de IA.
+</Card>

@@ -1,0 +1,33 @@
+---
+title: "SCIM 用户预配"
+description: "通过来自 Okta、Microsoft Entra 或其他身份提供商的目录同步，自动为 dashboard 成员预配、取消预配并分配角色。"
+keywords: ["SCIM", "目录同步", "Okta", "Microsoft Entra", "身份提供商", "用户管理", "RBAC", "管理门户"]
+---
+
+<Info>
+  SCIM 适用于 [Enterprise 方案](https://mintlify.com/pricing?ref=scim)。
+</Info>
+
+SCIM（System for Cross-domain Identity Management，跨域身份管理系统）让管理员可以通过目录同步，直接从你的身份提供商为 Mintlify 组织预配和取消预配成员。
+
+SCIM 管理谁可以访问你的组织。要控制成员的登录方式，请设置 [SSO](/zh/dashboard/sso)。
+
+<div id="set-up-directory-sync">
+  ## 设置目录同步
+</div>
+
+1. 在 dashboard 中，前往 [Security](https://app.mintlify.com/settings/organization/access) 页面的 **SCIM** 部分。
+2. 点击 **Set up directory sync**。
+3. 在管理门户中，按照适用于你的身份提供商的步骤操作。
+
+连接激活后，**Directory sync** 会显示 **Connected** 标记。之后，你的身份提供商会将成员添加到你的组织；当你在身份提供商中将成员从 Mintlify 应用中移除时，也会将其从组织中移除。
+
+如需稍后更改目录同步配置，请点击 **Manage directory** 重新打开管理门户。
+
+<div id="roles-for-provisioned-members">
+  ## 已预配成员的角色
+</div>
+
+已预配的成员会获得你的身份提供商为其分配的[角色](/zh/dashboard/roles)。当你在身份提供商中更改某成员的角色分配时，其在 Mintlify 中的角色会随之更新。
+
+在 [Members](https://app.mintlify.com/settings/organization/members) 页面上，已预配的成员会显示 **Managed by SSO**。请在身份提供商中更改他们的角色并移除他们，而不是在 dashboard 中操作。

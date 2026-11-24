@@ -1,0 +1,28 @@
+---
+title: "Récupérer les statistiques d'appels de l'Assistant"
+openapi: /fr/analytics.openapi.json GET /v1/analytics/{projectId}/assistant/caller-stats
+keywords: ["analytics", "assistant", "caller", "stats", "export"]
+---
+
+<div id="usage">
+  ## Utilisation
+</div>
+
+Utilisez cet endpoint pour voir combien de conversations de l'Assistant proviennent de chaque type d'appelant. Chaque conversation n'est comptée qu'une seule fois, quel que soit le nombre de questions qu'elle contient. La réponse décompose le total des conversations en :
+
+- `web` : Conversations provenant du site de documentation
+- `api` : Conversations provenant d'appels API directs
+- `other` : Conversations provenant d'autres sources (par exemple, intégrations, SDKs)
+- **total** : Somme de tous les types d'appelants
+
+<div id="filtering">
+  ## Filtrage
+</div>
+
+Filtrez par plage de dates à l'aide des paramètres `dateFrom` et `dateTo`. Chaque conversation est comptabilisée dans la plage où elle a démarré.
+
+<div id="rate-limits">
+  ## Limites de débit
+</div>
+
+Cet endpoint autorise 100 requêtes par organisation et par heure. Tous les endpoints d'analytics partagent cette limite.

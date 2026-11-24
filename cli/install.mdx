@@ -1,0 +1,223 @@
+---
+title: "Install the CLI"
+description: "Install the Mintlify CLI to preview documentation locally, test changes in real time, and catch build errors before deploying to production."
+keywords: ["CLI", "npm", "install", "Node.js", "pnpm", "mint"]
+---
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/en) v20.17.0 or later, except Node.js 25, which the CLI doesn't support. Use an LTS version.
+
+## Install the CLI
+
+<CodeGroup>
+  ```bash npm
+  npm i -g mint
+  ```
+
+  ```bash pnpm
+  pnpm add -g mint
+  ```
+</CodeGroup>
+
+<Note>
+  The CLI is published on npm as the [`mint`](https://www.npmjs.com/package/mint) package. Do not install the legacy `mintlify` package in install scripts or CI pipelines. If you have both packages installed, see [mintlify versus mint package](#troubleshooting).
+</Note>
+
+<Visibility for="agents">
+  If the user asked you to set up Mintlify rather than only install the CLI, continue through authentication, project creation, preview, validation, and deployment. Follow the [agent setup workflow in the Quickstart](/quickstart#set-up-mintlify-for-the-user). Do not stop after `mint --version` succeeds.
+
+  Start by running `mint status`. Preserve an existing authenticated session. Otherwise, run `mint login` for an existing account. For a new account, create the site with `mint deploy` and hand it to the user with `mint claim`; see [Agent signup](/cli/agent-signup). Don't run `mint signup`: when an agent runs it, it only prints the [agent signup guide](https://mintlify.com/auth.md). The user approves browser-based authentication or claims the site, and you perform the remaining CLI steps.
+</Visibility>
+
+<Tip>
+  Using an AI coding tool? Copy the following prompt to have your agent install the CLI and verify it works.
+</Tip>
+
+{/* vale off */}
+
+<Prompt description="Install the Mintlify CLI globally and verify the installation." actions={["copy", "cursor"]}>
+Install the Mintlify CLI globally so I can preview my documentation locally.
+
+1. Confirm Node.js v20.17.0 or newer is installed by running `node --version`. The CLI doesn't run on Node.js 25. If Node.js is missing, older, or v25, tell me before continuing.
+2. Install the CLI with `npm i -g mint` (or `pnpm add -g mint` if I use pnpm).
+3. Verify the install by running `mint --version` and share the output.
+4. If the install fails with a permissions error, suggest re-running with `sudo` and explain the tradeoff.
+</Prompt>
+
+{/* vale on */}
+
+## Create a new project
+
+To create a new documentation project from the Mintlify starter template, run the following command:
+
+```bash
+mint new [directory]
+```
+
+{/* vale off */}
+
+<Prompt description="Scaffold a new Mintlify project." actions={["copy", "cursor"]}>
+Create a new Mintlify project in the current workspace.
+
+1. Ask me for a project name and preferred theme (or template) if I haven't already told you.
+2. Run `mint new <directory> --name <name> --theme <theme>` non-interactively, substituting the values I gave you. If I chose a template instead, run `mint new <directory> --name <name> --template <template-name>`.
+3. After the command finishes, list the generated files and point out `docs.json` as the main configuration entry point.
+4. Run `mint dev` from the new directory and share the local preview URL.
+</Prompt>
+
+{/* vale on */}
+
+If you don't specify a directory, the CLI creates the project in the current directory. If the target directory isn't empty, the CLI prompts you to create the project in a new subdirectory or overwrite the directory.
+
+<Warning>
+  Overwriting the current directory deletes any existing files.
+</Warning>
+
+| Flag | Description |
+| --- | --- |
+| `--name` | Project name. The CLI prompts for this if not provided. |
+| `--theme` | Project [theme](/customize/themes). The CLI prompts for this if not provided. |
+| `--template` | Pre-defined template. The CLI prompts for this if not provided. |
+| `--force` | In non-interactive mode, overwrite a directory that isn't empty. |
+
+In interactive mode, the CLI asks whether you want to pick a theme or clone a template. To skip the prompt, pass the `--template` flag directly:
+
+```bash
+mint new my-docs --template <template-name>
+```
+
+You can combine `--template` with `--theme` to override the template's default theme:
+
+```bash
+mint new my-docs --template <template-name> --theme <theme>
+```
+
+See available templates in the [mintlify/templates](https://github.com/mintlify/templates) repository on GitHub. In interactive mode, the CLI fetches and displays available templates automatically.
+
+In non-interactive environments such as CI/CD pipelines or AI coding agents, you must provide `--name` and either `--theme` or `--template`. Otherwise, the CLI prints usage guidance and creates nothing. If the target directory isn't empty, the CLI also creates nothing unless you pass `--force`.
+
+## Update
+
+If your local preview is out of sync with your deployed documentation, update the CLI to the latest version:
+
+```bash
+mint update
+```
+
+If `mint update` is not available on your version, reinstall the CLI with the latest version:
+
+<CodeGroup>
+  ```bash npm
+  npm i -g mint@latest
+  ```
+
+  ```bash pnpm
+  pnpm add -g mint@latest
+  ```
+</CodeGroup>
+
+### Automatic updates
+
+Global installs update themselves in the background after a command finishes. Local installs and `npx` runs show a reminder to run `mint update` instead.
+
+To turn off automatic updates:
+
+```bash
+mint config set autoUpdate false
+```
+
+## Install in CI
+
+To run CLI checks in a continuous integration pipeline, install the `mint` package globally, then run the commands you need. For example, this GitHub Actions job checks formatting with [`mint format`](/cli/commands#mint-format) and validates the build with [`mint validate`](/cli/commands#mint-validate):
+
+```yaml
+name: Docs checks
+
+on:
+  pull_request:
+    paths:
+      - "**/*.mdx"
+      - "docs.json"
+
+jobs:
+  docs-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the Mintlify CLI
+        run: npm i -g mint
+      - name: Check formatting
+        run: |
+          mint format
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Files are not formatted. Run 'mint format' locally and commit the changes."
+            exit 1
+          fi
+      - name: Validate the build
+        run: mint validate
+```
+
+`mint format` rewrites files in place and exits with code `1` if any file fails to parse, so the job checks for a diff after it runs. `mint validate` exits with code `1` if any rule reports an error, so it needs no extra check. Warnings don't fail the job, so check the output for them.
+
+## Editor support
+
+For syntax highlighting, autocomplete, and error checking in MDX files, use the following extensions:
+
+- **Cursor, Devin Desktop, VS Code**: [Mintlify MDX extension](/cli/mdx-extension) and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for formatting.
+- **JetBrains**: [MDX IntelliJ IDEA plugin](https://plugins.jetbrains.com/plugin/14944-mdx) and [Prettier](https://prettier.io/docs/webstorm).
+
+You can also format MDX files with [`mint format`](/cli/commands#mint-format).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
+    This may be due to an outdated version of Node.js. Try the following:
+
+    1. Remove the currently installed version of the mint CLI: `npm uninstall -g mint`
+    2. Upgrade to Node.js v20.17.0 or later. Don't use Node.js 25, which the CLI doesn't support.
+    3. Reinstall the mint CLI: `npm install -g mint`
+  </Accordion>
+  <Accordion title="Issue: Encountering an unknown error">
+    **Solution**: Go to the root of your device and delete the `~/.mintlify` folder. Afterwards, run `mint dev` again.
+  </Accordion>
+  <Accordion title="Error: permission denied">
+    This is due to not having the required permissions to globally install node packages.
+
+    **Solution**: Try running `sudo npm i -g mint`. When prompted, enter the password that you use to unlock your computer.
+  </Accordion>
+  <Accordion title="The local preview doesn't look the same as my docs do on the web">
+    This is likely due to an outdated version of the CLI.
+
+    **Solution**: Run `mint update` to get the latest changes.
+  </Accordion>
+  <Accordion title="mintlify versus mint package">
+    If you have any problems with the CLI package, first run `npm ls -g` to see what packages are globally installed. If you don't use npm, try `which mint` to locate the installation.
+
+    If you have both a `mint` and a `mintlify` package installed, uninstall `mintlify`:
+
+    ```bash
+    npm uninstall -g mintlify
+    npm cache clean --force
+    npm i -g mint
+    ```
+  </Accordion>
+  <Accordion title="Client version shows 'none' after installation">
+    If you run `mint version` and the client version displays as `none`, the CLI may be unable to download the client application due to a corporate firewall or VPN.
+
+    **Solution**: Ask your IT administrator to add `releases.mintlify.com` to your network allowlist.
+  </Accordion>
+  <Accordion title="CLI connects to localhost instead of production when using npx">
+    In versions before `4.0.1125`, running `npx mint dev` or other commands from a docs
+    repository could cause the CLI to incorrectly detect itself as a local development
+    build. This made the CLI point to `localhost` URLs instead of the Mintlify production
+    API, resulting in connection errors or unexpected behavior.
+
+    **Solution**: Update to the latest CLI version:
+
+    ```bash
+    npm i -g mint@latest
+    ```
+  </Accordion>
+</AccordionGroup>

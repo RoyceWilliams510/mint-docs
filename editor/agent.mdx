@@ -1,0 +1,275 @@
+---
+title: "Write and edit with the agent"
+sidebarTitle: "Agent"
+description: "Use the editor's built-in AI agent to write content, edit pages, leave comments and suggestions, search your site, upload files, and configure settings."
+keywords: ["editor", "AI", "assistant", "agent", "chat", "comments", "suggestions", "file upload", "skills"]
+---
+
+<Info>
+  The editor agent requires a [paid plan](https://mintlify.com/pricing?ref=editor-agent).
+</Info>
+
+The editor includes a built-in agent that can edit pages, reorganize navigation, update `docs.json`, search across your site's content, and manage dashboard settings. The agent is also available on dashboard settings pages.
+
+The editor agent makes changes directly on the chat's branch, which starts as the branch you have open when you start the chat. You can ask the agent to [work on a different branch](#work-on-other-branches). Like your own edits, the agent's changes save automatically but don't reach your live site until you [publish](/editor/publish) them. You can also ask the agent to publish for you. Changes the agent makes to [dashboard settings](#configure-your-site) apply immediately.
+
+## Open the agent
+
+<Info>
+  Only editors and admins can open the agent.
+</Info>
+
+Click **Ask agent** in the editor toolbar, or press <kbd>Cmd</kbd> + <kbd>J</kbd> (macOS) or <kbd>Ctrl</kbd> + <kbd>J</kbd> (Windows). You can also open the agent on dashboard settings pages. Your chat session stays open as you move between the editor and settings.
+
+Type <kbd>@</kbd> to mention a specific page in a prompt for the agent to focus on. Without a mention, the agent uses the page you currently have open as its initial context. On your dashboard, the agent knows which page you're viewing so you can ask about the current page without naming it.
+
+Example prompts:
+
+- `simplify the introduction page`
+- `fix all grammar errors across my content`
+- `add a new page that explains authentication`
+- `rename every mention of "Acme Pro" to "Acme Team" across all pages`
+- `update docs.json to add a new group called "Guides"`
+
+If a missing decision would materially change the result, the agent pauses and asks you up to four questions in the chat panel. Select a suggested option or type your own answer.
+
+## Choose a model and effort
+
+Click the model name in the chat box to change which model the agent uses and how much effort it puts into a response.
+
+- **Model**: Search for a model or pick one from the **Suggested** or **Other models** lists.
+- **Effort**: Choose a higher effort level for complex requests or a lower one for faster responses. The available levels depend on the model, and some models don't support effort levels.
+
+Switching models mid-chat can reduce response quality and speed, so start a new chat when you change models.
+
+If your project uses [bring your own model](/ai/bring-your-own-model), the agent always uses your configured model and you can't choose a different one.
+
+## Attach files
+
+Click the <Icon icon="plus" /> button in the chat box and select **Add attachment**, or drag and drop files onto the panel. The agent reads attached files as context for your request.
+
+Supported file types:
+
+- **Images**: JPG, PNG, GIF, WebP, SVG
+- **Documents**: PDF
+- **Code and text**: `.js`, `.ts`, `.jsx`, `.tsx`, `.mdx`, `.md`, `.json`, `.yaml`, `.html`, `.css`, Python, Go, Rust, Ruby, Java, Swift, C, C++, SQL, shell scripts, and more
+
+Maximum size: 5 MB per image or PDF, except SVG files, which Mintlify limits to 256 KB. Code and text files can be up to 20 MB each. Maximum: 10 files per message, up to 20 MB in total.
+
+Mintlify strips scripts and other active content from SVG files before the agent reads them.
+
+## Ask for comments and suggestions
+
+The agent edits content directly by default. To get feedback without immediately changing the page, explicitly ask the agent to review the page, leave comments, or make suggestions.
+
+- [Suggestions](/editor/collaborate#suggestions) propose a specific replacement that you can accept or reject. The original text remains visible with a strikethrough until you decide, and the agent can include an explanation in the suggestion thread.
+- [Comments](/editor/collaborate#comments) leave feedback or a question anchored to specific text without changing the page.
+
+Example prompts:
+
+- `review this page and leave suggestions`
+- `comment on anything that needs more context`
+- `suggest ways to make the introduction more concise`
+
+The agent uses the page you currently have open unless you name another page. It can annotate rendered page text, including prose inside components. It can't annotate frontmatter, page metadata, configuration, or raw MDX component tags and attributes.
+
+### Work with existing feedback
+
+The agent can read the open comments and suggestions on a page, including replies, and reply to them. Ask it to summarize feedback, act on it, or respond to it. For example:
+
+- `what feedback has been left on this page?`
+- `apply the changes requested in the open comments`
+- `reply to each comment with what you changed and resolve the thread`
+
+The agent only reads unresolved threads. It also notes when the commented text no longer exists on the page.
+
+The agent can also resolve comment threads, and it tells you why when it does. It can't resolve suggestion threads. To have the agent reply to or resolve a thread, you must have permission to edit the page.
+
+## Review what the agent changed
+
+A file changes list appears in the chat as the agent works. Expand it to see every file modified in the session, and click any file to compare the changes against the original in diff view.
+
+To revert the agent's edits, click **Discard changes** next to a file or click **Discard all** to discard every change from the session. To revert the changes from a single response, click **Undo changes** on that message. Click **Redo changes** to restore it.
+
+## What the agent can do
+
+### Edit pages
+
+The agent can write, rewrite, expand, and reorganize content on any page. It reads your existing content to match your style and structure.
+
+### Search and navigate your content
+
+The agent can search across all of your site's content, not just the page you have open. Use it to find information, check for inconsistencies, or verify that content exists before adding it.
+
+### View images
+
+The agent can view JPEG, PNG, GIF, and WebP images on your pages. This includes published images, images you uploaded on your current branch, and images on private pages you can open. Prompt the agent to describe images, write alt text, or check whether screenshots match the surrounding content.
+
+The agent can't view SVG files or images hosted on other sites.
+
+Example: `write alt text for every image on this page`
+
+### Mention teammates and pages
+
+Ask the agent to mention a teammate or a page, and it adds the [mention](/editor/collaborate#mentions-in-page-content) to the page content. The agent finds teammates in your organization by name or by full email address. If a name matches more than one teammate, the agent asks you which one you mean. A page mention is a link to a page on your site.
+
+Mentions that the agent adds don't send email notifications to the teammates it mentions.
+
+### Update navigation and docs.json
+
+The agent can add, rename, reorder, and delete navigation elements. These are the same changes you'd make manually in the navigation panel. It can also update `docs.json` configuration directly, including adding new groups, adjusting settings, and configuring redirects.
+
+Example: `add a "Quickstart" group under the Getting Started tab and move the quickstart page into it`
+
+### Work on other branches
+
+Ask the agent to list your repository's branches, create a branch, or switch the chat to an existing branch. After a switch, the agent reads, edits, and publishes on the new branch.
+
+When the agent creates a branch, it branches from your deployment branch and names the branch after its pull request title. Include a title in your prompt to choose it.
+
+Creating a branch doesn't switch the chat to it, so the agent switches before it edits there.
+
+Switching branches doesn't move unpublished changes. Changes the agent already made stay on the branch where it made them.
+
+Switching the chat's branch doesn't change the branch you're viewing in the editor. The agent gives you a link to open the branch it switched to.
+
+The agent can't create or switch branches when [Auto publish](/editor/settings#auto-publish) is on, because your site has no branches.
+
+If [Auto-create branches](/editor/settings#auto-create-branches) is on and your deployment branch is protected, the agent's first change there starts a new branch, and the editor moves you to it too.
+
+Example: `create a branch called "Update quickstart" and rewrite the quickstart page there`
+
+### Run bash commands
+
+The agent can run read-only shell commands like `grep`, `rg`, and `find` across your site's content. Use this to find content that spans many files.
+
+Example: `find every page that mentions the deprecated /v1/auth endpoint`
+
+### Configure your site
+
+The agent can change dashboard settings for you, such as authentication, custom domains, Git settings, members, and workflows. These changes apply to your live deployment immediately. They don't wait for you to publish.
+
+The agent respects your dashboard permissions. If you can't change a setting in the dashboard, the agent can't change it either.
+
+Example prompts:
+
+- `enable JWT authentication for my site`
+- `create a workflow that updates my site when I merge a PR`
+- `add a custom domain`
+
+### Research code and websites
+
+Give the agent a link to a GitHub or GitLab repository, and it reads the source code while it writes. The agent can also search the web and read public websites, such as your product's marketing site or existing docs.
+
+Example: `read https://github.com/acme/sdk and document the client configuration options`
+
+### Work with private pages
+
+The agent can read your [private pages](/editor/pages#private-pages) and pages shared with you. It can create, move, and duplicate pages and folders in **Personal**, and move a private page to your site when you ask.
+
+### Use connected integrations
+
+<Info>
+  Integrations require an [Enterprise plan](https://mintlify.com/pricing?ref=automations).
+</Info>
+
+The editor agent can use third-party apps connected through [Integrations](/automations/integrations) as read-only tools while it researches, edits pages, or answers your questions.
+
+- **Shared integrations** are available to everyone in your organization.
+- **Personal integrations** use the account connected by the teammate chatting with the agent. For example, a Google Drive search uses your own Drive connection.
+
+Ask the agent to use a connected app naturally in your request, such as:
+
+- `update the migration guide based on the latest Jira issue`
+- `check what the Notion launch brief says about availability and add it to the release notes page`
+
+If the integration you need isn't connected yet, ask the agent to connect it. The agent returns an authorization link. Complete the flow, then send another message so the agent can confirm the connection and continue.
+
+### Ask about your analytics
+
+The agent can answer questions about your documentation's traffic, search, assistant, and feedback data. The agent returns information in writing, as a chart, or as a ranked list. Use the agent to request specific explanations, compare page performance, or investigate changes in traffic.
+
+Example prompts:
+
+- `what are the top 5 user agents hitting my site?`
+- `which pages do AI agents visit more often than humans?`
+- `what are people searching for and not finding results for?`
+- `graph traffic for the REST API introduction page over the last month`
+
+### Read your Slack workspace
+
+If you install the [Mintlify Slack app](/agent/slack), the editor agent can read your Slack workspace for context while it researches or answers your questions. The editor agent has read-only access. It can't post messages, add reactions, or perform other actions in Slack.
+
+Ask the agent to use Slack in a request. For example:
+
+- `check the #engineering channel for context on the new auth flow`
+- `summarize what the team decided about rate limiting yesterday`
+
+If you haven't installed the Slack app, ask the agent to connect it for you. The agent returns an authorization link and guides you through the installation process.
+
+### Continue an automation run
+
+When you open the editor from an automation's Slack or email notification, the agent panel opens automatically with context on what the automation did. An **Updated pages** card at the top of the chat lists every page the automation modified. Click any page to open a diff view.
+
+The agent has context on the automation's prompt, a summary of the changes it made, and which pages it modified. You can ask it to refine or extend the automation's work without re-explaining the background.
+
+For example: `The new section on rate limits is too long. Trim it to three sentences.`
+
+## Session history
+
+Click the <Icon icon="clock" /> **Show agent history** button in the panel header to see your previous chat sessions. Sessions are grouped into **Today**, **Last 30 days**, and **Older**. Each session shows its first message as the title and when it started.
+
+- A spinner replaces the time while the agent is still working on a session.
+- A blue dot and bold title mark a session with agent messages you haven't read.
+- If the branch selector is visible, sessions on a branch other than your deploy branch show the branch name.
+
+Click any session to reopen it and see what the agent changed. To start over, click **New chat**.
+
+To delete a session, hover over it, click <Icon icon="ellipsis" /> **More actions**, then click **Delete** and confirm. You can't delete a session while the agent is still working on it. If you delete the session you have open, the panel starts a new chat.
+
+## AI instructions
+
+To give the agent persistent guidance like voice rules, terminology, or formatting conventions, configure AI instructions in [Editor settings](/editor/settings#ai-instructions). The agent follows these instructions on every request without you needing to repeat them.
+
+## Skills
+
+Skills are reusable sets of instructions that the agent follows for specific kinds of tasks, such as writing a release note or reviewing an API reference page. The agent sees the name and description of each skill that's turned on and loads a skill's full instructions only when your request matches it. Use [AI instructions](#ai-instructions) for guidance that applies to every request.
+
+Manage skills on the [Skills](https://app.mintlify.com/settings/organization/skills) page of your organization settings. The page has two sections:
+
+- **Organization**: Skills available to everyone in your organization. Admins can add and manage organization skills. Editors and viewers can see them but can't change them.
+- **Personal**: Skills available only to you, on top of your organization's skills.
+
+<Note>
+  Editor agent skills are separate from [assistant skills](/assistant/skills), which guide the assistant on your docs site and live in your repository.
+</Note>
+
+### Add a skill
+
+Click **Add skill** in the section where you want the skill, then choose one of these options:
+
+- **Create a skill**: Enter a name, a description, and the instructions. The description tells the agent when to use the skill, so describe the tasks it applies to.
+- **Upload a skill**: Drop or browse for a `SKILL.md` file, a `.skill` or `.zip` archive, or a folder. Each folder that contains a `SKILL.md` file becomes a skill, and the agent can read the other files in that folder as references. You can upload up to 20 skills at once.
+
+A `SKILL.md` file needs YAML frontmatter with a `name` and `description`, followed by the instructions:
+
+```markdown SKILL.md
+---
+name: release-notes
+description: Use when writing or editing release notes and changelog entries.
+---
+
+Start each entry with the date as a heading. Group changes under New features, Improvements, and Bug fixes.
+```
+
+Skill names can contain only lowercase letters, numbers, and single hyphens, up to 64 characters.
+
+You can also ask the agent to save something as a skill while you chat, for example a workflow you just walked it through. The agent writes the `SKILL.md` file and any reference files, and the skill appears in your **Personal** section.
+
+### Manage skills
+
+Use the toggle next to a skill to turn it on or off. The agent only uses skills that are on.
+
+Click the <Icon icon="ellipsis" /> menu next to a skill to **Edit**, **Download**, or **Delete** it. Admins can also select **Move to organization** on a personal skill to share it with everyone in the organization.
+
+To see which skills the agent can use in a chat, click the <Icon icon="plus" /> button in the chat box and select **Skills**.

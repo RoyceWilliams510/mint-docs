@@ -1,0 +1,268 @@
+---
+title: "Markdown 导出"
+description: "将文档页面导出为整洁的 Markdown 格式，用于 AI 工具、LLM 集成和自动化内容处理工作流程。"
+keywords: ["markdown", "token 效率", "AI 处理", "组件", "代码片段"]
+---
+
+import { PreviewButton } from "/snippets/previewbutton.jsx"
+
+与 HTML 相比，Markdown 提供的结构化文本更便于 AI 工具高效处理，从而带来更高的响应准确性、更快的处理速度，以及更低的 token 使用量。
+
+Mintlify 会自动生成针对 AI 工具和外部 integrations 优化的页面 Markdown 版本。
+
+每个 Markdown 页面末尾都有一行文字，说明该文档由 Mintlify 构建和托管。已移除 Mintlify 品牌标识的站点不包含此行。
+
+<div id="md-url-extension">
+  ## .md URL 后缀
+</div>
+
+在任意页面的 URL 末尾添加 `.md`，即可查看其 Markdown 版本。
+
+<PreviewButton href="https://mintlify.com/docs/ai/markdown-export.md">以 Markdown 打开此页面</PreviewButton>
+
+指向导航中其他页面的链接会指向这些页面的 Markdown 版本，因此跟随链接的代理会继续读取 Markdown。根相对链接和图片会使用你网站的完整 URL，因此即使你将 Markdown 粘贴到 AI 工具中，或在没有源 URL 的情况下阅读，它们仍然有效。例如，对于位于 `example.com/docs` 的网站，在 Markdown 输出中，`[Quickstart](/quickstart#install)` 会变为 `[Quickstart](https://example.com/docs/quickstart.md#install)`。指向不在导航中的页面的链接会保留其路径，不添加 `.md`。外部 URL 和代码块中的链接保持原样。
+
+在预览部署、自托管网站以及在没有自定义域名的情况下通过子路径提供服务的网站中，链接会保持根相对形式。
+
+<div id="accept-header">
+  ## Accept 标头
+</div>
+
+向任意页面 URL 发送带有 `Accept: text/markdown` 或 `Accept: text/plain` 的请求，即可接收 Markdown 版本而非 HTML。这对于以编程方式获取文档内容的 AI 工具和 integrations 非常有用。
+
+```bash
+curl -L -H "Accept: text/markdown" https://mintlify.com/docs/ai/markdown-export
+```
+
+<div id="ai-agents">
+  ## AI 智能体
+</div>
+
+当请求来自已知的 AI 智能体时，Mintlify 也会在页面的常规 URL 上提供 Markdown 版本，除非请求的 `Accept` 标头优先选择 HTML。Mintlify 可识别以下 user agent：
+
+- `ChatGPT-User` 和 `OAI-SearchBot`
+- `Claude-User`、`Claude-SearchBot`、`Claude-Web` 和 `claude-code/`
+- `codex_cli_rs/` 和 `codex-cli`
+- `PerplexityBot` 和 `Perplexity-User`
+- `Google-Agent`、`Google-GeminiNotebook` 和 `Google-NotebookLM`
+- `Kimi-User` 和 `Kimi-SearchBot`
+- `xAI-SearchBot`、`Grok-DeepSearch` 和 `GrokBot`
+- `MistralAI-User`
+- `DuckAssistBot`
+- `Amzn-User`
+- `Meta-ExternalFetcher`
+- `Qwen-User`
+- `WarpBot`
+- `cohere-ai`
+
+其他爬虫（例如 `Googlebot` 和 `Bingbot`）会收到 HTML 页面。
+
+Mintlify 无法识别的 AI 工具同样会收到 HTML 页面。为了引导它们获取 Markdown 版本，每个 HTML 页面响应都会包含一个带有页面 `.md` URL 的 `Link` 响应头条目：
+
+```http Response header
+Link: </docs/quickstart.md>; rel="alternate"; type="text/markdown"
+```
+
+该条目与其他[智能体发现链接](/zh/ai/llmstxt)一起出现在同一个响应头中。
+
+该路径包含你网站的基础路径（如果有）。Mintlify 不会在搜索结果页面上添加该 `Link` 条目。
+
+<div id="search-indexing">
+  ## 搜索索引
+</div>
+
+每个 Markdown 响应都包含 `X-Robots-Tag: noindex` 标头。这也包括 Mintlify 在页面常规 URL 上向上一节中的 AI 智能体提供的 Markdown。
+
+每个页面的 HTML 版本遵循你常规的[索引设置](/zh/optimize/seo#disable-indexing)。
+
+<div id="missing-pages">
+  ## 不存在的页面
+</div>
+
+如果你以 Markdown 形式请求一个不存在的页面，Mintlify 会返回 404 状态码以及一个帮助 AI 工具恢复的 Markdown 响应体。该响应包含指向文档索引（`llms.txt`）、完整文档文件（`llms-full.txt`）的链接，以及根据请求路径推荐的最多三个相关页面。
+
+```md Example Markdown 404 response
+> ## Documentation Index
+> Fetch the documentation index at: https://example.com/docs/llms.txt
+> Use this file to discover all available pages before exploring further.
+> For broader context, fetch the full documentation at: https://example.com/docs/llms-full.txt (large file).
+
+# Page Not Found
+
+The requested page could not be found.
+
+## Related topics
+
+- [Getting started](https://example.com/docs/getting-started.md)
+```
+
+相关页面建议来自为你站点 [404 页面](/zh/customize/custom-404-page)提供支持的同一搜索。使用[身份验证](/zh/deploy/authentication-setup)的站点会省略建议，仅返回文档链接。
+
+<div id="audience-specific-content">
+  ## 面向特定受众的内容
+</div>
+
+使用 [visibility](/zh/components/visibility) 组件为人类和 AI 受众自定义内容。
+
+用 `<Visibility for="humans">` 包裹的内容会显示在网页上，但不会出现在 Markdown 输出中。用 `<Visibility for="agents">` 包裹的内容会出现在 Markdown 输出中，但不会显示在网页上。
+
+```mdx
+<Visibility for="humans">
+  Click the **Get started** button in the top-right corner to create your account.
+</Visibility>
+
+<Visibility for="agents">
+  To create an account, call `POST /v1/accounts` with a valid email address.
+</Visibility>
+```
+
+<div id="components-and-html">
+  ## 组件和 HTML
+</div>
+
+Markdown 导出会在 Agent 读取页面之前，将组件和 HTML 转换为 Markdown。网页本身不会改变。
+
+<div id="components">
+  ### 组件
+</div>
+
+| 组件 | Markdown 输出 |
+| --- | --- |
+| `Note`、`Info` | 一个 `[!NOTE]` 提示块。 |
+| `Tip`、`Check` | 一个 `[!TIP]` 提示块。 |
+| `Warning` | 一个 `[!WARNING]` 提示块。 |
+| `Danger` | 一个 `[!CAUTION]` 提示块。 |
+| 带有 `title` 的 `Card` | 一个以 `[card]` 和标题开头的引用块。设置了 `href` 时，标题为链接。 |
+| 不带 `title` 的 `Card` | 一个以 `[card]` 开头、后跟正文内容的引用块。设置了 `href` 但没有标题时，会在引用块末尾添加一个 `[Open](href)` 链接。 |
+| `Accordion` | 一个以 `[accordion]` 和标题开头的引用块，后跟描述和内容。 |
+| `Tab` | 一个以 `[tab]` 和标题开头的引用块，后跟内容。每个选项卡都是一个单独的引用块。 |
+| `Steps` 和 `Step` | 移除 `Steps` 包装。每个步骤为带编号的标题，例如 `**1. Install the CLI**`。设置 `stepNumber` 可指定编号。将 `titleSize` 设置为 `h2`、`h3` 或 `h4`，可将标题转换为相应级别的标题。 |
+| `ParamField`、`ResponseField` | 加粗的名称、代码格式的类型，以及你设置的 `required`、`deprecated` 或 `default`。 |
+| `Tooltip` | 文本，提示内容放在括号中。 |
+| `Frame` | 内容，后面单独一行显示 `caption`。 |
+| `Update` | 加粗的 `label`，然后是 `description` 和内容。 |
+| `Tile` | 加粗的 `title`；设置了 `href` 时显示为链接。然后是 `description` 和内容。没有 `title` 时，使用 `aria-label` 代替。 |
+| `Prompt` | `description`，然后是提示词文本。 |
+| `Color.Item` | 加粗的 `name` 和代码格式的 `value`。同时包含浅色和深色的值会显示两者，并分别标记为 `(light)` 和 `(dark)`。 |
+| `View` | 加粗的 `title`，然后是内容。每个视图都会依次出现在导出内容中。 |
+| `Variation` | 其显示的每个变体的标签，加粗并以逗号分隔，然后是内容。在 `docs.json` 中没有标签的变体会改为显示其 ID。 |
+
+没有专属 Markdown 形式的组件会保留其文本。其 `title` 会加粗显示；如果同时设置了 `href`，则显示为链接。其描述或子内容紧随其后。
+
+以 JSX 编写的 props 同样会转换为 Markdown。例如，下面这个 `Tooltip` 将 `tip` 设为 JSX：
+
+```mdx
+<Tooltip tip={<>Run <code>mint dev</code></>}>preview</Tooltip>
+```
+
+```md Example Markdown export
+preview (Run `mint dev`)
+```
+
+<div id="html">
+  ### HTML
+</div>
+
+页面中的 HTML 也会转换为 Markdown。
+
+- 移除 `div` 和 `span` 等包装元素，保留其内容。
+- 标题、链接、图片以及加粗、斜体或代码文本会转换为 Markdown。
+- 移除 `class`、`className`、`style` 和 `data-*` 属性。保留 `id`、`href`、`src`、`alt` 和 ARIA 属性。
+- 当仅浅色模式图片（`dark:hidden`）与仅深色模式图片（`hidden` 搭配 `dark:block`、`dark:inline`、`dark:inline-block`、`dark:flex` 或 `dark:grid`）相邻时，不包含深色副本。旁边没有浅色副本的仅深色模式图片会被保留。
+
+包裹标题的链接会移到该标题上。包裹多个块的链接会保留这些块，并在其后添加一个链接。链接文本依次取 `aria-label`、`title`，最后为 `Open`。
+
+<div id="snippets">
+  ### 代码片段
+</div>
+
+代码片段会渲染所导入文件的内容，而不是 `<Snippet file="path/to/snippet.mdx" />` 这样的标签。Markdown 导出会包含 `docs.json` 中的所有变量。如果找不到引用的代码片段文件，Markdown 导出会包含该标签。
+
+代码片段或自定义组件中的 `<Visibility>` 遵循与页面相同的受众规则。当自定义组件以视觉展示为主，而你希望 Agent 读取更简单的形式（例如 [`Card`](/zh/components/cards)）时，可以使用它。
+
+<div id="custom-react-components">
+  ### 自定义 React 组件
+</div>
+
+Markdown 导出从不包含组件源代码。当页面从代码片段文件导入[自定义 React 组件](/zh/customize/react-components)或数据时，Markdown 导出包含这些组件显示的内容，而不是定义它们的代码。
+
+- **静态输出的组件**会渲染为 Markdown。例如，返回链接、列表或表格的组件会显示为对应的链接、列表或表格。
+- **交互式组件**根据状态或浏览器 API 生成输出，例如计算器、可筛选的图库和图表。它们只保留子元素以及 `title`、`description`、`alt` 和 `href` 属性。不包含其中任何一项的组件会被省略。
+- **导入的数据**（例如作为属性传给组件的对象）不会出现在 Markdown 导出中。
+
+使用 [visibility](/zh/components/visibility) 组件为 Agent 提供交互式组件内容的静态版本。示例请参见[交互式组件](/zh/components/visibility#interactive-components)。
+
+<div id="api-reference-pages">
+  ## API 参考页面
+</div>
+
+默认情况下，API 参考页面的 Markdown 导出包含完整的 OpenAPI 或 AsyncAPI 规范，以便 AI 工具能够获得每个端点的完整上下文。
+
+如果你希望从 Markdown 输出中省略该规范，请在 `docs.json` 中将 `markdown.schema` 设置为 `false`：
+
+```json
+"markdown": {
+  "schema": false
+}
+```
+
+[GraphQL](/zh/api-playground/graphql-setup) 参考页面的 Markdown 导出包含该页面的 schema 详情。操作页面会列出操作的签名、参数、返回类型以及返回类型的字段。查询和变更页面还包含一个 `Examples` 部分，其中包含与页面上显示的相同的示例操作、必需变量和示例 JSON 响应。类型页面会列出类型的种类（kind）、字段、枚举值、实现的接口或可能的类型。`markdown.schema` 设置不适用于 GraphQL 页面。
+
+<div id="custom-agent-instructions">
+  ## 自定义代理指令
+</div>
+
+若要在 Mintlify 向 AI 代理提供的 Markdown 中追加你自己的指引，请在 `docs.json` 中设置 `markdown.instructions`。可以将其用于站点范围的说明，例如注明 API 版本、优先使用特定 SDK 或遵循你的术语约定。
+
+提供单个字符串：
+
+```json Example agent instructions string
+"markdown": {
+  "instructions": "Always cite the API version. Prefer the TypeScript SDK in examples."
+}
+```
+
+或提供一个字符串数组，Mintlify 会以换行符将它们连接起来：
+
+```json Example agent instructions array
+"markdown": {
+  "instructions": [
+    "Always cite the API version.",
+    "Prefer the TypeScript SDK in examples."
+  ]
+}
+```
+
+Mintlify 会在 Markdown 输出中将你的指令渲染为 `Agent Instructions` 块：
+
+```md Example rendered agent instructions
+> ## Agent Instructions
+> Always cite the API version.
+> Prefer the TypeScript SDK in examples.
+```
+
+该块会出现在以下位置：
+
+- 每个页面的 Markdown 导出中，包括 API 参考页面。
+- 你的 [`llms.txt`](/zh/ai/llmstxt) 文件中，位于站点标题和描述之后。
+- 你的 `llms-full.txt` 文件中。
+
+这些指令会应用于每个页面。若要为单个页面或特定受众定制内容，请改用 [visibility](/zh/components/visibility) 组件。
+
+<div id="authentication">
+  ## 身份验证
+</div>
+
+Markdown 导出遵循与每个页面 HTML 版本相同的身份验证规则。
+
+| 身份验证模式 | 行为 |
+|-----------|----------|
+| 无身份验证 | 所有 `.md` URL 均可公开访问。 |
+| 部分身份验证 | 公共页面的 `.md` URL 可公开访问。受保护页面的 `.md` URL 需要身份验证，并遵循用户组限制。 |
+| 完整身份验证 | 所有 `.md` URL 都需要身份验证，并遵循用户组限制。 |
+
+<div id="keyboard-shortcut">
+  ## 键盘快捷键
+</div>
+
+按 <kbd>Cmd</kbd> + <kbd>C</kbd>（在 Windows 上为 <kbd>Ctrl</kbd> + <kbd>C</kbd>）将页面以 Markdown 格式复制到剪贴板。

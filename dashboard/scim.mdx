@@ -1,0 +1,29 @@
+---
+title: "SCIM user provisioning"
+description: "Automatically provision, deprovision, and assign roles to dashboard members with directory sync from Okta, Microsoft Entra, or another identity provider."
+keywords: ["SCIM", "directory sync", "Okta", "Microsoft Entra", "identity provider", "user management", "RBAC", "admin portal"]
+---
+
+<Info>
+  SCIM requires an [Enterprise plan](https://mintlify.com/pricing?ref=scim).
+</Info>
+
+SCIM (System for Cross-domain Identity Management) lets admins provision and deprovision Mintlify organization members directly from your identity provider via directory sync.
+
+SCIM manages who has access to your organization. To control how members sign in, set up [SSO](/dashboard/sso).
+
+## Set up directory sync
+
+1. Navigate to the **SCIM** section of the [Security](https://app.mintlify.com/settings/organization/access) page in your dashboard.
+2. Click **Set up directory sync**.
+3. In the admin portal, follow the steps for your identity provider.
+
+When the connection is active, **Directory sync** shows a **Connected** badge. Your identity provider then adds members to your organization and removes them when you remove them from the Mintlify app in your identity provider.
+
+To change your directory sync configuration later, click **Manage directory** to reopen the admin portal.
+
+## Roles for provisioned members
+
+Provisioned members get the [role](/dashboard/roles) that your identity provider assigns them. When you change a member's role assignment in your identity provider, their role in Mintlify updates to match.
+
+On the [Members](https://app.mintlify.com/settings/organization/members) page, provisioned members show **Managed by SSO**. Change their roles and remove them in your identity provider instead of in the dashboard.

@@ -1,0 +1,171 @@
+---
+title: "Work with branches"
+description: "Create and manage documentation branches to preview changes, collaborate with teammates, and merge updates before publishing to production."
+keywords: ["Git","branches","branch workflow","creating branches","deployment branch"]
+---
+
+Branches are a feature of version control that point to specific commits in your repository. Your deployment branch, usually called `main`, represents the content used to build your live documentation site. All other branches are independent of your live docs unless you choose to merge them into your deployment branch.
+
+Branches let you create separate instances of your documentation to make changes, get reviews, and try new approaches before publishing. Your team can work on branches to update different parts of your documentation simultaneously without affecting what users see on your live site.
+
+The following diagram shows an example of a branch workflow where you create a feature branch, make changes, and then merge the feature branch into the main branch.
+
+```mermaid
+gitGraph
+    commit id: "Initial commit"
+    commit id: "Branch created"
+    branch feature-branch
+    checkout feature-branch
+    commit id: "Add Changes"
+    commit id: "Add more changes"
+    checkout main
+    checkout feature-branch
+    commit id: "Add reviewer feedback"
+    checkout main
+    merge feature-branch id: "Merge into main" type: HIGHLIGHT
+    commit id: "Live docs"
+```
+
+Always work from branches when updating documentation to keep your live site stable and enable review workflows.
+
+## Branch naming conventions
+
+Use clear, descriptive names that explain the purpose of a branch.
+
+**Use**:
+
+- `fix-broken-links`
+- `add-webhooks-guide`
+- `reorganize-getting-started`
+- `ticket-123-oauth-guide`
+
+**Avoid**:
+
+- `temp`
+- `my-branch`
+- `updates`
+- `branch1`
+
+## Create a branch
+
+<Tabs>
+  <Tab title="Using web editor">
+    1. Click the branch name in the editor toolbar. If you don't see it, [show the branch selector](/editor/publish#show-the-branch-selector).
+    1. In **Find a branch**, type a descriptive title. If you leave it empty, the editor names the branch after the current date.
+    1. Click **New branch**.
+    1. If you have pending changes, select **Bring them to this branch** or **Leave them behind**. Your original branch keeps its pending changes either way.
+  </Tab>
+  <Tab title="Using local development">
+    <Steps>
+      <Step title="Create a branch from your terminal">
+        ```bash
+        git checkout -b branch-name
+        ```
+
+        This creates the branch and switches to it in one command.
+      </Step>
+      <Step title="Push the branch to GitHub">
+        ```bash
+        git push -u origin branch-name
+        ```
+
+        The `-u` flag sets up tracking so future pushes just need `git push`.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Save changes on a branch
+
+<Tabs>
+  <Tab title="Using web editor">
+    You don't need to save manually. The editor commits your edits to the branch about 15 seconds after you stop editing. The first commit opens a pull request against your deployment branch.
+  </Tab>
+  <Tab title="Using local development">
+    Stage, commit, and push your changes.
+
+    ```bash
+    git add .
+    git commit -m "Describe your changes"
+    git push
+    ```
+  </Tab>
+</Tabs>
+
+## Switch branches
+
+<Tabs>
+  <Tab title="Using web editor">
+    1. Click the branch name in the editor toolbar to open the branch dropdown.
+    1. Search for a branch by name or scroll through the list.
+    1. Click the branch you want to switch to.
+
+    Each branch in the dropdown displays a pull request indicator so you can see whether the branch has an open, draft, merged, or closed pull request, or no pull request yet.
+
+    Before you search, the dropdown lists branches created in the editor and branches with an open pull request targeting your deployment branch. Searching by name also matches other branches in your repository, including branches pushed directly through Git and branches with merged or closed pull requests. See [Branch missing from the web editor branch list](/help-center/branch-missing-from-editor-branch-list).
+
+    Your pending changes stay on the branch you leave.
+  </Tab>
+  <Tab title="Using local development">
+    Switch to an existing branch:
+
+    ```bash
+    git checkout branch-name
+    ```
+
+    Or create and switch in one command:
+
+    ```bash
+    git checkout -b new-branch-name
+    ```
+  </Tab>
+</Tabs>
+
+## Merge branches
+
+Once your changes are ready to publish, merge your branch into the deployment branch.
+
+<Tabs>
+  <Tab title="Using the editor">
+    If Mintlify hosts your repository and your branch doesn't require approvals, click **Publish** in the editor toolbar, then click **Publish** to merge your branch and publish your changes. The same applies to a branch without a pull request when your deployment branch requires no approvals or code owner reviews. **Publish** opens the pull request and merges it in one step.
+
+    Otherwise:
+
+    1. Click **Publish** in the editor toolbar, then click **Request review**. This marks your branch's pull request ready for review.
+    1. Complete any required reviews and checks.
+    1. Click **Publish**, then click **Merge and publish**.
+
+    See [Publishing your changes](/editor/publish) for how the available publish actions change based on your branch and branch protections.
+  </Tab>
+  <Tab title="Using local development">
+    Push your branch, then open a pull request in your Git provider that targets your deployment branch. After the pull request merges, Mintlify builds and deploys your changes to your live site.
+  </Tab>
+</Tabs>
+
+## Delete a branch
+
+Delete branches you no longer need to keep the branch dropdown manageable.
+
+<Tabs>
+  <Tab title="Using web editor">
+    1. Click the branch name in the editor toolbar to open the branch dropdown.
+    1. Hover over the branch that you want to delete.
+    1. Click the **Delete branch** trash icon.
+    1. Click **Delete branch** to confirm.
+
+    Deleting a branch closes any open pull request for the branch and deletes the branch from your repository. You cannot delete your deployment branch.
+  </Tab>
+  <Tab title="Using local development">
+    Delete the branch locally:
+
+    ```bash
+    git branch -d branch-name
+    ```
+
+    Then delete it from your remote repository:
+
+    ```bash
+    git push origin --delete branch-name
+    ```
+  </Tab>
+</Tabs>

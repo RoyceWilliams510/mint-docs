@@ -1,0 +1,126 @@
+---
+title: "Déployer sur un sous-chemin avec Vercel"
+sidebarTitle: "Vercel"
+description: "Servez votre site Mintlify sur un sous-chemin de votre domaine principal grâce aux rewrites Vercel, avec un guide pas à pas de la configuration vercel.json."
+keywords: ["vercel.json", "déploiement Vercel", "configuration des rewrites", "routage par sous-chemin", "proxy externe", "CloudFront", "vérification de domaine", "certificats SSL"]
+boost: 3
+---
+
+import { VercelJsonGenerator } from "/snippets/fr/vercel-json-generator.mdx";
+import SubpathSetupSteps from "/snippets/fr/subpath-setup-steps.mdx";
+
+Configurez votre fichier `vercel.json` pour acheminer les requêtes de votre domaine principal vers votre documentation sur un sous-chemin.
+
+
+<div id="verceljson-file">
+  ## Le fichier vercel.json
+</div>
+
+Le fichier `vercel.json` définit la façon dont votre projet est construit et déployé. Il se trouve à la racine de votre projet et contrôle divers aspects de votre déploiement, notamment le routage, les redirections, les en-têtes et les paramètres de build.
+
+Nous utilisons la configuration `rewrites` dans votre fichier `vercel.json` pour faire transiter les requêtes de votre domaine principal vers votre documentation via un proxy.
+
+Les réécritures (`rewrites`) font correspondre les requêtes entrantes à différentes destinations sans modifier l'URL dans le navigateur. Quand quelqu’un visite `yoursite.com/docs`, Vercel récupère en interne le contenu depuis `your-subdomain.mintlify.site/docs`, mais l’utilisateur voit toujours `yoursite.com/docs` dans son navigateur. Cela diffère des redirections, qui envoient les utilisateurs vers une URL complètement différente.
+
+<div id="configuration">
+  ## Configuration
+</div>
+
+<div id="host-at-docs-subpath">
+  ### Héberger sur le sous-chemin `/docs`
+</div>
+
+1. Accédez à [Configuration du domaine personnalisé](https://app.mintlify.com/settings/project/custom-domain) dans votre Dashboard.
+2. Saisissez votre domaine suivi de `/docs`. Par exemple, `example.com/docs`.
+3. Cliquez sur **Add domain**.
+4. Ajoutez les réécritures suivantes à votre fichier `vercel.json`. Remplacez `[subdomain]` par votre sous-domaine, que vous trouverez à la fin de l’URL de votre Dashboard. Par exemple, `app.mintlify.com/your-organization/your-subdomain` possède un identifiant de domaine `your-subdomain`.
+
+    ```json
+    {
+      "rewrites": [
+        {
+          "source": "/_mintlify/:path*",
+          "destination": "https://[subdomain].mintlify.site/_mintlify/:path*"
+        },
+        {
+          "source": "/api/request",
+          "destination": "https://[subdomain].mintlify.site/_mintlify/api/request"
+        },
+        {
+          "source": "/docs",
+          "destination": "https://[subdomain].mintlify.site/docs"
+        },
+        {
+          "source": "/docs/:match*",
+          "destination": "https://[subdomain].mintlify.site/docs/:match*"
+        },
+        {
+          "source": "/mintlify-assets/:path+",
+          "destination": "https://[subdomain].mintlify.site/mintlify-assets/:path+"
+        }
+      ]
+    }
+    ```
+
+La configuration `rewrites` fait correspondre le sous-chemin `/docs` sur votre domaine au sous-chemin `/docs` sur votre documentation.
+
+- **`source`** : Le modèle de chemin sur votre domaine qui déclenche la réécriture.
+- **`destination`** : L’endroit où la requête doit être transmise en proxy.
+- **`:match*`** : Un joker qui capture tous les segments de chemin après votre sous-chemin.
+
+La réécriture `/_mintlify` est requise. Elle sert le CSS, le JavaScript, les polices et les requêtes API de votre site depuis la racine de votre domaine. Sans elle, les pages se chargent sans styles. La réécriture `/mintlify-assets` sert les favicons et les ressources statiques de certains sites. Conservez ces deux réécritures à la racine de votre domaine, sans votre sous-chemin.
+
+Pour plus d’informations, consultez [Configuring projects with vercel.json: Rewrites](https://vercel.com/docs/projects/project-configuration#rewrites) dans la documentation Vercel.
+
+<div id="host-at-custom-subpath">
+  ### Héberger sur un sous-chemin personnalisé
+</div>
+
+Pour utiliser un sous-chemin personnalisé (tout chemin autre que `/docs`) :
+
+<SubpathSetupSteps />
+
+Utilisez ensuite le générateur ci-dessous pour créer votre configuration de réécritures et ajoutez-les à votre fichier `vercel.json`.
+
+Mintlify reconstruit votre documentation pour la servir sur votre chemin de base, vos fichiers de documentation n’ont donc pas besoin de se trouver dans un répertoire correspondant à votre sous-chemin.
+
+<VercelJsonGenerator />
+
+<div id="external-proxies-in-front-of-vercel">
+  ## Proxys externes devant Vercel
+</div>
+
+Si vous utilisez un proxy externe comme Cloudflare ou AWS CloudFront devant votre déploiement Vercel, configurez-le correctement. Cela permet d'éviter les conflits avec la vérification de domaine de Vercel et l'approvisionnement des certificats SSL.
+
+Une mauvaise configuration du proxy peut empêcher Vercel d'approvisionner des certificats SSL Let's Encrypt et entraîner des échecs de vérification de domaine.
+
+Consultez les [fournisseurs pris en charge](https://vercel.com/guides/how-to-setup-verified-proxy#supported-providers-verified-proxy-lite) dans la documentation Vercel.
+
+<div id="required-path-allowlist">
+  ### Liste d'autorisation de chemins obligatoire
+</div>
+
+Votre proxy externe doit autoriser le trafic vers ces chemins spécifiques sans le bloquer, le rediriger ni le mettre en cache de manière agressive :
+
+- `/.well-known/acme-challenge/*` : requis pour la vérification de certificat Let's Encrypt.
+- `/.well-known/vercel/*` : requis pour la vérification de domaine Vercel.
+- `/_mintlify/*` : requis pour le CSS, le JavaScript, les polices et les requêtes API.
+- `/mintlify-assets/*` : requis pour les favicons et les ressources statiques sur certains sites.
+
+Votre proxy doit transmettre ces chemins directement à votre déploiement Vercel sans modification.
+
+<div id="header-forwarding-requirements">
+  ### Exigences relatives au transfert des en-têtes
+</div>
+
+Assurez-vous que votre proxy transfère correctement l'en-tête `Host`. Sans un transfert correct des en-têtes, les requêtes de vérification échouent.
+
+<div id="test-your-proxy-setup">
+  ### Tester la configuration de votre proxy
+</div>
+
+Pour vérifier que votre proxy est correctement configuré :
+
+1. Vérifiez que `https://[yourdomain].com/.well-known/vercel/` renvoie une réponse.
+2. Assurez-vous que les certificats SSL sont correctement provisionnés dans votre dashboard Vercel.
+3. Vérifiez que la vérification du domaine se termine avec succès.

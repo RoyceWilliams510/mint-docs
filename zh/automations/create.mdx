@@ -1,0 +1,90 @@
+---
+title: "创建自定义自动化"
+description: "创建 Mintlify 自动化，按计划、仓库推送或集成事件运行。添加上下文仓库和自定义 agent 提示词。"
+keywords: ["automation", "automate", "cron", "agent", "custom automation"]
+---
+
+import GitlabAutomationSetup from '/snippets/zh/gitlab-automation-setup.mdx';
+
+<Info>
+  自定义自动化需要 [Enterprise 计划](https://mintlify.com/pricing?ref=automations)。
+</Info>
+
+自定义自动化使用你编写的指令，按计划、在仓库推送时、在已连接的集成事件发生时或在收到 webhook 请求时运行 agent。当[预定义自动化](/zh/automations/reference)无法覆盖你需要的行为，或者你希望将自己的提示词与特定的上下文仓库和集成组合在一起时，使用自定义自动化。有关所有自动化共享的触发器、更新模式和配置选项的概述，请参见[自动化](/zh/automations)。
+
+<div id="prerequisites">
+  ## 前置条件
+</div>
+
+- 一个已连接到 GitHub 或 GitLab 仓库的 Mintlify 项目
+- 对于 GitHub：在你计划用于自动化的每个仓库上都安装 [Mintlify GitHub 应用](/zh/deploy/github)
+- 对于 GitHub Enterprise Server：在你计划用于自动化的每个仓库上都安装你在实例上注册的 GitHub 应用（参见 [GitHub Enterprise Server](/zh/deploy/ghes)）
+- 对于 GitLab：已连接的 GitLab 账户（请参见下方[GitLab 设置](#gitlab-setup)）
+
+<div id="create-a-custom-automation">
+  ## 创建自定义自动化
+</div>
+
+<Note>
+  agent 运行在受限互联网访问的隔离沙箱中。它无法在运行时安装额外的包或工具。引用不可用工具的提示词可能产生意外结果或失败。
+</Note>
+
+1. 打开 [Automations](https://app.mintlify.com/settings/project/automations) 设置。
+2. 点击 **New automation**。
+3. 在配置页面上，设置自动化名称、触发器、提示词、上下文仓库、集成和更新模式。有关各字段的详细说明，请参见[配置](/zh/automations/manage#configurations)。
+4. 点击 **Save**。
+
+<div id="write-effective-instructions">
+  ## 撰写有效的指令
+</div>
+
+有效的自动化指令聚焦于单一任务，并定义清晰、可验证的结果。由于 agent 是非确定性的，自动化结果会有所差异，但格式良好的指令能产生更一致的结果。
+
+- **描述结果。** 告诉 agent 一次成功的运行应该是什么样的。
+- **撰写流程。** 给 agent 一份按步骤执行的指南。
+- **保持范围窄。** 将复杂任务拆分到多个自动化中，而不是合并到一个提示词里。
+
+更多示例和模式请参见[使用自动化](/zh/guides/use-automations)。
+
+<div id="open-multiple-pull-requests-or-append-to-open-ones">
+  ### 打开多个 pull request 或追加到已打开的 pull request
+</div>
+
+自定义自动化的每次运行可以打开零个、一个或多个 pull request。当工作可以拆分为需要分别审查的独立更改时，agent 会打开单独的 pull request。每个 pull request 都从你的部署分支开始，因此不会包含其他 pull request 的提交。
+
+默认情况下，每次运行都会打开新的 pull request。如需让 agent 将提交追加到同一自动化先前运行打开的 pull request，请在指令中明确说明。agent 最多可以看到该自动化的五个已打开的 pull request。它只能追加到或更新由同一自动化打开的 pull request。
+
+```text Example instructions
+Review the API reference for outdated endpoints. If an open pull request
+from this automation already covers API reference fixes, add your changes
+to that pull request. Otherwise, open a new pull request.
+```
+
+<div id="test-your-automation">
+  ## 测试你的自动化
+</div>
+
+通过手动运行来测试新的自动化，这样就无需等待其触发器发生。手动运行使用自动化的当前配置，并与自动运行一起显示在运行历史中。使用集成或 webhook 触发器的自动化无法手动运行；请改为发送事件或 webhook 请求。要为测试运行选择范围，请参见[手动运行自动化](/zh/automations/manage#run-an-automation-manually)。
+
+在[运行历史](/zh/automations/manage#view-run-history)中审查该次运行，查看提示词、agent 更改的文件以及它打开的任何拉取请求。如果结果不符合预期，请更新你的指令并再次运行。
+
+<GitlabAutomationSetup />
+
+<div id="edit-a-custom-automation">
+  ## 编辑自定义自动化
+</div>
+
+1. 打开 [Automations](https://app.mintlify.com/settings/project/automations) 设置。
+2. 点击自动化卡片上的 <Icon icon="settings-2" /> 设置按钮以打开其配置页面。
+3. 更新[配置](/zh/automations/manage#configurations)中描述的任何字段。
+4. 点击 **Save**。
+
+<div id="delete-a-custom-automation">
+  ## 删除自定义自动化
+</div>
+
+删除自动化是永久性的，会移除其配置和运行历史。
+
+1. 打开 [Automations](https://app.mintlify.com/settings/project/automations) 设置。
+2. 点击自动化卡片上的 <Icon icon="settings-2" /> 设置按钮以打开其配置页面。
+3. 点击页面底部的 **Delete automation** 并确认。

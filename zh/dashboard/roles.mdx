@@ -1,0 +1,150 @@
+---
+title: "角色"
+description: "为团队成员分配所有者、管理员、发布者、编辑者、评论者或查看者角色，控制谁可以在 Mintlify 中编辑、审阅和发布内容。"
+keywords: ["RBAC", "基于角色的访问控制", "所有者", "管理员", "发布者", "编辑者", "评论者", "查看者", "权限", "审阅", "批准", "转移所有权", "项目角色", "无访问权限"]
+boost: 3
+---
+
+<Info>
+  基于角色的访问控制（RBAC）在 [Enterprise 方案](https://mintlify.com/pricing?ref=rbac) 中提供。
+</Info>
+
+Mintlify 提供三种 dashboard 访问级别：查看者、编辑者和管理员。如果没有 RBAC，每位成员都拥有组织 dashboard 的完全访问权限，新成员以编辑者身份加入。
+
+要邀请成员、更改其角色、转移所有权或移除成员，请参阅[成员](/zh/dashboard/members)。
+
+<Note>
+  如果你的 [Members](https://app.mintlify.com/settings/organization/members) 页面上的角色选项包含 **Publisher**，说明你的组织使用的是[扩展角色](#expanded-roles)。
+</Note>
+
+|                                | 查看者 | 编辑者 | 管理员 |
+| ------------------------------ | :----: | :----: | :---: |
+| 在编辑器中查看内容             | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 查看 dashboard 和数据分析      | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 向 [Slack agent](/zh/agent/slack) 提问 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 使用 Slack agent 修改内容      | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 在网页编辑器中编辑内容         | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 发布更改                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是* | <Icon icon="check" color="#16a34a" /> 是 |
+| [请求审阅](/zh/editor/review#require-review-before-publishing) | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 批准审阅请求 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 创建、重命名和删除页面         | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 调整导航顺序                   | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 上传媒体文件                   | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 触发部署                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 回滚和提升部署                 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 创建和删除 API 密钥            | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 配置集成                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 配置 assistant                 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 配置附加组件                   | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 邀请编辑者和查看者             | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 更新用户角色                   | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 邀请管理员                     | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 删除用户                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理账单                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理 SSO                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理 SCIM                      | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理 IP 允许列表和会话有效期   | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 查看和导出审计日志             | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理安全联系人                 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 更新自定义域名                 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 更新 Git 源                    | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 配置自定义子路径               | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 删除项目                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 更改[代理发布设置](/zh/ai/admin-mcp-editing#publishing) | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 删除组织                       | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+
+\* 如果你的项目[要求发布前审阅](/zh/editor/review#require-review-before-publishing)，编辑者需要请求审阅，而不是直接发布到 deployment branch，由管理员发布已批准的更改。只有管理员可以从编辑器将 pull request 合并到 deployment branch。
+
+<Tip>
+  仅将管理员访问权限授予需要执行管理员任务的成员。
+</Tip>
+
+角色控制的是成员在 dashboard 和编辑器中可以执行的操作，而不是在你的 Git 仓库中。任何拥有仓库写入权限的人都可以推送更改，推送到 deployment branch 的更改会部署你的站点，无论其角色如何。请在你的 Git 提供商中管理仓库访问权限。
+
+<div id="expanded-roles">
+  ## 扩展角色
+</div>
+
+使用扩展角色的组织有六种角色：所有者、管理员、发布者、编辑者、评论者和查看者。
+
+你只能邀请成员或分配不高于你自己角色的角色。
+
+- **所有者**：拥有管理员的所有权限，还可以删除项目、删除组织和转移所有权。每个组织只有一位所有者，最初是创建该组织的人。
+- **管理员**：完全控制内容、成员、角色和设置，包括账单和自定义域名。管理员可以不经审阅直接发布，除非你的 deployment branch 启用了分支保护。
+- **发布者**：拥有编辑者的所有权限，还可以发布更改和批准[审阅请求](/zh/editor/review#require-review-before-publishing)。
+- **编辑者**：创建和编辑内容、发表评论、请求审阅，以及管理站点和工作区设置、集成、API 密钥和 assistant。编辑者无法发布或批准审阅。
+- **评论者**：拥有查看者的所有权限，还可以评论页面。
+- **查看者**：查看内容并预览未发布的编辑。
+
+|                                   | 查看者 | 评论者 | 编辑者 | 发布者 | 管理员 | 所有者 |
+| --------------------------------- | :----: | :-------: | :----: | :-------: | :---: | :---: |
+| 查看页面 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 预览未发布的编辑 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 评论页面 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 创建和编辑页面 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 重新组织页面 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 删除页面 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 不要求审阅时发布更改 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 请求审阅 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 批准审阅请求 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 发布已批准的更改 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 要求审阅时不经审阅直接发布 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 要求审阅时无需批准即可从编辑器合并分支 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理站点和工作区设置 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 邀请和移除成员 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 分配角色 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理页面访问权限 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理自定义域名 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 管理账单和方案 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 | <Icon icon="check" color="#16a34a" /> 是 |
+| 删除项目 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 删除组织 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+| 转移所有权 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="x" color="#dc2626" /> 否 | <Icon icon="check" color="#16a34a" /> 是 |
+
+<div id="custom-roles">
+  ## 自定义角色
+</div>
+
+如果内置角色都无法满足团队需求，可以创建一个自定义角色，精确授予成员所需的权限。自定义角色适用于使用[扩展角色](#expanded-roles)的组织。所有者和管理员可以在 [Members](https://app.mintlify.com/settings/organization/members) 页面的 **Custom roles** 部分管理自定义角色。
+
+<div id="create-a-custom-role">
+  ### 创建自定义角色
+</div>
+
+1. 前往 dashboard 的 [Members](https://app.mintlify.com/settings/organization/members) 页面。
+2. 在 **Custom roles** 部分，点击 **New custom role**。
+3. 输入 **Label**（显示在角色菜单中）以及可选的描述。
+4. 选择权限，或选择 **Grant all permissions**。
+5. 点击 **Create role**。
+
+权限分为三组：
+
+- **Content**：**Pages** 具有读写权限。**Comments** 和 **Publishing and reviews** 仅具有写入权限，且都需要 **Pages** 的读取权限。
+- **Project**：查看或管理项目级设置的权限，例如 **Domain setup**、**Site**、**Editor**、**Git** 和 **Assistant**。
+- **Organization**：查看或管理组织设置的权限，例如 **Members**、**Security**、**Billing** 和 **API keys**。
+
+你只能授予自己拥有的权限。仅所有者拥有的权限（例如删除组织或转移所有权）不适用于自定义角色。每个自定义角色都可以查看组织、项目、项目的发布历史及其成员。
+
+要更改自定义角色，请在 **Custom roles** 部分打开其操作菜单并选择 **Manage role**。
+
+<div id="project-roles">
+  ## 项目角色
+</div>
+
+如果你的组织使用[扩展角色](#expanded-roles)且拥有多个项目，你可以为成员在每个项目上设置不同的角色。除非你设置了项目角色，否则成员的组织角色适用于所有项目。
+
+项目角色可以实现以下两种作用之一：
+
+- **在某个项目上授予更多访问权限。** 例如，将组织范围内的查看者设为某个项目的发布者。你可以选择管理员、发布者、编辑者、评论者或查看者，但只能选择比该成员组织角色访问权限更多的角色。如果组织角色是自定义角色，则项目角色必须包含该自定义角色允许的所有权限。
+- **屏蔽某个项目。** 选择 **No access** 可向该成员隐藏该项目，并阻止其在 dashboard、编辑器、[CLI](/zh/cli/install) 和[管理员 MCP](/zh/ai/mintlify-mcp) 中使用该项目。如果该成员通过链接打开该项目，Mintlify 会将其转到其有权访问的另一个项目。
+
+所有者和管理员对所有项目都拥有完全访问权限，因此你无法为他们设置项目角色，也无法对他们屏蔽项目。你只能分配你自己拥有其权限的项目角色，并且无法更改包含你所没有的权限的项目角色。你无法更改自己的项目角色。
+
+如果你提升某成员的组织角色，使其包含某个项目角色，Mintlify 会移除该项目角色。将成员提升为管理员会移除其 **No access** 分配。
+
+在 [Members](https://app.mintlify.com/settings/organization/members) 页面上，**Role** 列显示每位成员在你当前打开的项目上的角色。要设置项目角色，请参阅[为成员设置项目角色](/zh/dashboard/members#set-a-members-role-on-a-project)。
+
+<div id="repository-contributors-and-deployments">
+  ## 存储库贡献者与部署
+</div>
+
+任何对你的文档存储库拥有写入权限的人都可以通过推送更改来做出贡献。推送到部署分支的更改会自动部署，与此人的 dashboard 角色无关。dashboard 角色仅控制成员在 Mintlify dashboard 中可以执行的操作。

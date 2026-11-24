@@ -1,0 +1,151 @@
+---
+title: "Registros de auditoría"
+description: "Revisa los registros de auditoría para rastrear las acciones de los miembros de la organización, incluidos despliegues, cambios de configuración y permisos."
+keywords: ["monitoreo", "seguimiento de actividad", "seguridad", "cumplimiento", "SIEM"]
+---
+
+<Info>
+  Los registros de auditoría están disponibles en los [planes Enterprise](https://mintlify.com/pricing?ref=audit-logs).
+</Info>
+
+Usa los registros de auditoría para supervisar y hacer un seguimiento de las acciones realizadas por los miembros de tu organización. Los registros de auditoría proporcionan un historial de actividades con fines de seguridad, cumplimiento y resolución de problemas.
+
+- **Supervisar la seguridad**: Realiza un seguimiento de los intentos de autenticación y los cambios de permisos.
+- **Garantizar el cumplimiento**: Mantén registros de todas las actividades de la organización.
+- **Solucionar problemas**: Investiga las acciones fallidas y sus causas.
+- **Hacer un seguimiento de los cambios**: Revisa quién realizó cambios específicos y cuándo.
+
+<div id="view-audit-logs">
+  ## Ver registros de auditoría
+</div>
+
+Solo los administradores de la organización pueden ver y exportar los registros de auditoría.
+
+Accede a la página de [Audit log](https://app.mintlify.com/settings/organization/audit-logs) de tu dashboard para ver los registros de auditoría. Mintlify conserva las entradas del registro de auditoría durante 455 días. Puedes ver y exportar las entradas de los últimos 90 días. Exporta los registros a CSV con regularidad para conservar un historial más largo.
+
+Haz clic en cualquier registro para abrir sus detalles, incluidos:
+
+| Campo     | Descripción                                                       |
+| --------- | ----------------------------------------------------------------- |
+| Timestamp | Fecha y hora en que ocurrió la acción                             |
+| Actor     | Dirección de correo electrónico del usuario que realizó la acción |
+| Acción    | Qué acción realizó el usuario                                     |
+| ID del evento | Identificador único del evento                                |
+| Categoría | Tipo de recurso afectado                                          |
+| Resultado | Si la acción se realizó con éxito o falló                         |
+| Recurso   | Nombre e ID del recurso afectado                                  |
+| Error     | Por qué falló la acción, en el caso de acciones fallidas          |
+| Metadata  | Contexto adicional sobre la acción                                |
+
+<div id="filter-logs">
+  ### Filtrar registros
+</div>
+
+Filtra los registros de auditoría para encontrar actividades específicas.
+
+**Rango de fechas**: Selecciona un rango de fechas preestablecido para ver registros en un período específico.
+
+**Categoría**: Filtra los registros por tipo de acción.
+
+| Categoría         | Descripción                                                        |
+|------------------|--------------------------------------------------------------------|
+| Organización     | Actualizaciones de la configuración de la organización y solicitudes de eliminación. |
+| Miembro          | Invitaciones de miembros del equipo, eliminaciones, cambios de rol y revocaciones de credenciales. |
+| Proyecto         | Cambios en la configuración del proyecto, incluidos dominios personalizados, autenticación, orígenes de Git, credenciales de cliente MCP, reversiones y promociones de compilaciones. |
+| Implementación de vista previa | Creación de implementaciones de vista previa, actualizaciones y cambios de autenticación. |
+| API key          | Creación y eliminación de API key y discovery API key. |
+| Assistant        | Actualizaciones de la configuración del assistant, como correo de soporte, sitios de búsqueda web y preguntas iniciales. |
+| Exportación PDF  | Generación y eliminación de exportaciones en PDF. |
+| Integración      | Instalaciones, eliminaciones y cambios de configuración de integraciones como GitHub, GitLab, Bitbucket, Azure DevOps, Slack, Discord, Microsoft Teams, Linear, Notion y conectores MCP. |
+| Facturación      | Actualizaciones de suscripciones, compras de complementos y visualización de facturas. |
+| Cuota            | Cambios en la política de excedentes y en la configuración de alertas. |
+| Usuario          | Configuración de notificaciones de usuarios individuales. |
+| Registro de auditoría | Visualización y exportaciones del registro de auditoría. |
+| Auth             | Intentos de inicio de sesión, cierres de sesión y creación de sesiones. |
+| Soporte          | Cambios de visibilidad en los casos de soporte. |
+
+Los eventos de SSO, SCIM y automatizaciones no tienen su propio filtro de categoría. Para encontrarlos, selecciona **All categories**. Incluyen la apertura de la configuración de SSO y SCIM en el portal de administración, el aprovisionamiento y desaprovisionamiento SCIM, y cambios y ejecuciones de automatizaciones.
+
+<div id="deleted-api-keys">
+  ### Claves de API eliminadas
+</div>
+
+Cuando Mintlify elimina las claves de API de administrador y del asistente de un miembro porque [eliminas al miembro](/es/dashboard/members#remove-a-member), [revocas sus credenciales](/es/dashboard/members#revoke-a-members-credentials) o tu proveedor de identidad lo desaprovisiona mediante [SCIM](/es/dashboard/scim), el registro de auditoría guarda una entrada por cada clave eliminada. Las claves de administrador registran `api_key.deleted` y las claves del asistente registran `discovery_api_key.deleted`, ambas en la categoría **API key**.
+
+El recurso de cada entrada es el ID de la clave eliminada. Sus metadatos incluyen el inicio de la clave (`key_start`), que coincide con el prefijo que aparece en la página [API keys](https://app.mintlify.com/settings/organization/api-keys), y el correo electrónico del miembro que creó la clave (`revoked_member_email`). Cuando un administrador elimina a un miembro o revoca sus credenciales, ese administrador es el actor.
+
+<div id="stream-audit-logs">
+  ## Transmitir registros de auditoría
+</div>
+
+<Info>
+  La transmisión de registros de auditoría es un complemento para los planes Enterprise. Ponte en contacto con tu representante de cuenta para habilitarla.
+</Info>
+
+Transmite los registros de auditoría a Amazon S3 o Datadog casi en tiempo real. Utiliza la transmisión para enviar eventos de auditoría a tus sistemas de monitoreo de seguridad y retención a largo plazo existentes, sin exportar repetidamente archivos CSV.
+
+Los administradores de la organización pueden agregar varios destinos y elegir qué categorías enviar. De forma predeterminada, se transmiten todas las categorías, y la selección de categorías se aplica a todos los destinos configurados.
+
+<div id="add-a-destination">
+  ### Agregar un destino
+</div>
+
+1. Dirígete a la página [Audit log](https://app.mintlify.com/settings/organization/audit-logs) de tu dashboard.
+2. Junto a **Stream configuration**, haz clic en **Configure**.
+3. Haz clic en **Add destination** y selecciona **Amazon S3** o **Datadog**.
+4. Ingresa una etiqueta opcional para identificar el destino y luego proporciona los detalles de conexión requeridos:
+
+   | Destino | Detalles requeridos | Detalles opcionales |
+   | --- | --- | --- |
+   | Amazon S3 | Bucket, región de AWS, access key ID y secret access key | Prefijo de clave |
+   | Datadog | Sitio de Datadog y API key | Ninguno |
+
+5. Haz clic en **Add destination**.
+
+<AccordionGroup>
+  <Accordion title="Preparar credenciales de Amazon S3">
+    Crea un usuario de IAM (o un rol con credenciales de acceso programático) cuya política permita escribir en el bucket de destino. Como mínimo, otorga `s3:PutObject` en el bucket y el prefijo de clave que planeas usar. Por ejemplo:
+
+    ```json
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": ["s3:PutObject"],
+          "Resource": "arn:aws:s3:::your-bucket-name/audit-logs/*"
+        }
+      ]
+    }
+    ```
+
+    Usa el access key ID y el secret access key de ese usuario de IAM al agregar el destino. El prefijo de clave es opcional y se antepone a cada objeto que Mintlify escribe.
+  </Accordion>
+  <Accordion title="Preparar credenciales de Datadog">
+    Crea una API key de Datadog desde **Organization Settings > API Keys** en tu cuenta de Datadog. No uses una application key.
+
+    Configura el sitio de Datadog para que coincida con la región donde está alojada tu cuenta de Datadog, por ejemplo `datadoghq.com` (US1), `us3.datadoghq.com`, `us5.datadoghq.com`, `datadoghq.eu` (EU1), `ap1.datadoghq.com` o `ddog-gov.com`. Usar un sitio incorrecto hace que se rechacen los eventos.
+  </Accordion>
+</AccordionGroup>
+
+Para dejar de transmitir a un destino, abre la configuración de transmisión, abre el menú de acciones del destino, haz clic en **Remove** y luego confirma.
+
+<div id="select-streamed-categories">
+  ### Seleccionar las categorías transmitidas
+</div>
+
+1. Dirígete a la página [Audit log](https://app.mintlify.com/settings/organization/audit-logs) de tu dashboard.
+2. Junto a **Stream configuration**, haz clic en **Configure**.
+3. En **Streamed categories**, selecciona las categorías que quieres enviar. Desmarca una categoría para excluir sus eventos de la transmisión.
+4. Haz clic en **Save**.
+
+<div id="export-audit-logs">
+  ## Exportar registros de auditoría
+</div>
+
+Exporta los registros de auditoría a CSV para su análisis, generación de informes de cumplimiento o archivo a largo plazo.
+
+1. Dirígete a la página de [Audit log](https://app.mintlify.com/settings/organization/audit-logs) de tu dashboard.
+2. Opcionalmente, aplica filtros para acotar los registros que quieres exportar.
+3. Haz clic en **Export CSV**.
+4. Mintlify te envía un correo electrónico con un enlace de descarga cuando la exportación esté lista.

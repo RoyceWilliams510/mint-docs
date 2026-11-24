@@ -1,0 +1,68 @@
+---
+title: "迁移概览"
+sidebarTitle: "概览"
+description: "比较将现有文档迁移到 Mintlify 的各种方式：编码代理、抓取内容、导出或从源文件迁移，以及手动迁移。"
+keywords: ["迁移", "Docusaurus", "ReadMe", "GitBook", "Fern", "Document360", "导入", "mint migrate", "编码代理"]
+---
+
+通过编码代理、Mintlify 抓取工具、导出的源文件或手动迁移，将你现有的文档迁移到 Mintlify。你可以组合使用多种方法，例如先抓取公开站点生成初稿，再通过导出文件补充私有页面。
+
+<div id="choose-a-migration-method">
+  ## 选择迁移方法
+</div>
+
+| 方法 | 工作原理 | 适用场景 |
+| --- | --- | --- |
+| [编码代理](#migrate-with-a-coding-agent) | 让你的代理运行 `mint migrate`，使其按照 Mintlify 的迁移说明操作。代理会盘点你的页面、将其转换为 MDX、构建导航结构并检查结果。 | `mint migrate` 支持的任意平台，包括 Docusaurus、MkDocs、GitBook、ReadMe、Confluence 和 PDF。有关所有支持的平台，请参见 [`mint migrate`](/zh/cli/commands#mint-migrate)。 |
+| 抓取工具 | 针对公开站点运行 `@mintlify/scraping` 包，将其页面转换为 MDX。 | 公开的 Docusaurus、ReadMe 和 GitBook 站点。 |
+| [导出文件或源文件](#platform-guides) | 转换从当前平台导出的文件，或从构建站点的仓库进行迁移。 | 私有页面、带版本的文档、本地化内容、OpenAPI 文件以及抓取工具无法访问的自定义组件。 |
+| [手动迁移](/zh/migration/manual) | 自行收集、转换和组织内容。 | 没有自动化迁移路径的平台，或混合了多个内容源的项目。 |
+
+<div id="platform-guides">
+  ## 平台指南
+</div>
+
+最简单的迁移方式是使用[编码代理](#migrate-with-a-coding-agent)。运行 `mint migrate --from <platform>`，为你的代理提供针对你所用平台的说明。如果不使用代理进行迁移，请按照相应指南中关于抓取、导出或迁移源文件的说明操作。
+
+<Card title="Docusaurus" href="/zh/migration/docusaurus">
+  抓取公开站点或迁移源文件，以保留私有页面、带版本的文档、本地化内容和自定义 React 组件。
+</Card>
+<Card title="ReadMe" href="/zh/migration/readme">
+  导出项目文件以保留私有内容和 OpenAPI 文件，或抓取公开站点以更快完成迁移。
+</Card>
+<Card title="GitBook" href="/zh/migration/gitbook">
+  使用 Git Sync 导出每个 section 以获得最完整的迁移，或抓取公开站点。
+</Card>
+<Card title="Fern" href="/zh/migration/fern">
+  从源仓库迁移 MDX、资源、API 规范和 `docs.yml` 配置。
+</Card>
+<Card title="Document360" href="/zh/migration/document360">
+  将每个工作区和语言导出为项目 ZIP，包括文章、分类和媒体文件。
+</Card>
+<Card title="其他平台" href="/zh/migration/manual">
+  对于 `mint migrate` 支持的任意平台，可使用编码代理；对于包含混合内容源的项目，请遵循手动迁移工作流。
+</Card>
+
+<div id="migrate-with-a-coding-agent">
+  ## 使用编码代理迁移
+</div>
+
+[CLI](/zh/cli/install) 会打印为 AI 编码代理编写的迁移说明。运行 `mint migrate` 查看迁移工作流和支持的源平台，或在当前目录中启动一个按照这些说明操作的代理。
+
+```bash Example migration command
+mint migrate --agent claude --from docusaurus
+```
+
+有关支持的代理、平台和选项，请参见 [`mint migrate`](/zh/cli/commands#mint-migrate)。
+
+<div id="scrape-individual-pages">
+  ## 抓取单个页面
+</div>
+
+Docusaurus、ReadMe 和 GitBook 指南使用抓取工具的 `section` 命令，该命令会从你提供的 URL 出发，转换其可到达的每个页面。要仅转换单个页面，请从迁移目录中使用 `page` 命令。
+
+```bash
+npx @mintlify/scraping@latest page https://docs.example.com/getting-started
+```
+
+使用 `page` 可以在完整运行前检查抓取工具如何转换你的内容，或填补 `section` 运行时遗漏的单个页面。对于大型站点,请使用 `--filter` 缩小 `section` 运行范围,而不是一次性抓取全部内容。

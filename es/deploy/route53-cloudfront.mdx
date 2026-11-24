@@ -1,0 +1,227 @@
+---
+title: "Despliega en una subruta con AWS Route 53 y CloudFront"
+sidebarTitle: "AWS"
+description: "Despliega tu documentación de Mintlify en una subruta de AWS combinando el enrutamiento DNS de Route 53, una distribución de CloudFront y políticas de caché."
+keywords: ["implementación en AWS", "Route 53 DNS", "CloudFront CDN", "políticas de caché"]
+---
+
+import Propagating from "/snippets/es/custom-subpath-propagating.mdx";
+import SubpathSetupSteps from "/snippets/es/subpath-setup-steps.mdx";
+
+Para alojar tu documentación en una subruta como `yoursite.com/docs` con AWS Route 53 y CloudFront, debes configurar tu proveedor de DNS para que apunte a tu distribución de CloudFront.
+
+Antes de configurar AWS, define tu ruta base en tu dashboard:
+
+<SubpathSetupSteps />
+
+<div id="routes-and-cache-policies">
+  ## Rutas y políticas de caché
+</div>
+
+<Note>
+  Los siguientes ejemplos usan la ruta base `/docs`. Si utilizas otra ruta base, reemplaza `/docs` por la tuya.
+</Note>
+
+Dirige el tráfico a estas rutas con una política de caché **CachingDisabled**:
+
+- `/.well-known/acme-challenge/*` - Obligatorio para la verificación de certificados de Let's Encrypt
+- `/.well-known/vercel/*` - Obligatorio para la verificación del dominio
+- `/docs/*` - Obligatorio para el enrutamiento por subruta
+- `/docs` - Obligatorio para el enrutamiento por subruta
+
+Dirige el tráfico a estas rutas con una política de caché **UseOriginCacheControlHeaders-QueryStrings**, para que CloudFront respete los encabezados de caché que envía Mintlify:
+
+- `/_mintlify/*` - Obligatorio para CSS, JavaScript, fuentes y solicitudes de API
+- `/mintlify-assets/*` - Obligatorio para favicons y recursos estáticos en algunos sitios
+
+Dirige el tráfico a esta ruta con una política de caché **CachingOptimized**:
+
+- `Default (*)`	- La página de inicio de tu sitio web
+
+Todos los comportamientos (Behaviors) deben tener una **origin request policy** de `AllViewerExceptHostHeader`.
+
+Los comportamientos de tu subruta deben permitir todos los métodos HTTP. CloudFront solo permite solicitudes `GET` y `HEAD` de forma predeterminada, lo que bloquea las solicitudes `POST` que Mintlify usa para analíticas y otras funciones interactivas.
+
+<div id="create-cloudfront-distribution">
+  ## Crear una distribución de CloudFront
+</div>
+
+1. Navega a [CloudFront](https://aws.amazon.com/cloudfront) en la consola de AWS.
+2. Selecciona **Create distribution**.
+3. En Origin domain, ingresa `[SUBDOMAIN].mintlify.site`, donde `[SUBDOMAIN]` es el subdomain único de tu proyecto.
+4. En «Web Application Firewall (WAF)», habilita las protecciones de seguridad.
+
+  <Note>
+    Las reglas de WAF pueden bloquear las solicitudes `POST` que Mintlify usa para analíticas y otras funciones interactivas. Si las analíticas dejan de aparecer en tu panel después de habilitar WAF, revisa los registros de WAF en busca de solicitudes bloqueadas a rutas bajo `/docs/_mintlify/`.
+  </Note>
+
+5. Deja el resto de la configuración con los valores predeterminados.
+6. Selecciona **Create distribution**.
+
+<div id="add-default-origin">
+  ## Agregar origen predeterminado
+</div>
+
+1. Después de crear la distribución, ve a la pestaña "Origins".
+2. Busca tu URL de staging que refleje el dominio principal. Esto varía según el proveedor de alojamiento de tu página de inicio. Por ejemplo, la URL de staging de Mintlify es [mintlify-landing-page.vercel.app](https://mintlify-landing-page.vercel.app).
+
+<Info>
+  Si Webflow aloja tu página de inicio, usa la URL de staging de Webflow. Se verá como `.webflow.io`.
+
+  Si usas Vercel, usa el domain `.vercel.app` disponible para cada proyecto.
+</Info>
+
+3. Crea un nuevo Origin y agrega tu URL de staging como el "Origin domain".
+
+Ahora deberías tener dos Origins: uno con `[SUBDOMAIN].mintlify.site` y otro con tu URL de staging.
+
+<div id="set-behaviors">
+  ## Configurar comportamientos
+</div>
+
+Los comportamientos en CloudFront permiten controlar la lógica de subrutas. A grandes rasgos, queremos implementar la siguiente lógica:
+
+- **Si un usuario llega a tu subruta personalizada**, redirigir a `[SUBDOMAIN].mintlify.site`.
+- **Si un usuario llega a cualquier otra página**, redirigir a la página de inicio actual.
+
+1. Ve a la pestaña "Behaviors" de tu distribución de CloudFront.
+2. Selecciona el botón **Create behavior** y crea los siguientes comportamientos.
+
+<div id="well-known">
+  ### `/.well-known/*`
+</div>
+
+Crea comportamientos para las rutas de verificación de domain de Vercel con un **Path pattern** de `/.well-known/*` y establece **Origin and origin groups** en la URL de tu documentación.
+
+Para "Cache policy", selecciona **CachingDisabled** para garantizar que estas solicitudes de verificación se procesen sin caché.
+
+<Info>
+Si `.well-known/*` es demasiado genérico, puedes acotarlo a un mínimo de 2 comportamientos para Vercel:
+  - `/.well-known/vercel/*` - Obligatorio para la verificación de domain de Vercel
+  - `/.well-known/acme-challenge/*` - Obligatorio para la verificación del certificado de Let's Encrypt
+</Info>
+
+<div id="your-subpath">
+  ### Tu subruta
+</div>
+
+Crea un comportamiento con un **Path pattern** de la subruta que elijas, por ejemplo `/docs`, con **Origin and origin groups** apuntando a la URL `.mintlify.site` (en nuestro caso `acme.mintlify.site`).
+
+- Establece "Cache policy" en **CachingDisabled**.
+- Establece "Origin request policy" en **AllViewerExceptHostHeader**.
+- Establece "Viewer protocol policy" en **Redirect HTTP to HTTPS**.
+- Establece "Allowed HTTP methods" en **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE**.
+
+<Warning>
+  CloudFront solo permite solicitudes `GET` y `HEAD` de forma predeterminada. Si no permites todos los métodos HTTP, CloudFront rechaza las solicitudes `POST` que Mintlify usa para analíticas, y tu panel no mostrará ninguna vista de página aunque tu documentación se cargue normalmente.
+</Warning>
+
+<div id="your-subpath-with-wildcard">
+  ### Tu subruta con comodín
+</div>
+
+Crea un comportamiento con un **Path pattern** que sea la subruta que elijas seguida de `/*`, por ejemplo `/docs/*`, y con **Origin and origin groups** apuntando a la misma URL `.mintlify.site`.
+
+Esta configuración debe coincidir exactamente con el comportamiento de tu subruta base, con la excepción de **Path pattern**.
+
+- Establece "Cache policy" en **CachingDisabled**.
+- Establece "Origin request policy" en **AllViewerExceptHostHeader**.
+- Establece "Viewer protocol policy" en **Redirect HTTP to HTTPS**.
+- Establece "Allowed HTTP methods" en **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE**.
+
+<div id="mintlify-assets">
+  ### `/mintlify-assets/*`
+</div>
+
+Crea un comportamiento con un **Path pattern** de `/mintlify-assets/*` con **Origin and origin groups** apuntando a la URL `.mintlify.site`. Esta ruta sirve favicons y recursos estáticos de algunos sitios de documentación desde la raíz de tu dominio.
+
+ - Establece "Cache policy" en **UseOriginCacheControlHeaders-QueryStrings**.
+ - Establece "Origin request policy" en **AllViewerExceptHostHeader**.
+ - Establece "Viewer protocol policy" en **Redirect HTTP to HTTPS**.
+
+<div id="_mintlify">
+  ### `/_mintlify/*`
+</div>
+
+Crea un comportamiento con un **Path pattern** de `/_mintlify/*` con **Origin and origin groups** apuntando a la URL `.mintlify.site`. Esta ruta sirve el CSS, JavaScript, fuentes y solicitudes de API de tu documentación desde la raíz de tu dominio. Sin este comportamiento, las páginas se cargan sin estilos.
+
+- Establece "Cache policy" en **UseOriginCacheControlHeaders-QueryStrings**. Mintlify marca los recursos versionados como almacenables en caché y las respuestas de la API como no almacenables en caché.
+- Establece "Origin request policy" en **AllViewerExceptHostHeader**.
+- Establece "Viewer protocol policy" en **Redirect HTTP to HTTPS**.
+- Establece "Allowed HTTP methods" en **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE**.
+
+<div id="default">
+  ### `Default (*)`
+</div>
+
+Edita el comportamiento de `Default (*)`.
+
+1. Cambia **Origin and origin groups** del comportamiento predeterminado a la URL de staging (en nuestro caso, `mintlify-landing-page.vercel.app`).
+2. Haz clic en **Save changes**.
+
+<div id="check-that-you-set-up-behaviors-correctly">
+  ### Verifica que hayas configurado los comportamientos correctamente
+</div>
+
+Si sigues los pasos anteriores, tu distribución tiene seis comportamientos:
+
+- `/docs/*`
+- `/docs`
+- `/mintlify-assets/*`
+- `/_mintlify/*`
+- `/.well-known/*`
+- `Default (*)`
+
+Confirma que cada comportamiento apunte al origen correcto: la URL `.mintlify.site` para las rutas de la documentación, los assets, la API y `/.well-known/*`, y tu URL de staging para `Default (*)`.
+
+<div id="preview-distribution">
+  ## Vista previa de la distribución
+</div>
+
+Para probar tu distribución, ve a la pestaña "General" y visita la URL de **Distribution domain name**.
+
+Todas las páginas deberían enrutar a tu página de inicio principal. Cuando agregas la subruta que elegiste, por ejemplo `/docs`, la URL debería servir tu documentación de Mintlify.
+
+<div id="connect-with-route-53">
+  ## Conectar con Route 53
+</div>
+
+A continuación, conecta la distribución de CloudFront a tu dominio principal.
+
+<div id="add-your-domain-to-the-distribution">
+  ### Agregar tu dominio a la distribución
+</div>
+
+Primero, agrega tu dominio a la distribución de CloudFront. Sin un nombre de dominio alternativo, CloudFront rechaza las solicitudes que llegan a través de tu dominio.
+
+1. Abre la pestaña "General" de tu distribución y selecciona **Edit** en la sección "Settings".
+2. Agrega tu dominio (por ejemplo, `yoursite.com`) como **Alternate domain name (CNAME)**.
+3. En "Custom SSL certificate", adjunta un certificado de AWS Certificate Manager (ACM) que cubra tu dominio.
+
+<Warning>
+  CloudFront solo acepta certificados de ACM emitidos en la región US East (N. Virginia) `us-east-1`. Un certificado emitido en cualquier otra región no aparece en el menú "Custom SSL certificate".
+</Warning>
+
+<div id="create-the-route-53-record">
+  ### Crear el registro de Route 53
+</div>
+
+<Note>
+  Para esta sección, también puedes consultar la guía oficial de AWS sobre [Configurar
+  Amazon Route 53 para enrutar el tráfico a una
+  distribución de CloudFront](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-to-cloudfront-distribution.html#routing-to-cloudfront-distribution-config), que cubre estos requisitos previos.
+</Note>
+
+1. Ve a [Route53](https://aws.amazon.com/route53) en la consola de AWS.
+2. Ve a la "Hosted zone" de tu dominio principal.
+3. Selecciona **Create record**.
+4. Activa `Alias` y luego, en **Route traffic to**, selecciona la opción `Alias to CloudFront distribution`.
+5. Selecciona **Create records**.
+
+<Note>
+  Es posible que tengas que eliminar el registro A existente si ya hay uno.
+</Note>
+
+Tu documentación ahora está disponible en la subruta elegida de tu dominio principal.
+
+<Propagating />

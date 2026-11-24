@@ -1,0 +1,131 @@
+---
+title: "Colaborar en el editor"
+sidebarTitle: "Colaborar"
+description: "Deje comentarios, proponga cambios como sugerencias y edite junto a sus compañeros en tiempo real en el editor."
+keywords: ["comments", "suggestions", "collaboration", "review", "mentions", "real time"]
+---
+
+Trabaje con su equipo en una página comentándola, sugiriendo cambios o editándola conjuntamente al mismo tiempo.
+
+Los comentarios y las sugerencias no bloquean la publicación. Para requerir la aprobación de un compañero antes de que los cambios en su deployment branch se publiquen, consulte [Requerir revisión antes de publicar](/es/editor/review#require-review-before-publishing).
+
+<div id="comments">
+
+## Comentarios
+
+</div>
+
+<Info>
+  Todos los [roles](/es/dashboard/roles) pueden comentar, responder y resolver hilos. Si su organización usa [roles ampliados](/es/dashboard/roles#expanded-roles), los viewers pueden leer los comentarios, pero no pueden añadirlos. Para permitir que alguien comente sin editar, asígnele el rol commenter.
+</Info>
+
+Los comentarios le permiten dejar opiniones sobre un texto concreto o sobre una página completa sin editar el contenido.
+
+**Los comentarios nunca llegan a su repositorio.** Existen solo dentro del editor y nunca se incluyen en el sitio publicado ni se hacen commit en Git. Si su repositorio está en GitHub o GitLab y su branch tiene una pull request abierta, Mintlify añade a su descripción un resumen de los hilos sin resolver, con un enlace a cada comentario. El resumen se actualiza a medida que cambian los hilos. Los hilos copiados desde otra branch por [Crear branches automáticamente](/es/editor/settings#auto-create-branches) se incorporan al resumen cuando alguien responde, los edita o los resuelve.
+
+Para añadir un comentario, resalte un texto y haga clic en el icono <Icon icon="message-square-text" /> **Comment** de la barra de herramientas o presione <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (Windows).
+
+Para comentar un bloque completo, como un párrafo, un bloque de código, una imagen, una tabla o un componente, pase el cursor sobre el bloque, haga clic en <Icon icon="grip-vertical" /> **Block actions** y seleccione **Comment**. También puede colocar el cursor en el bloque sin seleccionar ningún texto y presionar <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (Windows). Si alguien elimina un bloque que tiene un comentario sin resolver, el hilo se mueve junto al título de la página con una nota que indica que el bloque comentado se eliminó.
+
+Para comentar la página completa en lugar de un texto concreto, use cualquiera de estas dos opciones:
+
+- Pase el cursor sobre el título de la página y haga clic en **Add comment**.
+- En el panel de comentarios, haga clic en **New comment**.
+
+Los comentarios de página aparecen junto al título de la página.
+
+Escriba `@` para mencionar a un compañero en un comentario. Debe ser miembro de su organización y haber aceptado su invitación. Cuando menciona a un compañero en un comentario, recibe una notificación por correo electrónico y un elemento en su [bandeja de entrada](/es/dashboard/inbox). Gestione qué correos de comentarios y sugerencias recibe desde la página de [Notificaciones](/es/dashboard/notifications) de su dashboard.
+
+Las respuestas en hilos que usted inició o en los que lo mencionaron, así como los nuevos comentarios y sugerencias en páginas de su propiedad, también aparecen en su bandeja de entrada.
+
+Los hilos de comentarios aparecen tanto en el modo visual como en el modo source. En el modo source puede leer, responder y resolver hilos existentes, pero para iniciar un comentario nuevo necesita el modo visual.
+
+Para ver todos los hilos de la página actual:
+
+1. Haga clic en <Icon icon="ellipsis" /> **More options** en la esquina superior derecha de la página.
+2. Haga clic en **Comments**.
+
+Reaccione a un comentario para darse por enterado sin responder. Pase el cursor sobre un comentario, haga clic en el botón **Add reaction** y seleccione un emoji. Reaccionar al comentario de otra persona envía una notificación al autor del comentario.
+
+{/* vale Vale.Terms = NO */}
+Para reaccionar a un texto de la página, resáltelo, haga clic en **Add reaction** en la barra de herramientas y seleccione un emoji. Mintlify agrega un comentario sobre el texto resaltado con el emoji como contenido. Sus compañeros pueden responderlo, reaccionar a él, resolverlo o eliminarlo como cualquier otro comentario. Reaccionar a un texto requiere el modo visual.
+{/* vale Vale.Terms = YES */}
+
+Para editar o eliminar un comentario que ha escrito, haga clic en **More actions** en el comentario. Solo puede editar sus propios comentarios. Puede eliminar sus propios comentarios y, si su organización usa [roles](/es/dashboard/roles), los administradores pueden eliminar cualquier comentario o hilo. Eliminar el primer comentario de un hilo elimina el hilo completo.
+
+<div id="mentions-in-page-content">
+
+## Menciones en el contenido de la página
+
+</div>
+
+Escriba `@` mientras edita una página para abrir el menú de menciones. Las menciones funcionan tanto en el modo visual como en el modo source.
+
+- **Mencione a un compañero** para hacer referencia a él en el contenido de la página. Si tiene acceso a la página, Mintlify le envía un correo electrónico y agrega un elemento a su [bandeja de entrada](/es/dashboard/inbox).
+- **Mencione una página** para insertar un enlace a ella. Mintlify usa el título de la página como texto del enlace.
+
+Active o desactive los correos de menciones en páginas con la opción **Page @mention** de la página de [Notificaciones](/es/dashboard/notifications) de su dashboard. Esta opción no afecta a su bandeja de entrada.
+
+<div id="suggestions">
+
+## Sugerencias
+
+</div>
+
+Las sugerencias proponen un cambio manteniendo el contenido actual, de modo que un compañero pueda aceptarlas o rechazarlas.
+
+Los editors y admins pueden aceptar o rechazar cualquier sugerencia. Los viewers no.
+
+Para hacer una sugerencia, resalte un texto y haga clic en **Switch to suggesting** en la barra de herramientas o presione <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> (Windows). En el modo de sugerencias aparece una etiqueta **Suggesting** en la barra superior, y sus eliminaciones e inserciones aparecen como texto resaltado en lugar de como ediciones. Los cambios de formato también se convierten en sugerencias, incluidos negrita, cursiva, subrayado, tachado y código en línea. El texto muestra una vista previa del formato propuesto, pero el formato solo se aplica cuando alguien acepta la sugerencia. Haga clic en la etiqueta para volver a editar. Las sugerencias pendientes aparecen junto a la página y en el panel de comentarios.
+
+El modo de sugerencias solo funciona en el modo visual. Mientras el modo de sugerencias está activado, no puede cambiar al modo source. Desactive el modo de sugerencias para editar el MDX directamente.
+
+<Note>
+  Los [viewers](/es/dashboard/roles) están siempre en modo de sugerencias. El modo de sugerencias se activa automáticamente cuando un viewer abre el editor, de forma que pueda proponer cambios sin editar el contenido directamente. Los miembros con el [rol commenter](/es/dashboard/roles#expanded-roles) no cambian al modo de sugerencias. Pueden comentar en una página, pero no pueden editarla.
+</Note>
+
+Haga clic en una sugerencia resaltada y luego en **Accept suggestion** o **Reject suggestion**. Cualquiera de las dos opciones resuelve el hilo de la sugerencia. Un cambio aceptado pasa a formar parte de su branch actual y se publica la próxima vez que [publique](/es/editor/publish).
+
+<div id="ask-the-mintlify-agent">
+
+## Preguntar al agente de Mintlify
+
+</div>
+
+Mencione `@mintlify` en un comentario, una sugerencia o una respuesta para preguntar al [agente del editor](/es/editor/agent) sobre la página actual. El agente se ejecuta en segundo plano con la página, el hilo y la branch como contexto, y luego publica su respuesta en el mismo hilo.
+
+```text
+@mintlify does this endpoint support pagination?
+@mintlify is this explanation clear for someone new to the API?
+```
+
+Para preguntar sobre un texto específico, resáltelo y haga clic en <Icon icon="square-sparkles" /> **Ask Mintlify** en la barra de herramientas. Mintlify abre un nuevo comentario sobre el texto resaltado con `@mintlify` ya añadido, así que solo tiene que escribir su pregunta.
+
+Si puede editar contenido, también puede pedirle al agente que modifique la página desde el hilo. Los administradores y editores pueden editar contenido. Sin [control de acceso basado en roles](/es/dashboard/roles), todos los miembros pueden hacerlo.
+
+```text
+@mintlify fix the typo in this sentence
+```
+
+El agente edita la página en la branch del hilo solo cuando su comentario solicita explícitamente un cambio. Para preguntas, comentarios o sugerencias, responde y ofrece hacer el cambio. Cuando edita la página, su respuesta indica qué cambió. El agente no publica, así que revise sus cambios y [publíquelos](/es/editor/publish) usted mismo.
+
+Para los [lectores](/es/dashboard/roles), el agente responde en modo de solo lectura. Puede leer páginas y sus comentarios abiertos, ver imágenes, buscar y consultar contenido web, y buscar en la documentación de Mintlify, pero no puede editar contenido.
+
+Las menciones funcionan en páginas privadas para los miembros que ya tienen acceso.
+
+<div id="real-time-editing">
+
+## Edición en tiempo real
+
+</div>
+
+Cuando varias personas abren la misma página en la misma branch, editan conjuntamente. El cursor y las ediciones de cada persona son visibles para todos, con avatares en la barra de herramientas.
+
+La edición en tiempo real funciona tanto en el modo visual como en el modo source. Puede editar el MDX en el modo source mientras un compañero trabaja en el modo visual sobre la misma página. Su cursor y su selección aparecen en su editor, y los suyos aparecen en el de él, incluidos los campos de título y descripción.
+
+- Los cambios de todos los colaboradores se combinan automáticamente. Que dos personas editen la misma sección no genera conflictos.
+- Deshacer solo afecta a sus propias ediciones.
+- Si pierde la conexión, sus ediciones se guardan localmente y se sincronizan cuando vuelve a conectarse.
+- En el modo source, el MDX no válido o el YAML de frontmatter no válido permanecen locales hasta que los corrige. Sus compañeros solo reciben contenido válido, y el MDX no válido [bloquea la publicación](/es/editor/publish#invalid-mdx-blocks-publishing) hasta que se repara.
+
+Cuando el [agente de Mintlify](/es/agent) edita una página a través de la API o de MCP, aparece como cualquier otro colaborador, con un avatar y un cursor en vivo en su edición más reciente. El cursor desaparece cuando el agente termina.

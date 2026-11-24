@@ -1,0 +1,150 @@
+---
+title: "Rôles"
+description: "Attribuez des rôles de propriétaire, d'administrateur, de publieur, d'éditeur, de commentateur ou de lecteur pour contrôler qui peut modifier, relire et publier du contenu dans Mintlify."
+keywords: ["RBAC", "contrôle d'accès basé sur les rôles", "owner", "admin", "publisher", "editor", "commenter", "viewer", "autorisations", "relecture", "approbation", "transfert de propriété", "rôles de projet", "aucun accès"]
+boost: 3
+---
+
+<Info>
+  Le contrôle d'accès basé sur les rôles (RBAC) est disponible avec les [offres Enterprise](https://mintlify.com/pricing?ref=rbac).
+</Info>
+
+Mintlify propose trois niveaux d'accès au dashboard : lecteur, éditeur et administrateur. Sans RBAC, chaque membre dispose d'un accès complet au dashboard de votre organisation, et les nouveaux membres rejoignent l'organisation en tant qu'éditeurs.
+
+Pour inviter des membres, modifier leurs rôles, transférer la propriété ou les supprimer, consultez [Membres](/fr/dashboard/members).
+
+<Note>
+  Si les options de rôle de votre page [Members](https://app.mintlify.com/settings/organization/members) incluent **Publisher**, votre organisation utilise plutôt les [rôles étendus](#expanded-roles).
+</Note>
+
+|                                          | Lecteur | Éditeur | Administrateur |
+| ---------------------------------------- | :-----: | :-----: | :------------: |
+| Voir le contenu dans l'éditeur           | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Voir le dashboard et les Analytics       | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Poser des questions au [Slack agent](/fr/agent/slack) | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Effectuer des modifications avec le Slack agent | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Modifier le contenu dans l'éditeur web   | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Publier les modifications                | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui* | <Icon icon="check" color="#16a34a" /> Oui |
+| [Demander une relecture](/fr/editor/review#require-review-before-publishing) | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Approuver les demandes de relecture | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Créer, renommer et supprimer des pages   | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Réorganiser la navigation                | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Importer des médias                      | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Déclencher des déploiements              | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Effectuer des retours en arrière et promouvoir des déploiements | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Créer et supprimer des clés d'API        | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Configurer les intégrations              | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Configurer l'Assistant                   | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Configurer les modules complémentaires   | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Inviter des éditeurs et des lecteurs     | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Mettre à jour les rôles des utilisateurs | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Inviter des administrateurs              | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Supprimer des utilisateurs               | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer la facturation                     | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer le SSO                             | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer le SCIM                            | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer la liste d'adresses IP autorisées et les durées de session | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Consulter et exporter les journaux d'audit | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer le contact de sécurité             | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Mettre à jour le domaine personnalisé    | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Mettre à jour la source Git              | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Configurer un sous-chemin personnalisé   | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Supprimer un projet                      | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Modifier le [paramètre de publication des agents](/fr/ai/admin-mcp-editing#publishing) | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Supprimer l'organisation                 | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+
+\* Si votre projet [exige une relecture avant publication](/fr/editor/review#require-review-before-publishing), les éditeurs demandent une relecture au lieu de publier sur la deployment branch, et un administrateur publie les modifications approuvées. Seuls les administrateurs peuvent fusionner des pull requests dans la deployment branch depuis l'éditeur.
+
+<Tip>
+  Limitez l'accès administrateur uniquement aux personnes qui doivent effectuer des tâches d'administration.
+</Tip>
+
+Les rôles contrôlent ce que les personnes peuvent faire dans le dashboard et l'éditeur, pas dans votre dépôt Git. Toute personne disposant d'un accès en écriture à votre dépôt peut pousser des modifications, et les push sur votre deployment branch déploient votre site, quel que soit son rôle. Gérez l'accès au dépôt dans votre fournisseur Git.
+
+<div id="expanded-roles">
+  ## Rôles étendus
+</div>
+
+Les organisations avec des rôles étendus disposent de six rôles : propriétaire, administrateur, publieur, éditeur, commentateur et lecteur.
+
+Vous ne pouvez inviter des membres ou attribuer des rôles que jusqu'à votre propre rôle.
+
+- **Propriétaire** : Tout ce que peut faire un administrateur, plus la suppression du projet, la suppression de l'organisation et le transfert de propriété. Chaque organisation a un seul propriétaire, qui est d'abord la personne qui la crée.
+- **Administrateur** : Contrôle total sur le contenu, les membres, les rôles et les paramètres, y compris la facturation et le domaine personnalisé. Les administrateurs peuvent publier sans relecture, sauf si votre deployment branch est protégée.
+- **Publieur** : Tout ce que peut faire un éditeur, plus la publication des modifications et l'approbation des [demandes de relecture](/fr/editor/review#require-review-before-publishing).
+- **Éditeur** : Créer et modifier du contenu, commenter, demander des relectures et gérer les paramètres du site et de l'espace de travail, les intégrations, les clés d'API et l'assistant. Les éditeurs ne peuvent ni publier ni approuver des relectures.
+- **Commentateur** : Tout ce que peut faire un lecteur, plus la possibilité de commenter les pages.
+- **Lecteur** : Voir le contenu et prévisualiser les modifications non publiées.
+
+|                                   | Lecteur | Commentateur | Éditeur | Publieur | Administrateur | Propriétaire |
+| --------------------------------- | :----: | :-------: | :----: | :-------: | :---: | :---: |
+| Voir les pages | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Prévisualiser les modifications non publiées | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Commenter les pages | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Créer et modifier des pages | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Réorganiser les pages | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Supprimer des pages | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Publier les modifications si la relecture n'est pas exigée | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Demander une relecture | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Approuver les demandes de relecture | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Publier les modifications approuvées | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Publier sans relecture si la relecture est exigée | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Fusionner des branches depuis l'éditeur sans approbation si la relecture est exigée | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer les paramètres du site et de l'espace de travail | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Inviter et supprimer des membres | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Attribuer des rôles | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer l'accès aux pages | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer le domaine personnalisé | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Gérer la facturation et le forfait | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui | <Icon icon="check" color="#16a34a" /> Oui |
+| Supprimer le projet | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Supprimer l'organisation | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+| Transférer la propriété | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="x" color="#dc2626" /> Non | <Icon icon="check" color="#16a34a" /> Oui |
+
+<div id="custom-roles">
+  ## Rôles personnalisés
+</div>
+
+Si aucun des rôles intégrés ne convient à votre équipe, créez un rôle personnalisé avec exactement les autorisations dont un membre a besoin. Les rôles personnalisés sont disponibles pour les organisations qui utilisent les [rôles étendus](#expanded-roles). Les propriétaires et les administrateurs peuvent gérer les rôles personnalisés dans la section **Custom roles** de la page [Members](https://app.mintlify.com/settings/organization/members).
+
+<div id="create-a-custom-role">
+  ### Créer un rôle personnalisé
+</div>
+
+1. Accédez à la page [Members](https://app.mintlify.com/settings/organization/members) de votre dashboard.
+2. Dans la section **Custom roles**, cliquez sur **New custom role**.
+3. Saisissez un **Label**, qui apparaît dans les menus de rôles, ainsi qu'une description facultative.
+4. Sélectionnez des autorisations, ou sélectionnez **Grant all permissions**.
+5. Cliquez sur **Create role**.
+
+Les autorisations sont réparties en trois groupes :
+
+- **Content** : **Pages** dispose d'un accès en lecture et en écriture. **Comments** et **Publishing and reviews** disposent uniquement d'un accès en écriture. Tous deux nécessitent l'accès en lecture à **Pages**.
+- **Project** : Accès en consultation ou en gestion aux paramètres au niveau du projet, comme **Domain setup**, **Site**, **Editor**, **Git** et **Assistant**.
+- **Organization** : Accès en consultation ou en gestion aux paramètres de l'organisation, comme **Members**, **Security**, **Billing** et **API keys**.
+
+Vous ne pouvez accorder que les autorisations dont vous disposez vous-même. Les autorisations réservées au propriétaire, comme la suppression de l'organisation ou le transfert de propriété, ne sont pas disponibles pour les rôles personnalisés. Chaque rôle personnalisé peut consulter l'organisation, le projet, son historique de publication et ses membres.
+
+Pour modifier un rôle personnalisé, ouvrez son menu d'actions dans la section **Custom roles** et sélectionnez **Manage role**.
+
+<div id="project-roles">
+  ## Rôles de projet
+</div>
+
+Si votre organisation utilise les [rôles étendus](#expanded-roles) et possède plusieurs projets, vous pouvez attribuer à un membre un rôle différent sur chaque projet. Le rôle d'organisation d'un membre s'applique à tous les projets, sauf si vous définissez un rôle de projet.
+
+Un rôle de projet peut faire l'une de ces deux choses :
+
+- **Donner plus d'accès sur un projet.** Par exemple, faire d'un lecteur à l'échelle de l'organisation un publieur sur un seul projet. Vous pouvez choisir administrateur, publieur, éditeur, commentateur ou lecteur, mais uniquement des rôles disposant de plus d'accès que le rôle d'organisation du membre. Si le rôle d'organisation est un rôle personnalisé, le rôle de projet doit inclure tout ce que le rôle personnalisé autorise.
+- **Bloquer un projet.** Choisissez **No access** pour masquer le projet au membre et l'empêcher de l'utiliser dans le dashboard, l'éditeur, la [CLI](/fr/cli/install) et l'[Admin MCP](/fr/ai/mintlify-mcp). S'il ouvre le projet depuis un lien, Mintlify le redirige vers un autre projet auquel il a accès.
+
+Les propriétaires et les administrateurs ont un accès complet à tous les projets : vous ne pouvez donc pas leur définir de rôles de projet ni leur bloquer un projet. Vous ne pouvez attribuer que des rôles de projet dont vous possédez les autorisations, et vous ne pouvez pas modifier un rôle de projet qui comporte des autorisations que vous n'avez pas. Vous ne pouvez pas modifier vos propres rôles de projet.
+
+Si vous élevez le rôle d'organisation d'un membre de sorte qu'il inclue un rôle de projet, Mintlify supprime ce rôle de projet. Promouvoir un membre au rôle d'administrateur supprime ses attributions **No access**.
+
+Sur la page [Members](https://app.mintlify.com/settings/organization/members), la colonne **Role** affiche le rôle de chaque membre sur le projet que vous avez ouvert. Pour définir des rôles de projet, consultez [Définir le rôle d'un membre sur un projet](/fr/dashboard/members#set-a-members-role-on-a-project).
+
+<div id="repository-contributors-and-deployments">
+  ## Contributeurs du référentiel et déploiements
+</div>
+
+Toute personne disposant d'un accès en écriture à votre référentiel de documentation peut contribuer en y poussant des modifications. Les push vers votre branche de déploiement sont déployés automatiquement, quel que soit le rôle de la personne dans le dashboard. Les rôles du dashboard contrôlent uniquement ce que les personnes peuvent faire dans le dashboard Mintlify.

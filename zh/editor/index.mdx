@@ -1,0 +1,97 @@
+---
+title: "编辑器概览"
+sidebarTitle: "概览"
+description: "使用 Mintlify 编辑器在浏览器中创建、编辑和发布内容。支持实时协作和持续的 Git 同步。"
+keywords: ["web editor", "git", "branches", "commits", "pull requests"]
+---
+
+<Card title="第一次使用编辑器？请从教程开始。" icon="graduation-cap" horizontal href="/zh/editor/tutorial">
+  创建分支、进行修改、共享预览并发布。
+</Card>
+
+使用编辑器在浏览器中撰写和发布文档。编辑器采用 docs-as-code 工作流，你的所有更改都由 Git 保存。你的工作会以 commit 的形式保存到你的仓库中，编辑器会替你处理 Git 操作。
+
+打开[仪表板](https://app.mintlify.com)时会默认加载编辑器。组织中的任何成员都可以打开编辑器，但具体能执行哪些操作取决于你的[角色](/zh/dashboard/roles)。Admins 和 editors 可以编辑和发布。Viewers 可以浏览内容，并留下[评论和建议](/zh/editor/collaborate)。如果你的组织使用[扩展角色](/zh/dashboard/roles#expanded-roles)，editors 无法发布，viewers 无法评论。
+
+<div id="how-the-editor-works">
+
+## 编辑器的工作方式
+
+</div>
+
+**更改会自动保存，但保存不等于发布。** 在你输入时，编辑器会保存你的工作。你的更改会在标签页、设备和网络中断之间保留。若要让更改出现在你的线上站点上，你必须[发布](/zh/editor/publish)它们。
+
+**发布会写入 Git。** 发布时，编辑器会把你的更改提交到你的仓库。如果你发布到 deployment branch，你的线上站点会立即更新。在 feature branch 上，你的编辑会自动提交到该分支，并打开一个 pull request 供人审阅。在合并到 deployment branch 之前，feature branch 上的任何内容都不会进入你的线上站点。
+
+**Git 保持同步。** 当有人向你的仓库推送更改时，这些更改会自动出现。你无需 pull 或刷新页面。编辑器会合并没有冲突的更改，并标记出需要你处理的部分。
+
+**你的团队可以共同编辑。** 多人可以同时编辑同一个页面，实时光标会显示每个人正在处理的位置。评论和建议对所有人可见。
+
+<Tip>
+  如果编辑器看起来与你的仓库不同步，请使用[重置编辑器](/zh/editor/settings#reset-editor)强制重新同步。
+</Tip>
+
+<div id="editor-layout">
+
+## 编辑器布局
+
+</div>
+
+* **顶部栏**：点击 <Icon icon="panel-left" /> **Collapse sidebar** 可隐藏页面列表，点击 **Ask agent** 可在页面旁打开智能体。在私有页面上，顶部栏还包含 **Share**。在站点的其他页面上，它包含 **Preview** 和 **Publish**，以及可见时的[分支选择器](/zh/editor/publish#show-the-branch-selector)。点击 <Icon icon="ellipsis" /> **More options** 可以执行页面操作，例如 **Page settings**、**Comments**、**Version history**、**Duplicate** 和 **Move**。
+* **侧边栏**：使用侧边栏选择要编辑的页面、创建新页面、管理站点结构，以及在仪表板中切换位置。按 <kbd>Cmd</kbd> + <kbd>\\</kbd>（macOS）或 <kbd>Ctrl</kbd> + <kbd>\\</kbd>（Windows）可以隐藏或显示页面列表。
+  * **仪表板图标**：通过顶部的菜单切换项目。点击 **Home** 可打开 **Publishes** 页面。点击 **Editor** 可返回你上次在编辑器中打开的页面。其下方可打开 **Autopilot**、**Assistant**、**Analytics**、**MCP** 和 **Settings**。
+  * **侧边栏底部**：点击 <Icon icon="search" /> **Search** 可[搜索仪表板](#search-the-dashboard)，点击 <Icon icon="inbox" /> [**Inbox**](/zh/dashboard/inbox) 可查看需要你处理的事项，点击 <Icon icon="circle-help" /> **Get help** 可查看文档、获取支持和了解产品更新。点击你的头像可打开个人资料菜单。
+  * **页面**：**Navigation** 包含站点导航中的页面。**Files** 列出仓库中不在导航里的文件。**Personal** 中是你的[私有页面](/zh/editor/pages#private-pages)，**Shared with me** 中是同事直接与你共享的页面。在[多仓库项目](/zh/deploy/multi-repo#edit-sources-in-the-web-editor)中，使用页面上方的仓库菜单在仓库之间切换。
+
+<div id="search-the-dashboard">
+
+## 搜索仪表板
+
+</div>
+
+按 <kbd>Cmd</kbd> + <kbd>K</kbd>（macOS）或 <kbd>Ctrl</kbd> + <kbd>K</kbd>（Windows），或点击侧边栏底部的 **Search**，即可搜索仪表板。在可视化模式下，请先取消选中所有文本，因为 <kbd>Cmd</kbd> + <kbd>K</kbd> 会为所选文本添加链接。
+
+搜索可以找到：
+
+* 你的页面。
+* 设置页面。
+* `docs.json` 中的各个部分，会在编辑器中打开。
+* Analytics 和 Publishes 中的各个部分。
+* 按名称查找的自动化。
+
+搜索还可以执行操作，例如邀请成员、创建自动化、打开或关闭智能体、显示或隐藏侧边栏、在浅色和深色主题之间切换、联系支持，以及打开键盘快捷键列表。部分操作（例如邀请成员）仅在你的[角色](/zh/dashboard/roles)允许时才会显示。
+
+在你输入之前，搜索会针对你当前所在的页面推荐结果。例如，在设置页面上，它会推荐该页面的各个部分；在编辑器中，它会推荐站点配置的各个部分。
+
+<div id="visual-and-source-mode">
+
+## 可视化模式与 source 模式
+
+</div>
+
+**可视化模式**会在你输入时渲染页面。按 <kbd>/</kbd> 打开组件菜单并插入组件。
+
+**source 模式**让你直接访问 MDX，并显示行号。适合精确控制组件属性和 frontmatter。输入 <kbd>&lt;</kbd> 可访问组件。按 <kbd>Cmd</kbd> + <kbd>S</kbd>（macOS）或 <kbd>Ctrl</kbd> + <kbd>S</kbd>（Windows）可格式化文档。如果一次修改改变了超过 10,000 个字符，编辑器会请你确认。
+
+两种模式编辑的是同一个文件，都支持[实时协作](/zh/editor/collaborate#real-time-editing)。使用 <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>（macOS）或 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>（Windows）在两者之间切换，或使用 <Icon icon="ellipsis" /> **More options** 中的 **Source mode** 开关。编辑器会在跨页面时记住你的选择。开启[建议模式](/zh/editor/collaborate#suggestions)时，source 模式不可用。
+
+有关可插入的组件，请参阅[组件](/zh/components)。有关 MDX 语法，请参阅[文本格式](/zh/create/text)和[代码格式](/zh/create/code)。
+
+<div id="git-concepts">
+
+## Git 概念
+
+</div>
+
+了解一些 Git 概念有助于你更好地使用编辑器。有关 commit、branch、pull request、merge、冲突和 diff 的定义，请参阅[文档相关的 Git 概念](/zh/guides/git-concepts)。
+
+| 编辑器中的操作 | Git 操作 |
+|---|---|
+| 编辑页面 | 自动保存。尚未创建 commit。 |
+| 在 deployment branch 上发布 | `git commit` 和 `git push`。触发部署。 |
+| 在 feature branch 上编辑 | 在你停止编辑约 15 秒后，`git commit` 并 `git push` 到该分支。首次提交时会打开一个针对 deployment branch 的 pull request。 |
+| Request review | 将 pull request 标记为可供审阅。 |
+| Merge and publish | 合并 pull request 并触发部署。 |
+| 创建分支 | `git checkout -b <branch-name>` |
+| 切换分支 | `git checkout <branch-name>` |
+| 外部 push 或 CLI 更新 | 传入的更改通过三方合并同步到编辑器中。 |

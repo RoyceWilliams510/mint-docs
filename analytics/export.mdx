@@ -1,0 +1,55 @@
+---
+title: "Export analytics to CSV"
+sidebarTitle: "Export analytics"
+description: "Export traffic, referrals, assistant, search, and feedback analytics to CSV from your Mintlify dashboard and interpret each export field."
+keywords: ["analytics", "export", "CSV", "traffic export", "assistant export"]
+---
+
+<Info>
+  Analytics require a [Pro or Enterprise plan](https://mintlify.com/pricing?ref=analytics).
+</Info>
+
+Export analytics categories to CSV for deeper analysis, reporting, or archival. Exports use the time range selected on the [analytics](https://app.mintlify.com/analytics) page.
+
+1. Select **Export to CSV**.
+2. Select a category to export: traffic, referrals, assistant conversations, searches, or feedback.
+3. Wait for Mintlify to email you a download link.
+
+## Interpret traffic exports
+
+Traffic exports break down page views by visitor category so you can compare traffic from humans, agents, search crawlers, and other bots.
+
+| Column | Description |
+| --- | --- |
+| `humanViews` | HTML page views from non-bot traffic. |
+| `aiViews` | Views from AI agents such as ChatGPT, Claude, and Cursor, plus Markdown page fetches from clients that are not recognized crawlers. |
+| `searchIndexViews` | Views from search and indexing crawlers, such as Googlebot, Bingbot, and OAI-SearchBot. |
+| `trainingViews` | Views from crawlers that collect content for AI model training, such as GPTBot, ClaudeBot, and CCBot. |
+| `otherAiViews` | Views from other AI-related bots that do not fit the preceding categories. |
+| `totalViews` | The sum of `humanViews` and `aiViews`. |
+
+Mintlify classifies each view using known user-agent patterns for search crawlers, training crawlers, and AI assistants. Categories are mutually exclusive, so each view counts toward exactly one column.
+
+<Note>
+  `searchIndexViews`, `trainingViews`, and `otherAiViews` do not count toward `totalViews`.
+</Note>
+
+## Interpret assistant exports
+
+Assistant exports include the queries, responses, and sources for each question, plus the following columns.
+
+| Column | Description |
+| --- | --- |
+| `resolutionStatus` | Whether the assistant answered the question: `answered` or `unanswered`. Use it to identify documentation gaps surfaced by questions the assistant could not resolve. |
+| `feedback` | The user's thumbs rating on the response: `positive` or `negative`. Empty if the user did not rate the response. |
+
+Email addresses and phone numbers in queries, responses, and sources appear as `[REDACTED_EMAIL]` and `[REDACTED_PHONE]`.
+
+<Tip>
+  Sample analysis prompts for assistant exports:
+
+  - List any queries that had no sources cited.
+  - Find patterns in unsuccessful interactions.
+  - Group unanswered queries by topic to prioritize content updates.
+  - Summarize the sources cited in responses with `negative` feedback.
+</Tip>

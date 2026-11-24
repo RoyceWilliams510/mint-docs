@@ -1,0 +1,188 @@
+---
+title: "Exportation hors ligne"
+description: "Exportez votre site de documentation sous forme d'archive zip de pages pré-rendues pour la consultation hors ligne et la distribution interne."
+keywords: ["export", "hors ligne", "zip", "site statique", "distribution", "mint export"]
+---
+
+<Info>
+  Les exportations hors ligne nécessitent une [offre Enterprise](https://mintlify.com/pricing?ref=offline-export).
+</Info>
+
+Utilisez `mint export` pour empaqueter l'intégralité de votre site de documentation dans une archive zip de pages pré-rendues. Les destinataires peuvent décompresser l'archive et consulter la documentation dans leur navigateur sans compte Mintlify ni outil de build. Ils ont uniquement besoin de [Node.js](https://nodejs.org) installé.
+
+Cela est utile lorsque vous devez distribuer la documentation à des utilisateurs qui ne peuvent pas accéder à votre site en production, par exemple pour des clients on-premise ou des audits de conformité internes.
+
+La CLI empaquette dans l'archive les icônes, les polices et les styles LaTeX utilisés par votre site, afin que la documentation exportée fonctionne dans des environnements isolés (air-gapped) sans accès à internet. Les exportations sont servies depuis la racine d'un domaine, sauf si vous définissez un [chemin de base](#serve-under-a-subpath). Consultez les [limitations](#limitations) avant de déployer une exportation.
+
+<div id="prerequisites">
+  ## Prérequis
+</div>
+
+- La [CLI](/fr/cli/install) installée et à jour
+- [Node.js](https://nodejs.org) v20.17.0 ou version ultérieure installé, sauf Node.js 25
+
+<div id="limitations">
+  ## Limitations
+</div>
+
+- Les exportations hors ligne ne prennent pas en charge l'assistant Mintlify.
+- Les exportations hors ligne n'incluent pas les outils d'analytics ni les autres [intégrations](/fr/organize/settings-integrations) configurés dans votre `docs.json`.
+- Les images et autres fichiers que vos pages référencent par une URL externe ne sont pas empaquetés. Stockez-les dans votre projet pour les inclure dans l'archive.
+
+<div id="offline-search">
+  ### Recherche hors ligne
+</div>
+
+La barre de recherche fonctionne dans la documentation exportée sans connexion réseau. Lorsque vous exécutez `mint export`, la CLI génère un index de recherche à partir des pages exportées et l'enregistre dans l'archive. Le navigateur effectue la recherche dans cet index localement.
+
+La recherche hors ligne suit les mêmes règles que la recherche sur votre site en ligne. Elle ignore les pages [masquées de la recherche](/fr/organize/hidden-pages), comme les pages dont le frontmatter contient `noindex: true` ou `searchable: false`. Les résultats n'incluent que les pages dans la langue et la version actuelles du lecteur.
+
+<div id="bundled-assets">
+  ### Ressources empaquetées
+</div>
+
+Lorsque vous exécutez `mint export`, la CLI télécharge les ressources que votre site charge depuis des hôtes externes et les enregistre dans l'archive. Cela comprend :
+
+- Les icônes référencées par nom, comme les icônes Font Awesome et Lucide.
+- Les icônes de langage des blocs de code et les drapeaux du sélecteur de langue.
+- Google Fonts et les polices hébergées en externe.
+- Les feuilles de style et polices LaTeX.
+- Les fichiers référencés depuis les feuilles de style empaquetées.
+
+L'ordinateur qui exécute `mint export` a besoin d'un accès à internet pour télécharger ces ressources. La CLI ne télécharge que des ressources provenant d'hôtes publics. Si le téléchargement d'une ressource échoue, la CLI affiche un avertissement `could not bundle <url>` et la documentation exportée charge cette ressource depuis son hôte d'origine.
+
+<div id="export-your-site">
+  ## Exporter votre site
+</div>
+
+Accédez à votre répertoire de documentation contenant votre fichier `docs.json` et exécutez :
+
+```bash
+mint export
+```
+
+La CLI compile votre site, parcourt toutes les pages définies dans votre navigation et empaquète le résultat dans un fichier zip dans votre répertoire actuel.
+
+<div id="options">
+  ### Options
+</div>
+
+| Flag | Description | Par défaut |
+|---|---|---|
+| `--output <path>` | Définit le chemin du fichier zip de sortie. | `export.zip` |
+| `--groups <group>` | Simule des [groupes d'utilisateurs](/fr/deploy/authentication-setup#control-access-with-groups) pour l'exportation. Utile lorsque votre documentation utilise un contrôle d'accès basé sur les groupes et que vous souhaitez que l'archive inclue les pages restreintes. | — |
+| `--disable-openapi` | Ignore la génération des fichiers OpenAPI pendant l'exportation. Utilisez cette option si vous avez de nombreuses spécifications OpenAPI et souhaitez des builds plus rapides. | — |
+| `--base-path <path>` | Sert l'exportation sous un sous-chemin, par exemple `/docs`. Consultez [Servir sous un sous-chemin](#serve-under-a-subpath). | |
+| `--client-version <version>` | Compile l'exportation avec une version spécifique du client Mintlify au lieu de la dernière version compatible. Consultez [Épingler la version du client](#pin-the-client-version). | Dernière version compatible |
+
+Par exemple, pour exporter votre site avec un nom de fichier personnalisé et un groupe d'utilisateurs spécifique :
+
+```bash
+mint export --output customer-docs.zip --groups enterprise
+```
+
+<Note>
+  L'exportation inclut uniquement les pages listées dans votre navigation. Les [pages masquées](/fr/organize/hidden-pages) ne sont pas incluses dans l'archive.
+</Note>
+
+<div id="serve-under-a-subpath">
+  ### Servir sous un sous-chemin
+</div>
+
+Par défaut, une exportation est servie depuis la racine d'un domaine, par exemple `http://localhost:3000/`. Pour la servir sous un sous-chemin, passez le chemin avec `--base-path` :
+
+```bash
+mint export --base-path /docs
+```
+
+La CLI préfixe les liens, les images, les favicons et les ressources empaquetées avec le chemin de base, et `serve.js` sert la documentation à l'adresse `http://localhost:3000/docs/`. Une requête vers la racine redirige vers le chemin de base.
+
+Le chemin de base peut contenir des lettres, des chiffres, des tirets et des tirets bas, avec des segments séparés par `/`, par exemple `/docs` ou `/product/docs`. L'exportation échoue si un chemin de page commence par le chemin de base. Par exemple, `--base-path /docs` échoue si votre navigation inclut une page à `docs/intro`. Choisissez un chemin de base qu'aucune page n'utilise.
+
+<div id="pin-the-client-version">
+  ### Épingler la version du client
+</div>
+
+Par défaut, `mint export` compile votre site avec la dernière version du client Mintlify compatible avec votre version de la CLI. Pour compiler avec une version spécifique, passez son numéro de version avec `--client-version` :
+
+```bash
+mint export --client-version <version>
+```
+
+La CLI télécharge cette version depuis `releases.mintlify.com` avant de compiler l'exportation. Épinglez une version lorsque vous avez besoin que des exportations répétées s'affichent de la même manière, par exemple lorsque vous régénérez une archive pour le même client.
+
+Si le téléchargement échoue et que la CLI dispose déjà d'une version du client en cache issue d'une exécution précédente, la CLI compile l'exportation avec la version en cache.
+
+<div id="security-considerations">
+  ### Considérations de sécurité
+</div>
+
+L'archive exportée est un bundle statique et non authentifié. Toute personne disposant du fichier zip peut consulter chaque page qu'il contient.
+
+- L'option `--groups` contrôle quelles pages à accès restreint par groupe Mintlify inclut dans l'archive au moment de l'exportation. Elle **n'applique pas** d'authentification après l'exportation.
+- Ne partagez les archives qu'avec des destinataires autorisés à voir le contenu qu'elles contiennent.
+- Régénérez et redistribuez l'archive pour publier de nouvelles modifications — les destinataires qui utilisent un zip plus ancien continueront à voir l'ancien contenu.
+
+<div id="whats-in-the-zip">
+  ## Contenu du zip
+</div>
+
+L'archive exportée contient vos pages pré-rendues, leurs ressources groupées et un serveur pour les consulter :
+
+| Fichier | Fonction |
+|---|---|
+| Pages HTML | Version pré-rendue de chaque page de votre navigation |
+| `_mintlify/assets/` | CSS, JavaScript et autres ressources statiques empaquetés |
+| `_mintlify/export-assets/` | Icônes, polices et autres ressources téléchargées depuis des hôtes externes |
+| `_mintlify/search-index.json` | Index de recherche pour la [recherche hors ligne](#offline-search) |
+| `llms.txt` | Index des pages exportées pour les outils d'IA |
+| `README.md` | Instructions pour consulter l'exportation et l'héberger sur votre propre serveur |
+| `serve.js` | Serveur HTTP Node.js sans dépendance qui sert le site |
+| `Start Docs.command` | Lanceur macOS. Double-cliquez pour ouvrir la documentation. |
+| `Start Docs.bat` | Lanceur Windows. Double-cliquez pour ouvrir la documentation. |
+
+<div id="view-the-exported-docs">
+  ## Consulter la documentation exportée
+</div>
+
+Partagez le fichier zip avec toute personne disposant de Node.js. Pour consulter la documentation :
+
+<Tabs>
+  <Tab title="Manuel">
+    1. Décompressez l'archive.
+    2. Ouvrez un terminal dans le répertoire décompressé.
+    3. Exécutez `node serve.js`.
+    4. Ouvrez `http://localhost:3000` dans votre navigateur.
+  </Tab>
+  <Tab title="macOS">
+    1. Décompressez l'archive.
+    2. Double-cliquez sur **Start Docs.command**.
+    3. La documentation s'ouvre dans votre navigateur par défaut à l'adresse `http://localhost:3000`.
+
+    <Note>
+      macOS peut bloquer le fichier parce qu'il a été téléchargé depuis internet. Si vous voyez un avertissement de sécurité, accédez à **Réglages du système > Confidentialité et sécurité** et sélectionnez **Ouvrir quand même**. Consultez le [guide Apple pour contourner les réglages de sécurité](https://support.apple.com/guide/mac-help/mh40617/mac) pour plus de détails.
+    </Note>
+  </Tab>
+  <Tab title="Windows">
+    1. Décompressez l'archive.
+    2. Double-cliquez sur **Start Docs.bat**.
+    3. La documentation s'ouvre dans votre navigateur par défaut à l'adresse `http://localhost:3000`.
+
+    <Note>
+      Windows peut afficher un avertissement "Windows a protégé votre ordinateur" parce que le fichier a été téléchargé depuis internet. Sélectionnez **Informations complémentaires**, puis sélectionnez **Exécuter quand même**.
+    </Note>
+  </Tab>
+</Tabs>
+
+<div id="host-the-export-on-your-own-server">
+  ## Héberger l'exportation sur votre propre serveur
+</div>
+
+Pour héberger une exportation sur votre propre serveur web au lieu de `serve.js`, servez le dossier décompressé sous forme de fichiers statiques depuis la racine d'un domaine. Si vous avez exporté avec `--base-path`, servez plutôt le dossier sous ce chemin, et appliquez ces règles à la partie du chemin de la requête située après le chemin de base :
+
+1. **Pages :** Servez `<path>/index.html` pour une requête vers `/<path>`.
+2. **Mise en cache :** Servez `_mintlify/assets/*` et `_mintlify/export-assets/*` avec `Cache-Control: public, max-age=31536000, immutable`. Servez les pages avec `Cache-Control: no-cache`.
+
+`serve.js` implémente ces deux règles, vous pouvez donc l'utiliser comme référence.
+
+Si vous avez exporté avec l'option `--classic`, l'archive utilise la structure du client classique et nécessite des règles différentes. Le fichier `README.md` de cette archive les répertorie.

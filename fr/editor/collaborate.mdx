@@ -1,0 +1,131 @@
+---
+title: "Collaborer dans l'éditeur"
+sidebarTitle: "Collaborer"
+description: "Laissez des commentaires, proposez des modifications sous forme de suggestions et travaillez avec vos collègues en temps réel dans l'éditeur."
+keywords: ["comments", "suggestions", "collaboration", "review", "mentions", "real time"]
+---
+
+Travaillez avec votre équipe sur une page en la commentant, en y proposant des suggestions ou en la modifiant ensemble en même temps.
+
+Les commentaires et les suggestions ne bloquent pas la publication. Pour exiger l'approbation d'un collègue avant que les modifications sur votre deployment branch soient mises en ligne, consultez [Exiger une relecture avant publication](/fr/editor/review#require-review-before-publishing).
+
+<div id="comments">
+
+## Commentaires
+
+</div>
+
+<Info>
+  Tous les [rôles](/fr/dashboard/roles) peuvent commenter, répondre et résoudre les fils. Si votre organisation utilise les [rôles étendus](/fr/dashboard/roles#expanded-roles), les viewers peuvent lire les commentaires, mais pas en ajouter. Pour permettre à quelqu'un de commenter sans modifier, attribuez-lui le rôle commenter.
+</Info>
+
+Les commentaires vous permettent de laisser un retour sur un texte précis ou sur une page entière sans modifier le contenu.
+
+**Les commentaires n'atteignent jamais votre dépôt.** Ils n'existent que dans l'éditeur et ne sont jamais inclus dans le site publié ni commités dans Git. Si votre dépôt est sur GitHub ou GitLab et que votre branch comporte une pull request ouverte, Mintlify ajoute à sa description un résumé des fils non résolus, avec un lien vers chaque commentaire. Le résumé se met à jour au fil des changements. Les fils copiés depuis une autre branch par la [Création automatique de branches](/fr/editor/settings#auto-create-branches) rejoignent le résumé dès que quelqu'un y répond, les modifie ou les résout.
+
+Pour ajouter un commentaire, surlignez du texte et cliquez sur l'icône <Icon icon="message-square-text" /> **Comment** dans la barre d'outils, ou appuyez sur <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (macOS) ou <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (Windows).
+
+Pour commenter un bloc entier, comme un paragraphe, un bloc de code, une image, un tableau ou un composant, survolez le bloc, cliquez sur <Icon icon="grip-vertical" /> **Block actions** et sélectionnez **Comment**. Vous pouvez aussi placer votre curseur dans le bloc sans sélectionner de texte et appuyer sur <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (macOS) ou <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> (Windows). Si quelqu'un supprime un bloc qui comporte un commentaire non résolu, le fil est déplacé à côté du titre de la page, avec une note indiquant que le bloc commenté a été supprimé.
+
+Pour commenter la page entière plutôt qu'un texte précis, utilisez l'une de ces deux options :
+
+- Survolez le titre de la page et cliquez sur **Add comment**.
+- Dans le panneau des commentaires, cliquez sur **New comment**.
+
+Les commentaires de page apparaissent à côté du titre de la page.
+
+Saisissez `@` pour mentionner un collègue dans un commentaire. Il doit être membre de votre organisation et avoir accepté son invitation. Lorsque vous mentionnez un collègue dans un commentaire, il reçoit une notification par e-mail et un élément dans sa [boîte de réception](/fr/dashboard/inbox). Gérez les e-mails de commentaires et de suggestions que vous recevez depuis la page [Notifications](/fr/dashboard/notifications) de votre dashboard.
+
+Les réponses dans les fils que vous avez lancés ou dans lesquels vous avez été mentionné, ainsi que les nouveaux commentaires et suggestions sur les pages dont vous êtes propriétaire, apparaissent également dans votre boîte de réception.
+
+Les fils de commentaires apparaissent aussi bien en mode visuel qu'en mode source. En mode source, vous pouvez lire, répondre et résoudre les fils existants, mais démarrer un nouveau commentaire nécessite le mode visuel.
+
+Pour voir tous les fils de la page actuelle :
+
+1. Cliquez sur <Icon icon="ellipsis" /> **More options** en haut à droite de la page.
+2. Cliquez sur **Comments**.
+
+Réagissez à un commentaire pour en prendre acte sans répondre. Survolez un commentaire, cliquez sur le bouton **Add reaction** et sélectionnez un emoji. Réagir au commentaire de quelqu'un d'autre envoie une notification à l'auteur du commentaire.
+
+{/* vale Vale.Terms = NO */}
+Pour réagir à du texte de la page, surlignez-le, cliquez sur **Add reaction** dans la barre d'outils et sélectionnez un emoji. Mintlify ajoute un commentaire sur le texte surligné avec l'emoji comme contenu. Vos coéquipiers peuvent y répondre, y réagir, le résoudre ou le supprimer comme n'importe quel autre commentaire. Réagir à du texte nécessite le mode visuel.
+{/* vale Vale.Terms = YES */}
+
+Pour modifier ou supprimer un commentaire que vous avez écrit, cliquez sur **More actions** sur le commentaire. Vous ne pouvez modifier que vos propres commentaires. Vous pouvez supprimer vos propres commentaires et, si votre organisation utilise les [rôles](/fr/dashboard/roles), les administrateurs peuvent supprimer n'importe quel commentaire ou fil. Supprimer le premier commentaire d'un fil supprime le fil entier.
+
+<div id="mentions-in-page-content">
+
+## Mentions dans le contenu des pages
+
+</div>
+
+Tapez `@` pendant que vous modifiez une page pour ouvrir le menu des mentions. Les mentions fonctionnent en mode visuel comme en mode source.
+
+- **Mentionnez un collègue** pour le citer dans le contenu de la page. S'il a accès à la page, Mintlify lui envoie un e-mail et ajoute un élément à sa [boîte de réception](/fr/dashboard/inbox).
+- **Mentionnez une page** pour insérer un lien vers celle-ci. Mintlify utilise le titre de la page comme texte du lien.
+
+Activez ou désactivez les e-mails de mention de page avec le paramètre **Page @mention** sur la page [Notifications](/fr/dashboard/notifications) de votre dashboard. Ce paramètre n'affecte pas votre boîte de réception.
+
+<div id="suggestions">
+
+## Suggestions
+
+</div>
+
+Les suggestions proposent une modification tout en conservant le contenu actuel, de sorte qu'un collègue puisse l'accepter ou la refuser.
+
+Les editors et les admins peuvent accepter ou refuser n'importe quelle suggestion. Les viewers ne le peuvent pas.
+
+Pour faire une suggestion, surlignez du texte et cliquez sur **Switch to suggesting** dans la barre d'outils, ou appuyez sur <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> (macOS) ou <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> (Windows). En mode suggestion, un libellé **Suggesting** apparaît dans la barre supérieure, et vos suppressions et insertions apparaissent en surbrillance plutôt que comme des modifications. Les modifications de mise en forme deviennent aussi des suggestions, notamment le gras, l'italique, le soulignement, le barré et le code en ligne. Le texte affiche un aperçu de la mise en forme proposée, mais celle-ci ne s'applique que lorsque quelqu'un accepte la suggestion. Cliquez sur le libellé pour revenir en mode édition. Les suggestions en attente apparaissent à côté de la page et dans le panneau des commentaires.
+
+Le mode suggestion fonctionne uniquement en mode visuel. Tant que le mode suggestion est activé, vous ne pouvez pas passer en mode source. Désactivez le mode suggestion pour modifier directement le MDX.
+
+<Note>
+  Les [viewers](/fr/dashboard/roles) sont toujours en mode suggestion. Le mode suggestion s'active automatiquement quand un viewer ouvre l'éditeur, afin qu'il puisse proposer des modifications sans modifier directement le contenu. Les membres ayant le [rôle commenter](/fr/dashboard/roles#expanded-roles) ne passent pas en mode suggestion. Ils peuvent commenter une page, mais pas la modifier.
+</Note>
+
+Cliquez sur une suggestion surlignée, puis sur **Accept suggestion** ou **Reject suggestion**. Dans les deux cas, le fil de la suggestion est résolu. Une modification acceptée fait partie de votre branch actuelle et est mise en ligne la prochaine fois que vous [publiez](/fr/editor/publish).
+
+<div id="ask-the-mintlify-agent">
+
+## Interroger l'agent Mintlify
+
+</div>
+
+Mentionnez `@mintlify` dans un commentaire, une suggestion ou une réponse pour interroger l'[agent de l'éditeur](/fr/editor/agent) au sujet de la page en cours. L'agent s'exécute en arrière-plan avec la page, le fil et la branch comme contexte, puis publie sa réponse dans le même fil.
+
+```text
+@mintlify does this endpoint support pagination?
+@mintlify is this explanation clear for someone new to the API?
+```
+
+Pour poser une question sur un texte précis, sélectionnez-le et cliquez sur <Icon icon="square-sparkles" /> **Ask Mintlify** dans la barre d'outils. Mintlify ouvre un nouveau commentaire sur le texte sélectionné avec `@mintlify` déjà ajouté. Il ne vous reste plus qu'à saisir votre question.
+
+Si vous pouvez modifier le contenu, vous pouvez aussi demander à l'agent de modifier la page depuis le fil. Les administrateurs et les éditeurs peuvent modifier le contenu. Sans [contrôle d'accès basé sur les rôles](/fr/dashboard/roles), tous les membres le peuvent.
+
+```text
+@mintlify fix the typo in this sentence
+```
+
+L'agent modifie la page sur la branch du fil uniquement lorsque votre commentaire demande explicitement une modification. Pour les questions, les retours ou les suggestions, il répond et propose d'effectuer la modification. Lorsqu'il modifie la page, sa réponse indique ce qu'il a changé. L'agent ne publie pas. Vérifiez donc ses modifications et [publiez](/fr/editor/publish)-les vous-même.
+
+Pour les [lecteurs](/fr/dashboard/roles), l'agent répond en lecture seule. Il peut lire des pages et leurs commentaires ouverts, visualiser des images, rechercher et consulter du contenu web et faire des recherches dans la documentation de Mintlify, mais il ne peut pas modifier le contenu.
+
+Les mentions fonctionnent sur les pages privées pour les membres qui y ont déjà accès.
+
+<div id="real-time-editing">
+
+## Édition en temps réel
+
+</div>
+
+Lorsque plusieurs personnes ouvrent la même page sur la même branch, elles la modifient ensemble. Le curseur et les modifications de chacun sont visibles par tous, avec des avatars dans la barre d'outils.
+
+L'édition en temps réel fonctionne aussi bien en mode visuel qu'en mode source. Vous pouvez modifier le MDX en mode source pendant qu'un collègue travaille en mode visuel sur la même page. Son curseur et sa sélection apparaissent dans votre éditeur, et les vôtres apparaissent dans le sien, y compris dans les champs de titre et de description.
+
+- Les modifications de tous les collaborateurs fusionnent automatiquement. Deux personnes qui modifient la même section ne créent pas de conflit.
+- L'annulation n'affecte que vos propres modifications.
+- Si vous perdez la connexion, vos modifications sont enregistrées localement et synchronisées à la reconnexion.
+- En mode source, un MDX non valide ou un frontmatter YAML non valide reste local à votre poste tant que vous ne l'avez pas corrigé. Vos collègues ne reçoivent que du contenu valide, et un MDX non valide [empêche la publication](/fr/editor/publish#invalid-mdx-blocks-publishing) tant qu'il n'est pas corrigé.
+
+Lorsque l'[agent Mintlify](/fr/agent) modifie une page via l'API ou MCP, il apparaît comme n'importe quel autre collaborateur, avec un avatar et un curseur en direct sur sa modification la plus récente. Le curseur disparaît quand l'agent a terminé.

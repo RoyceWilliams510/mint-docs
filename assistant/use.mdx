@@ -1,0 +1,207 @@
+---
+title: "Control how the assistant appears"
+sidebarTitle: "Display"
+description: "Control where users find the AI assistant: open it from your own links, rename or restyle it, and see how users add context to a question."
+keywords: ["assistant", "keyboard shortcut", "URL parameters", "deep link", "hide assistant", "custom CSS", "assistant name", "assistant icon", "contact form", "file attachments", "troubleshooting"]
+---
+
+Users open the assistant from its button, a keyboard shortcut, or a link you share. You can rename the assistant, change how the button looks, hide it, or turn off the assistant.
+
+## Where the assistant appears
+
+The assistant appears in two locations: as a button next to the search bar and as a bar at the bottom of the page.
+
+<Columns cols={2}>
+  <Frame caption="Assistant button next to the search bar.">
+    <img
+  src="/images/assistant/assistant-button-light.png"
+  className="block dark:hidden"
+  style={{
+    width: '268px',
+    height: 'auto',
+  }}
+  alt="Search bar and assistant button in light mode."
+/>
+<img
+  src="/images/assistant/assistant-button-dark.png"
+  className="hidden dark:block"
+  style={{
+    width: '268px',
+    height: 'auto',
+  }}
+  alt="Search bar and assistant button in dark mode."
+/>
+</Frame>
+<Frame caption="Assistant button at the bottom of the page.">
+<img
+  src="/images/assistant/assistant-bar-light.png"
+  className="block dark:hidden"
+  style={{
+    width: '268px',
+    height: 'auto',
+  }}
+  alt="Assistant bar in light mode."
+/>
+<img
+  src="/images/assistant/assistant-bar-dark.png"
+  className="hidden dark:block"
+  style={{
+    width: '268px',
+    height: 'auto',
+  }}
+  alt="Assistant bar in dark mode."
+/>
+</Frame>
+</Columns>
+
+Users can also open the assistant chat panel with the keyboard shortcut <kbd>Cmd</kbd> + <kbd>I</kbd> on macOS and <kbd>Ctrl</kbd> + <kbd>I</kbd> on Windows.
+
+## Open the assistant from your own links
+
+Open the assistant from any page on your documentation site by adding the `?assistant` query parameter to the URL. Use this to deep-link to the assistant from external content like emails, support replies, in-app banners, or onboarding flows.
+
+- `?assistant`: Open the assistant chat panel without sending a message.
+- `?assistant=<message>`: Open the assistant chat panel and submit `<message>` as the user's first message. URL-encode the value so spaces and special characters survive the request.
+
+```text Examples
+https://yourdocs.mintlify.site/quickstart?assistant
+https://yourdocs.mintlify.site/quickstart?assistant=How%20do%20I%20get%20started%3F
+```
+
+To let users open the assistant with the current page as context from the page's contextual menu, add the `"assistant"` option to your [contextual menu](/ai/contextual-menu).
+
+## Add context to a question
+
+Users can give the assistant more context than their question. The assistant also knows which page the user is on.
+
+### Highlight text
+
+Highlight text on a page and click the **Add to assistant** button to open the assistant chat panel and add the highlighted text as context. You can add multiple text snippets or code blocks to the assistant's context.
+
+### Code blocks
+
+Click the **Ask Assistant** button in a code block to open the assistant chat panel and add the code block as context. You can add multiple code blocks or text snippets to the assistant's context.
+
+<Frame>
+<img src="/images/assistant/code-block-light.png" alt="The Ask Assistant button in a code block in light mode." className="block dark:hidden" />
+<img src="/images/assistant/code-block-dark.png" alt="The Ask Assistant button in a code block in dark mode." className="hidden dark:block" />
+</Frame>
+
+### File attachments
+
+Attach files to assistant messages to provide additional context.
+
+Supported file types:
+- **Images**: JPEG, PNG, GIF, WebP, SVG
+- **Documents**: PDF
+- **Code and text files**: JavaScript (`.js`, `.jsx`, `.mjs`, `.cjs`), TypeScript (`.ts`, `.tsx`), Python, HTML, CSS, Markdown, MDX, JSON, YAML, XML, SQL, CSV, plain text, shell scripts (`.sh`, `.bash`, `.env`), GraphQL, TOML, Go, Rust, Ruby, Java, Kotlin, Swift, C (`.c`, `.h`), C++ (`.cpp`, `.hpp`), C#, PHP, Lua, R, Scala
+
+Limits:
+- Maximum file size: 5 MB per attachment
+- Maximum attachments per message: 10
+
+## Hide or restyle the assistant
+
+To change how the assistant button looks, or to hide it across your site, target the `[data-layout-item="assistant-entry"]` selector in a [custom CSS](/customize/custom-scripts#add-custom-css) file. See [Custom scripts](/customize/custom-scripts#id-selectors) for the IDs of the assistant button, chat panel, and text input.
+
+### Change the assistant's name and icon
+
+To show your own name and icon on the assistant button instead of **Ask Assistant** and the sparkle icon, add this CSS to a [custom CSS](/customize/custom-scripts#add-custom-css) file. Replace `Ask Acme AI` with your button label and `/images/acme-ai.svg` with the path to an icon in your project.
+
+The CSS uses only the `[data-layout-item="assistant-entry"]` selector, so it applies to the button on desktop and mobile in every theme.
+
+```css style.css
+/* Hide the button's default icon and label */
+[data-layout-item="assistant-entry"] > * {
+  display: none;
+}
+
+/* Add your icon */
+[data-layout-item="assistant-entry"]::before {
+  content: "";
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  background: url("/images/acme-ai.svg") center / contain no-repeat;
+}
+
+/* Add your label */
+[data-layout-item="assistant-entry"]::after {
+  content: "Ask Acme AI";
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+```
+
+If your theme shows only an icon on the assistant button, remove the `::after` rule.
+
+This CSS changes only the assistant button. The chat panel, the bar at the bottom of the page, the **Ask Assistant** button on code blocks, the button's tooltip, and the labels that screen readers announce still say **Assistant**.
+
+### Style the contact form
+
+The [contact form](/assistant/support-routing#send-questions-by-email) that appears when the assistant routes a question to your team has classes you can target in a [custom CSS](/customize/custom-scripts#add-custom-css) file.
+
+| Class | Element |
+| :--- | :--- |
+| `chat-assistant-contact-form` | The form |
+| `chat-assistant-contact-form-title` | Form title |
+| `chat-assistant-contact-form-field` | Wrapper around each field's label, input, and error |
+| `chat-assistant-contact-form-label` | Field label |
+| `chat-assistant-contact-form-required` | Required marker (`*`) next to a label |
+| `chat-assistant-contact-form-input` | Text input or message box |
+| `chat-assistant-contact-form-field-error` | Error message under a field |
+| `chat-assistant-contact-form-error` | Error message when the form fails to send |
+| `chat-assistant-contact-form-dismiss-button` | Close or **Cancel** button |
+| `chat-assistant-contact-form-submit-button` | Submit button |
+| `chat-assistant-contact-form-success` | Confirmation shown after the form sends |
+
+Each field wrapper has a `data-field` attribute set to `firstName`, `lastName`, `company`, `email`, or `message`, so you can style one field at a time.
+
+```css style.css
+/* Hide the required markers */
+.chat-assistant-contact-form-required {
+  display: none;
+}
+
+/* Add a hint under the company label */
+.chat-assistant-contact-form-field[data-field="company"] .chat-assistant-contact-form-label::after {
+  content: " (your employer or project)";
+  font-weight: 400;
+}
+```
+
+Every field is required. Hiding the `*` marker doesn't make a field optional, and hiding a field with CSS prevents users from submitting the form.
+
+## Turn off the assistant
+
+To remove the assistant from your site, [disable the assistant](/assistant/configure#enable-or-disable-the-assistant) in your dashboard.
+
+## Troubleshooting
+
+<Accordion title="Assistant chat bar not visible">
+  If the assistant UI is not visible in some browsers, you may need to submit a false positive report to [EasyList](https://easylist.to). Browsers that use the EasyList Cookies List, such as Brave and Comet, sometimes block the assistant or other UI elements. The EasyList Cookies List includes a domain-specific rule that hides fixed elements on certain domains to block cookie banners. This rule inadvertently affects legitimate UI components.
+
+  Report the incorrect block to [EasyList](https://github.com/easylist/easylist) and request removal of the rule. This resolves the issue for all users once the filter list updates.
+
+</Accordion>
+
+<Accordion title="Assistant blocked on a corporate network, VPN, or firewall">
+  If the assistant loads on personal networks but fails on a work network, VPN, or other restricted network, the block occurs at the network level. Corporate proxies, VPNs, and firewalls sometimes block the outbound requests the assistant needs to make. The chat panel cannot connect even though the rest of the site loads normally.
+
+  **For readers:** Ask your IT team to allow outbound HTTPS requests to the following hostnames from your network. If you can, try the assistant from a personal network to confirm the issue is network-specific.
+
+  - `leaves.mintlify.com`: Assistant API
+  - `hcaptcha.com` and `*.hcaptcha.com`: CAPTCHA verification for the assistant
+
+  **For site owners:** If a reader reports that the assistant does not load on their corporate network or VPN, treat it as an outbound network block. It is not a problem with your documentation. Point them to the preceding hostnames and suggest that they share the list with their IT team. This allowlist applies to the visitor's device or network. You cannot configure it from your site. If you self-host behind a reverse proxy that overwrites the default CSP, see [CSP configuration](/deploy/csp-configuration) for the domains to allow.
+
+</Accordion>
+
+<Accordion title="Message contains `[REDACTED_SECRET]`">
+  The assistant scans each message for values that look like credentials, such as API keys, access tokens, passwords in URLs, JSON Web Tokens, and private keys. It also scans the text of attached files and any context sent with the message. Images are not scanned. Mintlify replaces each detected value with `[REDACTED_SECRET]` before the assistant model sees the message or Mintlify stores the conversation.
+
+  The assistant never receives the original value. It does not ask you to paste the value again. If an answer depends on the exact value, the assistant tells you that the value was redacted. To get help with a credential, describe it or replace it with a placeholder like `YOUR_API_KEY`.
+
+</Accordion>

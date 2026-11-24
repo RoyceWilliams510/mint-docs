@@ -1,0 +1,29 @@
+---
+title: "Branch missing from the web editor branch list"
+description: "Why a branch that exists in your repository does not appear in the web editor branch dropdown, and how to find it with search."
+keywords: ["branch disappeared", "branch missing", "branch dropdown incomplete", "editor branch list", "branch deleted", "web editor branches", "switch branches", "git branch not showing"]
+---
+
+If you don't see the branch dropdown in the editor toolbar at all, it may be hidden by a personal preference. See [Show the branch selector](/editor/publish#show-the-branch-selector).
+
+If a branch that exists in your repository doesn't appear in the web editor's branch dropdown, the branch is not deleted. Before you type a search, the dropdown intentionally lists only:
+
+- Branches created in the web editor that don't have a merged or closed pull request.
+- Branches with an open pull request or merge request targeting your deployment branch.
+
+## Find a branch with search
+
+Type in the dropdown's search field to find branches that aren't in the default list:
+
+- Branches pushed directly to GitHub, GitLab, or Bitbucket without a pull request appear when your search matches part of the branch name. These rows show only the branch name, without pull request status or contributors.
+- Branches whose pull request has been merged or closed appear when your search matches the branch name or pull request title.
+
+Branches with a pull request opened from a fork still don't appear, because the branch lives in the fork rather than in your repository. See [Preview deployment not created for a fork branch](/help-center/preview-deployment-not-created-for-fork-branch) for related fork limitations.
+
+## Work with a branch that has no pull request
+
+You can open a branch without a pull request by searching for it in the dropdown and selecting it. Until a pull request against your deployment branch exists, branch-specific editor features are unavailable. Automatic commits are skipped, the review view can't load a diff, and you can't rename or delete the branch from the editor.
+
+Open a pull request or merge request for the branch against your deployment branch, from a branch in the same repository rather than a fork. The branch then appears in the editor's branch dropdown with full editor support.
+
+For more on creating and switching branches, see [Work with branches](/guides/branches).

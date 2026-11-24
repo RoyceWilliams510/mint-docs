@@ -1,0 +1,90 @@
+---
+title: "Créer une automatisation personnalisée"
+description: "Créez une automatisation Mintlify déclenchée par un calendrier, un push sur un dépôt ou un événement d'intégration, avec contexte et prompt dédiés."
+keywords: ["automation", "automate", "cron", "agent", "custom automation"]
+---
+
+import GitlabAutomationSetup from '/snippets/fr/gitlab-automation-setup.mdx';
+
+<Info>
+  Les automatisations personnalisées nécessitent une [offre Enterprise](https://mintlify.com/pricing?ref=automations).
+</Info>
+
+Une automatisation personnalisée exécute l'agent selon un calendrier, en réponse à des pushes sur un dépôt, lorsqu'un événement survient dans une intégration connectée ou lorsqu'une requête webhook entrante est reçue, en utilisant les instructions que vous rédigez. Utilisez une automatisation personnalisée lorsque vous avez besoin d'un comportement non couvert par une [automatisation prédéfinie](/fr/automations/reference), ou lorsque vous souhaitez combiner votre propre prompt avec des dépôts de contexte et des intégrations spécifiques. Pour un aperçu des déclencheurs, des modes de mise à jour et des options de configuration communs à toutes les automatisations, consultez [Automatisations](/fr/automations).
+
+<div id="prerequisites">
+  ## Prérequis
+</div>
+
+- Un projet Mintlify connecté à un dépôt GitHub ou GitLab
+- Pour GitHub : la [GitHub App Mintlify](/fr/deploy/github) installée sur chaque dépôt que vous prévoyez d'utiliser dans l'automatisation
+- Pour GitHub Enterprise Server : la GitHub App que vous avez enregistrée sur votre instance (voir [GitHub Enterprise Server](/fr/deploy/ghes)) installée sur chaque dépôt que vous prévoyez d'utiliser dans l'automatisation
+- Pour GitLab : un compte GitLab connecté (voir [Configuration GitLab](#gitlab-setup) ci-dessous)
+
+<div id="create-a-custom-automation">
+  ## Créer une automatisation personnalisée
+</div>
+
+<Note>
+  L'agent s'exécute dans un sandbox isolé avec un accès Internet restreint. Il ne peut pas installer de packages ou d'outils supplémentaires à l'exécution. Les prompts qui font référence à des outils indisponibles peuvent produire des résultats inattendus ou échouer.
+</Note>
+
+1. Ouvrez vos paramètres [Automations](https://app.mintlify.com/settings/project/automations).
+2. Cliquez sur **New automation**.
+3. Sur la page de configuration, définissez le nom de l'automatisation, le déclencheur, le prompt, les dépôts de contexte, les intégrations et le mode de mise à jour. Pour plus de détails sur chaque champ, consultez [Configurations](/fr/automations/manage#configurations).
+4. Cliquez sur **Save**.
+
+<div id="write-effective-instructions">
+  ## Rédiger des instructions efficaces
+</div>
+
+Des instructions d'automatisation efficaces se concentrent sur une seule tâche et définissent un résultat clair et vérifiable. Les automatisations présentent une certaine variabilité car les agents sont non déterministes, mais des instructions bien formulées produisent des résultats plus cohérents.
+
+- **Décrivez le résultat.** Indiquez à l'agent à quoi devrait ressembler une exécution réussie.
+- **Rédigez une procédure.** Donnez à l'agent un guide étape par étape à suivre.
+- **Restez précis dans la portée.** Divisez les tâches complexes en plusieurs automatisations plutôt que de les combiner dans un seul prompt.
+
+Pour plus d'exemples et de modèles, consultez [Utiliser les automatisations](/fr/guides/use-automations).
+
+<div id="open-multiple-pull-requests-or-append-to-open-ones">
+  ### Ouvrir plusieurs pull requests ou ajouter des modifications à celles ouvertes
+</div>
+
+Chaque exécution d'une automatisation personnalisée peut ouvrir zéro, une ou plusieurs pull requests. L'agent ouvre des pull requests distinctes lorsque le travail se divise en modifications indépendantes que vous devez examiner séparément. Chaque pull request part de votre branche de déploiement, elle ne contient donc pas les commits des autres.
+
+Par défaut, chaque exécution ouvre de nouvelles pull requests. Pour que l'agent ajoute des commits à une pull request ouverte par une exécution précédente de la même automatisation, indiquez-le explicitement dans vos instructions. L'agent voit jusqu'à cinq pull requests ouvertes de l'automatisation. Il ne peut ajouter des modifications ou mettre à jour que les pull requests ouvertes par la même automatisation.
+
+```text Example instructions
+Review the API reference for outdated endpoints. If an open pull request
+from this automation already covers API reference fixes, add your changes
+to that pull request. Otherwise, open a new pull request.
+```
+
+<div id="test-your-automation">
+  ## Tester votre automatisation
+</div>
+
+Testez une nouvelle automatisation avec une exécution manuelle afin de ne pas avoir à attendre que son déclencheur se produise. Les exécutions manuelles utilisent la configuration actuelle de l'automatisation et apparaissent dans l'historique des exécutions aux côtés des exécutions automatisées. Vous ne pouvez pas exécuter manuellement les automatisations avec un déclencheur d'intégration ou de webhook ; envoyez un événement ou une requête webhook à la place. Consultez [Exécuter une automatisation manuellement](/fr/automations/manage#run-an-automation-manually) pour choisir la portée d'une exécution de test.
+
+Examinez l'exécution dans l'[historique des exécutions](/fr/automations/manage#view-run-history) pour voir le prompt, les fichiers modifiés par l'agent et toute pull request ouverte. Si le résultat ne correspond pas à vos attentes, mettez à jour vos instructions et relancez l'exécution.
+
+<GitlabAutomationSetup />
+
+<div id="edit-a-custom-automation">
+  ## Modifier une automatisation personnalisée
+</div>
+
+1. Ouvrez vos paramètres [Automations](https://app.mintlify.com/settings/project/automations).
+2. Cliquez sur le bouton <Icon icon="settings-2" /> de paramètres sur la carte de l'automatisation pour ouvrir sa page de configuration.
+3. Mettez à jour n'importe quel des champs décrits dans [Configurations](/fr/automations/manage#configurations).
+4. Cliquez sur **Save**.
+
+<div id="delete-a-custom-automation">
+  ## Supprimer une automatisation personnalisée
+</div>
+
+La suppression d'une automatisation est définitive et supprime sa configuration ainsi que l'historique de ses exécutions.
+
+1. Ouvrez vos paramètres [Automations](https://app.mintlify.com/settings/project/automations).
+2. Cliquez sur le bouton <Icon icon="settings-2" /> de paramètres sur la carte de l'automatisation pour ouvrir sa page de configuration.
+3. Cliquez sur **Delete automation** en bas de la page et confirmez.

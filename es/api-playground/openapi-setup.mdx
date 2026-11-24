@@ -1,0 +1,143 @@
+---
+title: "Configurar OpenAPI"
+sidebarTitle: "Configurar OpenAPI"
+description: "Agrega una especificación OpenAPI a tu documentación desde tu repositorio o una URL, valídala, mantenla sincronizada con tu API y controla quién puede descargarla."
+keywords: ["OpenAPI", "especificación de API", "Swagger", "openapi.json", "especificación alojada", "localhost", "mint validate", "descargar especificación"]
+---
+
+OpenAPI es un formato para describir APIs HTTP. Agrega una especificación OpenAPI a tu documentación y Mintlify generará una página para cada endpoint, con un [playground de API](/es/api-playground/overview) interactivo y ejemplos de solicitud. Cuando tu especificación cambia, las páginas se actualizan.
+
+Mintlify es compatible con documentos OpenAPI 3.0, 3.1 y 3.2 en JSON o YAML. Para usar un documento Swagger 2.0, conviértelo primero, por ejemplo con [Swagger Editor](https://editor.swagger.io/) (**Edit** > **Convert to OpenAPI 3**).
+
+<div id="add-your-specification">
+  ## Agregar tu especificación
+</div>
+
+<Steps>
+  <Step title="Agrega la especificación a tu proyecto.">
+    Coloca el archivo de especificación en tu repositorio de documentación o alójalo en una URL HTTPS pública.
+
+    ```bash
+    /your-project
+      |- docs.json
+      |- openapi.json
+    ```
+  </Step>
+  <Step title="Haz referencia a la especificación en tu navegación.">
+    Agrega un campo `openapi` a una pestaña, un anchor o un grupo en tu `docs.json`. Establécelo en la ruta del archivo en tu repositorio o en la URL de la especificación.
+
+    ```json docs.json {5}
+    "navigation": {
+      "tabs": [
+        {
+          "tab": "API reference",
+          "openapi": "openapi.json"
+        }
+      ]
+    }
+    ```
+  </Step>
+  <Step title="Previsualiza tus páginas.">
+    Ejecuta `mint dev` o abre un despliegue de vista previa. Cada endpoint de tu especificación tiene una página en la pestaña **API reference**, agrupada por tag.
+  </Step>
+</Steps>
+
+Para enumerar solo algunos endpoints, mezclar endpoints con otras páginas o usar más de una especificación, consulta [Organizar endpoints en la navegación](/es/api-playground/organize-endpoints).
+
+Mintlify solo admite `$ref` para referencias internas, dentro de un único documento OpenAPI. Empaqueta las especificaciones de varios archivos en un solo archivo antes de agregarlas.
+
+<div id="validate-your-specification">
+  ## Validar tu especificación
+</div>
+
+Ejecuta `mint validate` para comprobar tus especificaciones, páginas y navegación antes de desplegar.
+
+```bash
+mint validate
+```
+
+Para aprender el formato OpenAPI, consulta la [guía de OpenAPI de Swagger](https://swagger.io/docs/specification/v3_0/basic-structure/) y la [especificación OpenAPI](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/). La guía de Swagger cubre OpenAPI 3.0, pero la mayor parte se aplica a 3.1 y 3.2. Para conocer las diferencias, consulta [Migrating from OpenAPI 3.0 to 3.1.0](https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0) y [Upgrading from OpenAPI 3.1 to 3.2](https://learn.openapis.org/upgrading/v3.1-to-v3.2.html).
+
+<div id="use-a-specification-from-a-local-server">
+  ## Usar una especificación desde un servidor local
+</div>
+
+Durante el desarrollo local, puedes hacer referencia a una especificación servida por una API que se ejecuta en tu máquina:
+
+```json docs.json
+"navigation": {
+  "tabs": [
+    {
+      "tab": "API reference",
+      "openapi": "http://localhost:8000/openapi.json"
+    }
+  ]
+}
+```
+
+Pasa `--local-schema` para permitir que la CLI obtenga la especificación por HTTP:
+
+```bash
+mint dev --local-schema
+```
+
+Para validar la misma configuración, ejecuta `mint validate --local-schema`. Los despliegues requieren que las URLs de las especificaciones usen HTTPS.
+
+<div id="keep-a-hosted-specification-in-sync">
+  ## Mantener sincronizada una especificación alojada
+</div>
+
+Si tu campo `openapi` apunta a una URL, tu documentación solo se vuelve a compilar cuando haces push a tu repositorio de documentación. Los cambios en la especificación de la URL no activan una nueva compilación.
+
+Para actualizar tu documentación cuando cambie tu especificación, llama al endpoint [Trigger deployment](/es/api/update/trigger) desde el job de CI que publica tu especificación. Llámalo después de que la nueva especificación esté disponible, para que la compilación no obtenga un archivo incompleto.
+
+Las compilaciones obtienen la URL desde la internet pública sin credenciales. Si tu especificación está detrás de una autenticación o en una red privada, súbela a tu repositorio de documentación. Consulta [Corregir el error "Failed to load OpenAPI file"](/es/help-center/openapi-url-fetch-fails-during-build).
+
+Para cambiar una especificación que no es tuya, como una que publica otro equipo, usa [overlays](/es/api-playground/overlays).
+
+<div id="control-access-to-your-specification">
+  ## Controlar el acceso a tu especificación
+</div>
+
+Si tu sitio no requiere autenticación, Mintlify sirve cada archivo JSON y YAML de tu repositorio de documentación en su ruta dentro de tu dominio de documentación, como `https://docs.example.com/openapi.json`. Esto incluye las especificaciones a las que `docs.json` no hace referencia. Elimina de tu repositorio los archivos de especificación que no quieras hacer públicos.
+
+[`x-hidden` y `x-excluded`](/es/api-playground/organize-endpoints#hide-or-exclude-endpoints) mantienen los endpoints fuera de tu documentación, pero el archivo de especificación los sigue conteniendo.
+
+<div id="let-visitors-download-your-spec">
+  ### Permitir que los visitantes descarguen tu especificación
+</div>
+
+Para agregar la opción **Download API spec** al [menú contextual de la página](/es/organize/settings-structure#contextual), agrega `"download-spec"` a `contextual.options` en tu `docs.json`:
+
+```json docs.json
+"contextual": {
+  "options": ["copy", "download-spec", "chatgpt", "claude"]
+}
+```
+
+La opción descarga tu especificación OpenAPI. Si tu proyecto tiene más de una especificación, la descarga es un archivo zip llamado `api-specs.zip`. En sitios con [autenticación](/es/deploy/authentication-setup), solo los lectores que han iniciado sesión pueden descargar la especificación.
+
+Al habilitar `download-spec` también se publica un catálogo de API [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) en `/.well-known/api-catalog`. El catálogo enlaza a cada especificación OpenAPI de tu `docs.json`, para que los agentes de IA puedan encontrar tu API sin rastrear tu documentación. Sin `download-spec`, `/.well-known/api-catalog` devuelve un 404.
+
+<Warning>
+  La especificación descargada es el archivo completo. No filtra endpoints ni campos por [grupo de usuarios](/es/create/personalization#openapi-content-filtering). Cualquier lector que haya iniciado sesión y pueda abrir el menú contextual obtiene todos los endpoints y esquemas. No habilites `download-spec` en un sitio autenticado si tu especificación contiene endpoints o campos que consideras sensibles.
+</Warning>
+
+<div id="next-steps">
+  ## Próximos pasos
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Configurar el playground" icon="play" href="/es/api-playground/configure-playground">
+    Configura tu URL base y la autenticación para que los lectores puedan enviar solicitudes.
+  </Card>
+  <Card title="Organizar endpoints" icon="list-tree" href="/es/api-playground/organize-endpoints">
+    Agrupa endpoints, combina especificaciones y oculta endpoints.
+  </Card>
+  <Card title="URLs y títulos de endpoints" icon="link" href="/es/api-playground/endpoint-urls">
+    Controla las URLs de las páginas y mantenlas estables cuando tu especificación cambie.
+  </Card>
+  <Card title="Personalizar páginas de endpoints" icon="pencil" href="/es/api-playground/customize-endpoint-pages">
+    Cambia los títulos de las páginas, agrega contenido y crea páginas para endpoints individuales.
+  </Card>
+</CardGroup>

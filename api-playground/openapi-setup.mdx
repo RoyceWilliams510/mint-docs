@@ -1,0 +1,129 @@
+---
+title: "Set up OpenAPI"
+sidebarTitle: "Set up OpenAPI"
+description: "Add an OpenAPI specification to your docs from your repository or a URL, validate it, keep it in sync with your API, and control who can download it."
+keywords: ["OpenAPI", "API specification", "Swagger", "openapi.json", "hosted spec", "localhost", "mint validate", "download spec"]
+---
+
+OpenAPI is a format for describing HTTP APIs. Add an OpenAPI specification to your docs, and Mintlify generates a page for every endpoint, with an interactive [API playground](/api-playground/overview) and request examples. When your specification changes, the pages update.
+
+Mintlify supports OpenAPI 3.0, 3.1, and 3.2 documents in JSON or YAML. To use a Swagger 2.0 document, convert it first, for example with [Swagger Editor](https://editor.swagger.io/) (**Edit** > **Convert to OpenAPI 3**).
+
+## Add your specification
+
+<Steps>
+  <Step title="Add the specification to your project.">
+    Put the specification file in your docs repository, or host it at a public HTTPS URL.
+
+    ```bash
+    /your-project
+      |- docs.json
+      |- openapi.json
+    ```
+  </Step>
+  <Step title="Reference the specification in your navigation.">
+    Add an `openapi` field to a tab, anchor, or group in your `docs.json`. Set it to the file's path in your repository or the specification's URL.
+
+    ```json docs.json {5}
+    "navigation": {
+      "tabs": [
+        {
+          "tab": "API reference",
+          "openapi": "openapi.json"
+        }
+      ]
+    }
+    ```
+  </Step>
+  <Step title="Preview your pages.">
+    Run `mint dev`, or open a preview deployment. Each endpoint in your specification has a page in the **API reference** tab, grouped by tag.
+  </Step>
+</Steps>
+
+To list only some endpoints, mix endpoints with other pages, or use more than one specification, see [Organize endpoints in navigation](/api-playground/organize-endpoints).
+
+Mintlify supports `$ref` for internal references only, within a single OpenAPI document. Bundle multi-file specifications into one file before you add them.
+
+## Validate your specification
+
+Run `mint validate` to check your specifications, pages, and navigation before you deploy.
+
+```bash
+mint validate
+```
+
+To learn the OpenAPI format, see [Swagger's OpenAPI guide](https://swagger.io/docs/specification/v3_0/basic-structure/) and the [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/). Swagger's guide covers OpenAPI 3.0, but most of it applies to 3.1 and 3.2. For the differences, see [Migrating from OpenAPI 3.0 to 3.1.0](https://www.openapis.org/blog/2021/02/16/migrating-from-openapi-3-0-to-3-1-0) and [Upgrading from OpenAPI 3.1 to 3.2](https://learn.openapis.org/upgrading/v3.1-to-v3.2.html).
+
+## Use a specification from a local server
+
+During local development, you can reference a specification served by an API running on your machine:
+
+```json docs.json
+"navigation": {
+  "tabs": [
+    {
+      "tab": "API reference",
+      "openapi": "http://localhost:8000/openapi.json"
+    }
+  ]
+}
+```
+
+Pass `--local-schema` to let the CLI fetch the specification over HTTP:
+
+```bash
+mint dev --local-schema
+```
+
+To validate the same configuration, run `mint validate --local-schema`. Deployments require specification URLs to use HTTPS.
+
+## Keep a hosted specification in sync
+
+If your `openapi` field points to a URL, your docs rebuild only when you push to your docs repository. Changes to the specification at the URL don't trigger a rebuild.
+
+To update your docs when your specification changes, call the [Trigger deployment](/api/update/trigger) endpoint from the CI job that publishes your specification. Call it after the new specification is live, so the build doesn't fetch a partial file.
+
+Builds fetch the URL from the public internet without credentials. If your specification is behind authentication or a private network, commit it to your docs repository instead. See [Fix "Failed to load OpenAPI file" error](/help-center/openapi-url-fetch-fails-during-build).
+
+To change a specification you don't own, such as one another team publishes, use [overlays](/api-playground/overlays).
+
+## Control access to your specification
+
+If your site doesn't require authentication, Mintlify serves every JSON and YAML file in your docs repository at its path on your docs domain, such as `https://docs.example.com/openapi.json`. This includes specifications that `docs.json` doesn't reference. Remove specification files you don't want public from your repository.
+
+[`x-hidden` and `x-excluded`](/api-playground/organize-endpoints#hide-or-exclude-endpoints) keep endpoints out of your docs, but the specification file still contains them.
+
+### Let visitors download your spec
+
+To add a **Download API spec** option to the [page context menu](/organize/settings-structure#contextual), add `"download-spec"` to `contextual.options` in your `docs.json`:
+
+```json docs.json
+"contextual": {
+  "options": ["copy", "download-spec", "chatgpt", "claude"]
+}
+```
+
+The option downloads your OpenAPI specification. If your project has more than one specification, the download is a zip file named `api-specs.zip`. On sites with [authentication](/deploy/authentication-setup), only signed-in readers can download the specification.
+
+Enabling `download-spec` also publishes an [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) API catalog at `/.well-known/api-catalog`. The catalog links to each OpenAPI specification in your `docs.json`, so AI agents can find your API without crawling your docs. Without `download-spec`, `/.well-known/api-catalog` returns a 404.
+
+<Warning>
+  The downloaded specification is the full file. It doesn't filter endpoints or fields by [user group](/create/personalization#openapi-content-filtering). Any signed-in reader who can open the context menu gets every endpoint and schema. Don't enable `download-spec` on an authenticated site if your specification contains endpoints or fields you consider sensitive.
+</Warning>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Configure the playground" icon="play" href="/api-playground/configure-playground">
+    Set your base URL and authentication so readers can send requests.
+  </Card>
+  <Card title="Organize endpoints" icon="list-tree" href="/api-playground/organize-endpoints">
+    Group endpoints, combine specifications, and hide endpoints.
+  </Card>
+  <Card title="Endpoint URLs and titles" icon="link" href="/api-playground/endpoint-urls">
+    Control page URLs and keep them stable when your specification changes.
+  </Card>
+  <Card title="Customize endpoint pages" icon="pencil" href="/api-playground/customize-endpoint-pages">
+    Change page titles, add content, and create pages for individual endpoints.
+  </Card>
+</CardGroup>

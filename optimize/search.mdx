@@ -1,0 +1,162 @@
+---
+title: "Configure in-product search ranking, results, and filters"
+sidebarTitle: "Search"
+description: "Configure in-product search on your Mintlify docs site: ranking boosts, maximum results per query, full-page search results, and search filters."
+keywords: ["search", "search ranking", "search boost", "boost", "search prioritization", "maximum search results", "max results", "searchable", "exclude from search", "filters", "full-page search", "search results page"]
+---
+
+Configure how the search bar on your Mintlify-hosted documentation site behaves. These settings only affect in-product search. They do not change how external search engines index your pages.
+
+## Boost search ranking
+
+Use `boost` to bias the in-product search ranking of specific pages or sections. The value is a numeric multiplier applied to each chunk's relevance score: `boost: 3` makes a chunk three times as relevant as it would be without a boost.
+
+### Boost a single page
+
+Set `boost` in a page's [frontmatter](/organize/pages) to multiply its search ranking.
+
+```mdx
+---
+title: "Custom domain"
+description: "Connect your custom domain to your Mintlify documentation."
+boost: 3
+---
+```
+
+### Boost a navigation group
+
+Set `boost` on a group in your `docs.json` navigation to apply the multiplier to every page under it.
+
+```json
+{
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get started",
+        "boost": 5,
+        "pages": [
+          "quickstart",
+          "concepts"
+        ]
+      }
+    ]
+  }
+}
+```
+
+A page inherits the boost factor from its nearest ancestor that sets one. A child page or nested group can override the inherited boost by setting its own `boost` value. A page's frontmatter `boost` always wins over a value inherited from the navigation.
+
+### De-prioritize content
+
+Use a value below `1` to push pages further down in search results. For example, `boost: 0.5` halves a page's relevance score relative to other pages. A `boost` of `1` is equivalent to no boost.
+
+```mdx
+---
+title: "Deprecated API"
+description: "Documentation for the deprecated v1 API."
+boost: 0.25
+---
+```
+
+<Note>
+  Boost factors compose with the existing relevance score. Use them sparingly. Large multipliers can cause less-relevant pages to dominate search results and degrade overall search quality.
+</Note>
+
+### Recommended boost range
+
+`boost` accepts any positive number. In practice, keep values between `0.1` and `10`:
+
+- `0.1`–`0.9`: de-prioritize legacy, deprecated, or supporting content.
+- `1`: no change (equivalent to omitting `boost`).
+- `2`–`5`: prioritize a key landing page, quickstart, or heavily used reference.
+- `5`–`10`: reserve for a handful of top-level pages that should almost always appear first.
+
+Avoid values greater than `10`. Very large multipliers overwhelm the underlying relevance score and cause boosted pages to appear in search results even when they don't match the query well.
+
+### How boost interacts with title matches
+
+Search orders results in two steps:
+
+1. Search groups results by how closely they match the query. Pages whose title matches the query form the highest groups, followed by matches in section headings and exact phrase matches in the text. Pages that only partially match the query form the lowest group.
+2. Within each group, search orders results by relevance score, which `boost` multiplies.
+
+A boost reorders results within a group but doesn't move a result into a higher group. A boosted page whose title doesn't contain the search term still ranks below a page with no boost whose title does. To make a page appear first for a term, include the term in the page's `title`. Adding the term to `keywords` improves the page's relevance score but doesn't count as a title match.
+
+## Exclude a page from search
+
+Pages are searchable by default. The `searchable` field is optional and defaults to `true`. Set `searchable: false` in a page's [frontmatter](/organize/pages) to exclude it from your documentation site's search results. `searchable` is a page-level field only. To exclude every page under a navigation tab or group, hide the tab or group instead. See [Hidden pages](/organize/hidden-pages) for tab- and group-level controls.
+
+```mdx
+---
+title: "Internal notes"
+description: "Reference material we don't want surfacing in search."
+searchable: false
+---
+```
+
+Unlike `noindex`, `searchable: false` doesn't affect external SEO. The page is still:
+
+- Crawlable by external search engines
+- Listed in your `sitemap.xml`
+
+It's removed from your documentation site's search results and the AI assistant context.
+
+Use `searchable: false` for pages that should stay reachable through direct links or external search engines but shouldn't surface when users search inside your docs. Examples include deep reference pages, legacy content, and supporting material that would otherwise crowd out more relevant results.
+
+To exclude a page from both in-product search and external indexing, use [`noindex: true`](/optimize/seo#disable-indexing) instead.
+
+## Maximum search results
+
+Control how many results the search bar returns per query from your dashboard. The default is `6` results. You can set any value between `1` and `100`.
+
+Navigate to the [Site](https://app.mintlify.com/settings/project/site) settings page in your dashboard. In the "Search" section, set **Results per query** to your desired value.
+
+Higher values surface more matches per query, which is useful for sites with broad topic coverage where users expect to scan many candidates. Lower values keep the results panel compact and push users toward the top-ranked match.
+
+## Result snippets
+
+Enable **Result snippets** to show a single-line preview of matching content under each search result, in addition to the page title and breadcrumbs. The snippet centers on the first match of the user's query and highlights the matching terms. When a result has no query match, or the user hasn't typed a query yet, the snippet falls back to the start of the page's content.
+
+Result snippets help users disambiguate results that share similar titles by showing where the query appears in context. Leave them off if you prefer a more compact results panel.
+
+Enable or disable result snippets on the [Site](https://app.mintlify.com/settings/project/site) settings page in your dashboard. The setting is off by default.
+
+## Full-page search results
+
+Enable **Full-page search results** to give your site a dedicated search results page at `/search`. When enabled, the search bar shows a **Search for "query"** option that opens the results page for the current query. The page shows up to 50 results, 10 per page, and the URL includes the query (for example, `/search?q=authentication`) so users can bookmark or share it.
+
+On sites with multiple [languages](/organize/navigation#languages), each non-default language gets its own results page at `/{language}/search`, such as `/fr/search`.
+
+Enable or disable full-page search results on the [Site](https://app.mintlify.com/settings/project/site) settings page in your dashboard. The setting is off by default.
+
+<Warning>
+  Enabling full-page search results reserves the `/search` path. If your site already has a page at `/search` or `/{language}/search`, the built-in results page replaces it. Move that page to a different path before enabling this setting.
+</Warning>
+
+Mintlify excludes the results page from external search engines with `noindex`.
+
+## Search filters
+
+<Info>
+  Search filters require an [Enterprise plan](https://mintlify.com/pricing?ref=search-filters).
+</Info>
+
+Search filters add product, version, and section dropdowns to search results so users can narrow results to a single product, version, or navigation tab. Filters are useful for sites that maintain distinct products, versions, or tabs, where a search query might otherwise return matches across content the user isn't looking for.
+
+Enable or disable search filters on the [Site](https://app.mintlify.com/settings/project/site) settings page in your dashboard.
+
+Which dropdowns appear depends on your navigation configuration.
+
+- The **Product** filter appears when your navigation defines more than one [product](/organize/navigation#products).
+- The **Version** filter appears when your navigation defines [versions](/organize/navigation#versions).
+- The **Section** filter appears when your navigation defines [tabs](/organize/navigation#tabs). It lists the tabs that contain pages in the selected product and version. Hidden tabs and tabs that only link to external pages don't appear.
+
+If your navigation has no products, versions, or tabs, enabling search filters has no visible effect.
+
+### Filters on the search results page
+
+When you also enable [full-page search results](#full-page-search-results), the results page shows the same **Product**, **Version**, and **Section** filters as the search bar. If a user selects filters in the search bar and then opens the results page, the results page keeps those filters.
+
+The results page URL includes the selected filters, for example `/search?q=authentication&product=api&version=v2&tab=Guides`. Users can bookmark or share the URL and get the same filtered results.
+
+Changing the **Product** filter clears the **Version** and **Section** filters, because each product can have its own versions and tabs. Changing the **Version** filter clears the **Section** filter when the selected tab doesn't exist in the new version.

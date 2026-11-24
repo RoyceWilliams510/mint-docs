@@ -1,0 +1,65 @@
+---
+title: "我可以重命名我的项目或组织吗？"
+description: "在控制台中重命名项目或组织，并了解为什么子域名和组织 slug 只能通过删除并重新创建来更改。"
+keywords: ["rename project", "change project name", "rename deployment", "change deployment name", "rename organization", "change organization name", "change subdomain", "project name", "delete and recreate"]
+---
+
+Mintlify 中有些名称可以随时更改，有些则在创建时固定：
+
+- **可更改**：组织名称、项目名称、`docs.json` 中的文档站点名称，以及自定义域名。
+- **固定**：项目的子域名和组织的 slug。要更改这两者，只能删除后重新创建。
+
+<div id="rename-your-project">
+## 重命名项目
+</div>
+
+项目名称是你的项目在控制台中的展示名称。修改方法：
+
+1. 进入控制台的[站点设置](https://app.mintlify.com/settings/project/site)页面。
+2. 在 **Project name** 字段中输入新名称。名称长度为 3 到 100 个字符，且必须在同一行内。你可以使用空格、标点符号、非拉丁字符和表情符号。保存时，Mintlify 会去除名称首尾的空格。
+3. 保存更改。
+
+重命名项目需要具有更新项目的权限。如果该字段不可编辑，请联系组织的 admin。参见[角色和权限](/zh/dashboard/roles)。
+
+<div id="change-your-projects-subdomain">
+## 更改项目的子域名
+</div>
+
+子域名用于标识你的项目。它出现在 `<subdomain>.mintlify.site` URL 和控制台 URL `app.mintlify.com/<org>/<subdomain>` 中。项目创建后无法更改子域名。
+
+要使用不同的子域名，请先用想要的名称创建一个新项目，然后删除旧项目：
+
+1. 创建一个连接到同一仓库的新项目。
+2. 如果你使用自定义域名，先从旧项目中移除，再添加到新项目。参见[自定义域名](/zh/customize/custom-domain)。
+3. 在组织设置的[General](https://app.mintlify.com/settings/organization/general)页面的**危险区域**部分中删除旧项目。参见[删除项目](/zh/deploy/deployments#delete-a-project)。
+
+<Warning>
+  删除项目是永久性的，会移除所有项目数据，包括分析历史记录和所有关联的预览部署。控制台设置不会转移到新项目，请在创建新项目后重新配置。
+</Warning>
+
+<div id="rename-your-organization">
+## 重命名组织
+</div>
+
+组织名称是显示在控制台中的展示名称。修改方法：
+
+1. 进入控制台的[组织常规设置](https://app.mintlify.com/settings/organization/general)页面。
+2. 在 **Organization** 下的 **Name** 字段中输入新名称。
+3. 选择 **Save**。
+
+重命名组织需要具有更新组织的权限。如果该字段不可编辑，请联系组织的 admin。参见[角色和权限](/zh/dashboard/roles)。
+
+<div id="change-your-organizations-slug">
+## 更改组织的 slug
+</div>
+
+组织的 slug 是显示在控制台 URL `app.mintlify.com/<org>/<subdomain>` 中的唯一标识符。组织创建后无法更改 slug。要使用不同的 slug，请创建一个新组织，在其中重新创建你的项目，然后在组织设置的[General](https://app.mintlify.com/settings/organization/general)页面的**危险区域**部分中删除旧组织。删除组织不可撤销，并且需要 [admin 角色](/zh/dashboard/roles)。
+
+<div id="what-your-readers-see">
+## 读者看到的内容
+</div>
+
+读者很少能看到你的子域名和组织名称，因此你可能不需要重命名任何内容：
+
+- 文档上显示的站点名称来自 `docs.json` 中的 [`name` 字段](/zh/organize/settings-reference#name-必需)，可以随时更改。
+- 读者访问的 URL 可以是[自定义域名](/zh/customize/custom-domain)，例如 `docs.example.com`，可以随时添加或更改。

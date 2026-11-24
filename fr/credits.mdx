@@ -1,0 +1,204 @@
+---
+title: "Tarification par crédits"
+description: "Découvrez le prix fixe en crédits de chaque action d'IA, votre solde de crédits partagé et la facturation Mintlify des paliers, dépassements et reports."
+keywords: ["crédits", "facturation", "tarification", "organisation", "assistant", "agent", "automatisations", "narration", "audio", "paliers", "dépassements", "reports", "utilisation", "export", "CSV", "journal d'activité"]
+---
+
+Les fonctionnalités d'IA de Mintlify fonctionnent avec des crédits. Chaque action a un prix fixe en crédits, et vous ne payez que lorsqu'une action produit un résultat. Votre organisation dispose d'un solde de crédits mensuel unique, partagé entre tous les projets et tous les membres de votre équipe. Gérez-le depuis la page [Utilisation](https://app.mintlify.com/settings/organization/usage) de votre tableau de bord.
+
+<div id="your-shared-balance">
+  ## Votre solde partagé
+</div>
+
+Votre solde provient de trois sources :
+
+- **Vos forfaits.** Chaque forfait Pro de votre organisation apporte 10 000 crédits par mois. Une organisation avec deux projets Pro commence chaque mois avec 20 000 crédits.
+- **Paliers.** Achetez un palier lorsque vous avez besoin de plus que ce qu'incluent vos forfaits. Un palier est un achat unique pour l'organisation plutôt qu'un par projet, et n'importe quel projet peut le consommer.
+- **Report.** Les crédits non utilisés sont transférés au mois suivant et rejoignent le même solde.
+
+Chaque projet et chaque membre de l'équipe puise dans ce solde partagé, sauf si vous [allouez des crédits](#allocations) à un projet. La page [Utilisation](https://app.mintlify.com/settings/organization/usage) affiche le solde à l'échelle de l'organisation, avec le détail de l'utilisation par projet en dessous.
+
+Chaque projet dispose de son propre paramètre de dépassement, vous pouvez donc configurer des comportements de dépassement différents pour chacun.
+
+<Note>
+  Les crédits étaient auparavant suivis par projet. Ils sont désormais mutualisés au niveau de l'organisation.
+</Note>
+
+<div id="what-uses-credits">
+  ## Ce qui consomme des crédits
+</div>
+
+Chaque action d'IA a un prix fixe en crédits. Les actions qui ne produisent rien ne coûtent rien.
+
+| Action | Crédits |
+|:-------|:--------|
+| L'assistant répond à une question | 25 |
+| L'assistant ne peut pas répondre à une question | 0 |
+| La narration génère l'audio d'une page | 50 |
+| Une automatisation met à jour votre documentation | 250 |
+| Une automatisation ne trouve rien à mettre à jour | 0 |
+| Autopilot ouvre ou met à jour une pull request de lui-même | 250 |
+| Autopilot ouvre ou met à jour une pull request que vous demandez | 0 |
+| Autopilot ne trouve rien à mettre à jour | 0 |
+
+Le prix est le même quels que soient le volume de contenu que l'agent lit, le nombre de passes qu'il effectue ou la durée de l'action. Les conversations avec l'agent dans Slack sont gratuites et ne consomment jamais de crédits. L'agent de l'éditeur web est également gratuit.
+
+<div id="assistant-answers">
+  ### Réponses de l'assistant
+</div>
+
+Une réponse est un message qui traite la question de l'utilisateur. Chaque réponse coûte 25 crédits, que la question provienne de votre site de documentation ou de l'[API de l'assistant](/fr/api/assistant/create-assistant-message).
+
+Si l'assistant ne trouve pas de réponse dans votre documentation et le signale, le message ne coûte rien.
+
+<div id="page-narration">
+  ### Narration des pages
+</div>
+
+La [narration](/fr/assistant/narration) coûte 50 crédits lorsque Mintlify génère avec succès l'audio d'une page. Le premier lecteur qui écoute la page déclenche la génération à la demande. Une fois la génération terminée, Mintlify met en cache l'audio et les données de synchronisation, de sorte que les lectures suivantes, par n'importe quel lecteur, ne consomment aucun crédit supplémentaire.
+
+Lorsque vous modifiez le contenu narrable publié d'une page, l'auditeur suivant génère un enregistrement mis à jour pour 50 crédits supplémentaires. Les générations échouées ne coûtent rien. Si plusieurs lecteurs lancent la narration avant que la première génération soit terminée et mise en cache, chaque requête peut générer de l'audio et consommer 50 crédits.
+
+<div id="automation-updates">
+  ### Mises à jour des automatisations
+</div>
+
+Une mise à jour est une exécution qui modifie votre documentation, soit en ouvrant ou en mettant à jour une pull request, soit en committant directement dans votre dépôt, selon le [mode de mise à jour](/fr/guides/use-automations#update-mode) de l'automatisation. Chaque mise à jour coûte 250 crédits, que l'exécution démarre selon une planification, par un déclencheur, manuellement ou via l'API. Une exécution qui modifie plusieurs pages compte comme une seule mise à jour.
+
+Une exécution qui examine votre dépôt et ne trouve rien à mettre à jour ne coûte rien. Les exécutions qui échouent ne coûtent rien non plus.
+
+<div id="autopilot-updates">
+  ### Mises à jour d'Autopilot
+</div>
+
+Chaque exécution qu'[Autopilot](/fr/autopilot) lance de lui-même, par exemple après la fusion d'une modification de code ou selon une planification, coûte 250 crédits lorsqu'elle ouvre ou met à jour une pull request. Une exécution qui modifie plusieurs pages compte comme une seule mise à jour. Si Autopilot divise une exécution en parties parallèles, chaque partie qui ouvre ou met à jour une pull request coûte 250 crédits. Les exécutions qui n'ouvrent ni ne mettent à jour de pull request ne coûtent rien.
+
+Le travail que vous demandez directement à Autopilot ne coûte rien, même lorsqu'il ouvre ou met à jour une pull request. Cela inclut les discussions sur la page Autopilot, les conversations Slack, les réponses par e-mail et les commentaires sur les pull requests d'Autopilot.
+
+<div id="editor-agent-and-slack-agent">
+  ### Agent de l'éditeur et agent Slack
+</div>
+
+Les forfaits Pro et Enterprise incluent l'[agent de l'éditeur](/fr/editor/agent) et l'[agent dans Slack](/fr/agent/slack). Leur utilisation ne consomme pas de crédits. L'agent dans Slack fonctionne avec Autopilot : il cesse donc de répondre aux nouveaux messages lorsque votre organisation n'a plus de crédits et que le projet n'autorise pas les dépassements.
+
+<Note>
+  Avant le 4 septembre 2026, les coûts en crédits variaient selon les tokens utilisés par chaque exécution. Les prix fixes s'appliquent automatiquement à chaque action à partir de cette date. Votre forfait, ses crédits inclus et le prix par crédit restent les mêmes.
+</Note>
+
+<div id="plan-availability">
+  ## Disponibilité des forfaits
+</div>
+
+Les crédits sont disponibles sur les forfaits Pro et Enterprise.
+
+Le forfait Free n'inclut pas de crédits, et vous ne pouvez pas y acheter de crédits. Pour utiliser l'assistant, l'agent, Autopilot ou la narration, passez au forfait Pro ou Enterprise.
+
+<Note>
+  Les clients disposant de forfaits de crédits hérités conservent leurs forfaits de crédits et tarifs existants. Les paliers ci-dessous s'appliquent au forfait Pro.
+</Note>
+
+<div id="credit-add-ons">
+  ## Paliers de crédits
+</div>
+
+Chaque palier ajoute des crédits au solde mensuel de votre organisation, en plus de ce qu'incluent vos forfaits.
+
+| Crédits supplémentaires par mois | Coût mensuel |
+|:------------------------|:-------------|
+| 15,000 | $145 |
+| 40,000 | $370 |
+| 90,000 | $800 |
+
+Un projet Pro unique avec le palier de 40 000 crédits dispose de 50 000 crédits par mois. Les paliers plus élevés coûtent moins cher par crédit : le palier de 90 000 crédits revient à environ 8 % de moins par crédit que celui de 15 000 crédits, et les trois paliers coûtent moins par crédit que le tarif de dépassement de 0,01 $.
+
+Ajoutez ou modifiez un palier dans la section **Credit packages** de la page [Utilisation](https://app.mintlify.com/settings/organization/usage). Les changements prennent effet immédiatement, et Mintlify proratise les frais sur votre cycle de facturation en cours.
+
+Le palier de 90 000 crédits est le plus important que vous puissiez acheter vous-même. Pour davantage, [contactez l'équipe commerciale](https://www.mintlify.com/contact/sales) pour discuter d'un forfait de crédits personnalisé, disponible uniquement sur les forfaits Enterprise.
+
+Pour les informations tarifaires les plus à jour, consultez la [page Tarifs](https://mintlify.com/pricing).
+
+<div id="spending-controls">
+  ## Contrôles de dépenses
+</div>
+
+<div id="overages">
+  ### Dépassements
+</div>
+
+Les dépassements permettent aux fonctionnalités d'IA d'un projet de continuer à fonctionner après que votre organisation a épuisé ses crédits mensuels, au tarif de 0,01 $ par crédit supplémentaire. Lorsque les dépassements sont désactivés, ces fonctionnalités sont suspendues jusqu'à la réinitialisation de votre solde.
+
+Les dépassements sont désactivés par défaut et se configurent par projet, de sorte que chaque projet décide de ce qui se passe lorsque le solde partagé est épuisé. Activez-les avec l'interrupteur **Overage** sur la carte de chaque projet, dans la section **Usage** de la page [Facturation](https://app.mintlify.com/settings/organization/billing).
+
+Lorsque vous activez les dépassements pour un projet, choisissez une limite de dépenses :
+
+- **Limit spend** : Définissez un montant maximal de dépassement en dollars. Lorsque le projet l'atteint, ses fonctionnalités d'IA sont suspendues jusqu'au prochain cycle de facturation.
+- **No spend limit** : Facturez chaque crédit de dépassement sans plafond.
+
+Chaque palier coûte moins cher par crédit que le tarif de dépassement de 0,01 $. Utilisez les dépassements pour absorber un mois occasionnellement chargé. Si votre organisation dépasse régulièrement son solde, achetez un palier ou passez à un palier supérieur à la place.
+
+<div id="usage-alerts">
+  ### Alertes d'utilisation
+</div>
+
+Définissez le seuil **Alert** dans la section **Usage** de la page [Facturation](https://app.mintlify.com/settings/organization/billing) pour envoyer un e-mail aux administrateurs de votre organisation lorsque l'utilisation totale atteint un pourcentage donné de son solde. Les alertes couvrent l'organisation dans son ensemble plutôt qu'un projet individuel.
+
+<div id="allocations">
+  ### Allocations
+</div>
+
+Les allocations réservent une partie des crédits mensuels de votre organisation à un projet spécifique, afin que les autres projets ne puissent pas les épuiser. Définissez une **Allocation** sur la carte d'un projet, dans la section **Usage** de la page [Facturation](https://app.mintlify.com/settings/organization/billing). Les allocations sont disponibles avec les forfaits Pro et Enterprise.
+
+Un projet doté d'une allocation consomme d'abord ses crédits alloués, puis les crédits partagés qui ne sont alloués à aucun projet, puis les dépassements si vous les activez. Les autres projets ne peuvent pas consommer les crédits alloués à un projet.
+
+Le total des allocations de tous vos projets ne peut pas dépasser les crédits inclus de votre organisation. Si vos crédits inclus diminuent, par exemple lorsque vous supprimez un palier, Mintlify réduit les allocations pour qu'elles tiennent dans ce total et ne réserve qu'une partie du montant demandé pour chaque projet.
+
+Pour supprimer une allocation, définissez-la sur 0. Les crédits retournent dans le solde partagé. Vous pouvez supprimer une allocation avec n'importe quel forfait.
+
+<div id="rollovers">
+  ### Reports
+</div>
+
+Jusqu'à 50 % des crédits non utilisés sont reportés sur le mois suivant, de sorte que le maximum dont votre organisation peut disposer un mois donné est de 1,5 fois son solde mensuel. Les reports sont réinitialisés lorsque vous changez de palier.
+
+<div id="estimate-your-usage">
+  ## Estimer votre utilisation
+</div>
+
+Comme chaque action a un prix fixe, vous pouvez projeter votre utilisation à partir du volume seul :
+
+- Multipliez par 25 le nombre de questions auxquelles vous prévoyez que l'assistant réponde chaque mois.
+- Multipliez par 250 le nombre d'exécutions d'Autopilot et d'automatisations qui, selon vos prévisions, mettront à jour votre documentation chaque mois.
+- Multipliez par 50 le nombre de pages nouvelles ou mises à jour que vos lecteurs écouteront, selon vos prévisions, chaque mois.
+
+Par exemple, une organisation dont l'assistant répond à 200 questions et dont Autopilot effectue 12 mises à jour dans le mois utilise 8 000 crédits, ce qui tient dans les 10 000 crédits mensuels d'un seul forfait Pro.
+
+La section **Activity log** de la page [Utilisation](https://app.mintlify.com/settings/organization/usage) liste chaque action et les crédits qu'elle a consommés, afin que vous puissiez comparer votre projection à l'utilisation réelle.
+
+<div id="export-usage-activity">
+  ## Exporter l'activité d'utilisation
+</div>
+
+Exportez votre journal d'activité d'utilisation au format CSV pour une analyse approfondie, du reporting ou l'archivage.
+
+1. Rendez-vous sur la page [Utilisation](https://app.mintlify.com/settings/organization/usage) de votre tableau de bord.
+2. Facultativement, ajustez la plage de dates dans la barre d'outils pour modifier la période couverte par l'export.
+3. Dans la section **Activity log**, cliquez sur **Export to CSV**.
+4. Mintlify vous envoie par e-mail un lien de téléchargement une fois l'export prêt. Le lien expire après 72 heures.
+
+Le CSV exporté inclut la date, le produit et les crédits consommés pour chaque événement de la plage sélectionnée.
+
+<div id="reduce-credit-usage">
+  ## Réduire la consommation de crédits
+</div>
+
+<div id="run-automations-on-a-schedule">
+  ### Exécuter les automatisations selon une planification
+</div>
+
+Les audits SEO, les vérifications du style rédactionnel et la détection des liens cassés n'ont pas besoin d'être exécutés à chaque changement de code. Une planification quotidienne ou hebdomadaire regroupe plusieurs modifications en une seule mise à jour, de sorte que vous payez 250 crédits une seule fois au lieu d'une fois par modification. Les exécutions qui ne trouvent rien à mettre à jour sont gratuites, donc une planification qui s'exécute plus souvent que votre contenu ne change n'entraîne pas de coût supplémentaire. Le compromis est un délai entre le moment où le contenu change et celui où l'automatisation agit.
+
+<div id="find-whats-consuming-your-credits">
+  ### Identifier ce qui consomme vos crédits
+</div>
+
+La page [Utilisation](https://app.mintlify.com/settings/organization/usage) ventile l'utilisation par catégorie de fonctionnalité. Si une automatisation effectue plus de mises à jour que prévu, examinez la fréquence de son déclencheur et toute instruction personnalisée qui élargit sa portée.

@@ -1,0 +1,97 @@
+---
+title: "Descripción general del editor"
+sidebarTitle: "Descripción general"
+description: "Cree, edite y publique contenido en su navegador con el editor de Mintlify. Admite colaboración en tiempo real y sincronización continua con Git."
+keywords: ["web editor", "git", "branches", "commits", "pull requests"]
+---
+
+<Card title="¿Es nuevo en el editor? Empiece por el tutorial." icon="graduation-cap" horizontal href="/es/editor/tutorial">
+  Cree una branch, haga un cambio, comparta una vista previa y publique.
+</Card>
+
+Use el editor para escribir y publicar documentación en su navegador. El editor usa un flujo de trabajo docs-as-code en el que Git respalda todos sus cambios. Su trabajo se guarda como commits en su repositorio y el editor gestiona las operaciones de Git por usted.
+
+El editor se carga de forma predeterminada cuando abre su [dashboard](https://app.mintlify.com). Cualquier miembro de su organización puede abrirlo, pero ciertas acciones dependen de su [rol](/es/dashboard/roles). Los admins y editors pueden editar y publicar. Los viewers pueden explorar el contenido y dejar [comentarios y sugerencias](/es/editor/collaborate). Si su organización usa [roles ampliados](/es/dashboard/roles#expanded-roles), los editors no pueden publicar y los viewers no pueden comentar.
+
+<div id="how-the-editor-works">
+
+## Cómo funciona el editor
+
+</div>
+
+**Los cambios se guardan automáticamente, pero guardar es distinto de publicar.** A medida que escribe, el editor almacena su trabajo. Sus cambios persisten entre pestañas, dispositivos e interrupciones de red. Para que un cambio llegue a su sitio publicado, debe [publicarlo](/es/editor/publish).
+
+**Publicar escribe en Git.** Cuando publica, el editor hace commit de sus cambios en su repositorio. Si publica en su deployment branch, su sitio publicado se actualiza de inmediato. En una feature branch, sus ediciones se hacen commit automáticamente en la branch y se abre una pull request para su revisión. Nada de lo que hay en una feature branch llega a su sitio publicado hasta que hace merge en su deployment branch.
+
+**Git se mantiene sincronizado.** Cuando alguien hace push a su repositorio, esos cambios aparecen automáticamente. No necesita hacer pull ni actualizar la página. El editor combina los cambios que no entran en conflicto y señala todo lo que requiere su atención.
+
+**Su equipo edita en conjunto.** Varias personas pueden editar la misma página a la vez, con cursores en vivo que muestran quién trabaja en cada parte. Los comentarios y las sugerencias son visibles para todos.
+
+<Tip>
+  Si el editor alguna vez parece estar desincronizado con su repositorio, use [Restablecer editor](/es/editor/settings#reset-editor) para forzar una resincronización.
+</Tip>
+
+<div id="editor-layout">
+
+## Diseño del editor
+
+</div>
+
+* **Barra superior**: Haga clic en <Icon icon="panel-left" /> **Collapse sidebar** para ocultar sus páginas y en **Ask agent** para abrir el agente junto a su página. En una página privada, la barra superior también tiene **Share**. En las demás páginas de un sitio, tiene **Preview** y **Publish**, además del [selector de branch](/es/editor/publish#show-the-branch-selector) cuando está visible. Haga clic en <Icon icon="ellipsis" /> **More options** para acciones de página como **Page settings**, **Comments**, **Version history**, **Duplicate** y **Move**.
+* **Barra lateral**: Use la barra lateral para seleccionar páginas que editar, crear páginas nuevas, gestionar la estructura de su sitio y moverse por el dashboard. Presione <kbd>Cmd</kbd> + <kbd>\\</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>\\</kbd> (Windows) para mostrar u ocultar sus páginas.
+  * **Iconos del dashboard**: Cambie de proyecto desde el menú de la parte superior. Haga clic en **Home** para abrir la página **Publishes**. Haga clic en **Editor** para volver a la página que tenía abierta por última vez en el editor. Debajo, abra **Autopilot**, **Assistant**, **Analytics**, **MCP** y **Settings**.
+  * **Parte inferior de la barra lateral**: Haga clic en <Icon icon="search" /> **Search** para [buscar en el dashboard](#search-the-dashboard), en <Icon icon="inbox" /> [**Inbox**](/es/dashboard/inbox) para ver los elementos que requieren su atención y en <Icon icon="circle-help" /> **Get help** para acceder a la documentación, el soporte y las novedades del producto. Haga clic en su avatar para abrir el menú de su perfil.
+  * **Páginas**: **Navigation** contiene las páginas de la navegación de su sitio. **Files** enumera los archivos de su repositorio que no están en la navegación. **Personal** contiene sus [páginas privadas](/es/editor/pages#private-pages), y **Shared with me** contiene páginas que sus compañeros han compartido con usted directamente. En un [proyecto con varios repositorios](/es/deploy/multi-repo#edit-sources-in-the-web-editor), use el menú de repositorios situado encima de sus páginas para cambiar de repositorio.
+
+<div id="search-the-dashboard">
+
+## Buscar en el dashboard
+
+</div>
+
+Presione <kbd>Cmd</kbd> + <kbd>K</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>K</kbd> (Windows), o haga clic en **Search** en la parte inferior de la barra lateral, para buscar en el dashboard. En el modo visual, primero deseleccione cualquier texto, porque <kbd>Cmd</kbd> + <kbd>K</kbd> añade un enlace al texto seleccionado.
+
+La búsqueda encuentra:
+
+* Sus páginas.
+* Páginas de configuración.
+* Secciones de `docs.json`, que se abren en el editor.
+* Secciones de Analytics y Publishes.
+* Automatizaciones por nombre.
+
+La búsqueda también ejecuta acciones, como invitar a miembros, crear una automatización, abrir o cerrar el agente, mostrar u ocultar la barra lateral, cambiar entre los temas claro y oscuro, contactar con soporte y abrir la lista de atajos de teclado. Algunas acciones, como invitar a miembros, solo aparecen si su [rol](/es/dashboard/roles) lo permite.
+
+Antes de que escriba, la búsqueda sugiere resultados para la página en la que se encuentra. Por ejemplo, en una página de configuración sugiere secciones de esa página, y en el editor sugiere secciones de la configuración del sitio.
+
+<div id="visual-and-source-mode">
+
+## Modo visual y modo source
+
+</div>
+
+**El modo visual** representa su página a medida que escribe. Presione <kbd>/</kbd> para abrir el menú de componentes e insertar componentes.
+
+**El modo source** le da acceso directo al MDX, con números de línea. Úselo para tener control preciso sobre las propiedades de los componentes y el frontmatter. Escriba <kbd>&lt;</kbd> para acceder a los componentes. Presione <kbd>Cmd</kbd> + <kbd>S</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>S</kbd> (Windows) para dar formato al documento. Si un solo cambio modifica más de 10.000 caracteres, el editor le pide que lo confirme.
+
+Ambos modos editan el mismo archivo y admiten la [colaboración en tiempo real](/es/editor/collaborate#real-time-editing). Cambie entre ellos con <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> (macOS) o <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> (Windows), o con el interruptor **Source mode** en <Icon icon="ellipsis" /> **More options**. El editor recuerda su elección entre páginas. El modo source no está disponible mientras el [modo de sugerencias](/es/editor/collaborate#suggestions) está activado.
+
+Para conocer los componentes que puede insertar, consulte [Componentes](/es/components). Para la sintaxis de MDX, consulte [Dar formato al texto](/es/create/text) y [Dar formato al código](/es/create/code).
+
+<div id="git-concepts">
+
+## Conceptos de Git
+
+</div>
+
+Entender algunos conceptos de Git le ayuda a aprovechar mejor el editor. Para ver las definiciones de commits, branches, pull requests, merges, conflictos y diffs, consulte [Conceptos de Git para la documentación](/es/guides/git-concepts).
+
+| Acción en el editor | Operación de Git |
+|---|---|
+| Editar una página | Se guarda automáticamente. Todavía no hay commit. |
+| Publicar en su deployment branch | `git commit` y `git push`. Activa un despliegue. |
+| Editar en una feature branch | `git commit` y `git push` en la branch aproximadamente 15 segundos después de que deja de editar. El primer commit abre una pull request contra su deployment branch. |
+| Request review | Marca la pull request como lista para revisión. |
+| Merge and publish | Hace merge de la pull request y activa un despliegue. |
+| Crear una branch | `git checkout -b <branch-name>` |
+| Cambiar de branch | `git checkout <branch-name>` |
+| Push externo o actualización por CLI | Los cambios entrantes se sincronizan en el editor mediante un merge de tres vías. |

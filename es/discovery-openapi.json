@@ -1,0 +1,563 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Mintlify Assistant API",
+    "description": "Una API para integrar las funciones de descubrimiento de Mintlify en tu producto.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.mintlify.com/discovery"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v2/assistant/{domain}/message": {
+      "post": {
+        "summary": "Crear mensaje del assistant",
+        "description": "Genera un mensaje de respuesta del assistant para el domain indicado. Compatible con el SDK de IA v5 o superior.\n\nAutentícate con una clave de API del assistant.",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El identificador de domain de tu URL, por ejemplo `domain.mintlify.site`. Puedes encontrarlo al final de la URL de tu dashboard. Por ejemplo, en `dashboard.mintlify.com/organization/domain`, el identificador de domain es `domain`."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fp",
+                  "messages"
+                ],
+                "properties": {
+                  "fp": {
+                    "type": "string",
+                    "description": "Identificador de huella (fingerprint) para realizar el seguimiento de las sesiones de conversación. Usa `anonymous` para usuarios anónimos o proporciona un identificador de usuario único."
+                  },
+                  "threadId": {
+                    "default": null,
+                    "type": "string",
+                    "description": "Un identificador opcional que se utiliza para mantener la continuidad de la conversación a través de varios mensajes. Cuando se incluye, permite que el sistema asocie los mensajes posteriores con el mismo hilo de conversación. El `threadId` se devuelve en la respuesta como `event.threadId` cuando `event.type === 'finish'`."
+                  },
+                  "messages": {
+                    "type": "array",
+                    "default": [
+                      {
+                        "id": "foobar",
+                        "role": "user",
+                        "parts": [
+                          {
+                            "type": "text",
+                            "text": "How do I get started"
+                          }
+                        ]
+                      }
+                    ],
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Identificador único del mensaje."
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "system",
+                            "assistant",
+                            "user"
+                          ],
+                          "description": "El rol del emisor del mensaje."
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Marca de tiempo en la que se creó el mensaje."
+                        },
+                        "parts": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "description": "Segmento de contenido de texto.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "text"
+                                    ]
+                                  },
+                                  "text": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "text"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "Segmento de contenido de razonamiento con metadata opcional del proveedor.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "reasoning"
+                                    ]
+                                  },
+                                  "text": {
+                                    "type": "string"
+                                  },
+                                  "providerMetadata": {
+                                    "type": "object",
+                                    "description": "Metadata opcional específica del proveedor."
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "text"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "Segmento que hace referencia a la URL de origen.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "source-url"
+                                    ]
+                                  },
+                                  "sourceId": {
+                                    "type": "string"
+                                  },
+                                  "url": {
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "providerMetadata": {
+                                    "type": "object",
+                                    "description": "Metadata opcional específica del proveedor."
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "sourceId",
+                                  "url"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "Segmento de archivo adjunto.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "file"
+                                    ]
+                                  },
+                                  "mediaType": {
+                                    "type": "string"
+                                  },
+                                  "url": {
+                                    "type": "string"
+                                  },
+                                  "filename": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "mediaType",
+                                  "url"
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "description": "Marca el inicio de un nuevo paso.",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "step-start"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "type"
+                                ]
+                              }
+                            ]
+                          },
+                          "description": "Array de partes del mensaje. Cada parte tiene un tipo y campos específicos de ese tipo."
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "description": "Metadata opcional asociada con el mensaje."
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "parts"
+                      ]
+                    },
+                    "description": "Array de mensajes de la conversación. Usa la función handleSubmit del hook useChat del paquete @ai-sdk/react para gestionar los mensajes y las respuestas en streaming."
+                  },
+                  "retrievalPageSize": {
+                    "type": "number",
+                    "default": 5,
+                    "description": "Número de resultados de búsqueda en la documentación que se utilizarán para generar la respuesta. Valores más altos proporcionan más contexto, pero pueden aumentar el tiempo de respuesta. Recomendado: 5."
+                  },
+                  "filter": {
+                    "type": "object",
+                    "default": null,
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "description": "Filtro de versión opcional."
+                      },
+                      "language": {
+                        "type": "string",
+                        "description": "Filtro de idioma opcional."
+                      },
+                      "groups": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Grupos opcionales del usuario para el que responde el asistente. Si omites `groups`, el asistente solo lee contenido público. En las implementaciones en las que todas las páginas requieren autenticación, omitir `groups` funciona como un array vacío. Un array vacío representa a un usuario con sesión iniciada sin grupos: el asistente también lee las páginas abiertas a cualquier usuario con sesión iniciada. Cuando pasas grupos, también lee las páginas restringidas a al menos uno de ellos. Las secciones `<Visibility>` para lectores con sesión iniciada o para grupos específicos siguen las mismas reglas. Mintlify no verifica la pertenencia a grupos, por lo que tu backend debe elegir los grupos para cada usuario. En las implementaciones protegidas con contraseña que tienen páginas públicas, pasa un array vacío para leer las páginas que no están marcadas como públicas."
+                      }
+                    },
+                    "description": "Criterios de filtrado opcionales para la búsqueda."
+                  },
+                  "context": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "code",
+                            "textSelection"
+                          ],
+                          "description": "El tipo de contexto que se está proporcionando."
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "El fragmento de código o el contenido de texto seleccionado."
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "Ruta opcional al archivo o página de origen."
+                        },
+                        "elementId": {
+                          "type": "string",
+                          "description": "Identificador opcional para el elemento de la interfaz de usuario que contiene el contexto."
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "value"
+                      ]
+                    },
+                    "description": "Array opcional de información contextual para proporcionar al assistant."
+                  },
+                  "currentPath": {
+                    "type": "string",
+                    "description": "La ruta de la página que el usuario está viendo actualmente. Cuando se proporciona, el assistant usa este contexto para ofrecer respuestas más relevantes. Longitud máxima: 200 caracteres."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mensaje generado con éxito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Streaming de respuestas compatible con AI SDK v5. Usa el [hook useChat de @ai-sdk/react](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat#usechat) para gestionar el flujo de la respuesta."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo de la solicitud no es válido; por ejemplo, falta el campo `fp` o `messages`. El cuerpo de la respuesta describe el error."
+          },
+          "401": {
+            "description": "La clave de API falta o no es válida, o el assistant no está habilitado para tu organización."
+          },
+          "402": {
+            "description": "Tu organización alcanzó su límite de créditos para este ciclo de facturación."
+          },
+          "403": {
+            "description": "Las funciones de IA no están disponibles en tu región, tu clave de API no tiene acceso a este domain, tu plan no incluye acceso a la API del assistant o tu solicitud provino de una dirección IP que no está en la lista de permitidos de tu clave de API."
+          },
+          "404": {
+            "description": "No existe un sitio de documentación para este domain, o el `threadId` o `threadKey` no es válido."
+          },
+          "413": {
+            "description": "La conversación alcanzó su número máximo de mensajes o la entrada es demasiado larga."
+          },
+          "429": {
+            "description": "Superaste el límite de tasa de 10,000 solicitudes por hora por organización."
+          },
+          "500": {
+            "description": "Se produjo un error inesperado del servidor. Vuelve a intentar la solicitud. Si el error persiste, contacta al soporte."
+          }
+        }
+      }
+    },
+    "/v1/page/{domain}": {
+      "post": {
+        "summary": "Obtener contenido de la página",
+        "description": "Recupera el contenido de texto completo de una página de documentación específica por su ruta. Úsalo después de una búsqueda para obtener el contenido completo de una página coincidente.\n\nAutentícate con una clave de API del assistant. Las solicitudes de contenido de página no consumen créditos.",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El identificador domain de tu URL `domain.mintlify.site`. Se encuentra al final de la URL de tu dashboard. Por ejemplo, `dashboard.mintlify.com/organization/domain` tiene un identificador domain de `domain`."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "path"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "El slug o ruta de la página cuyo contenido se desea recuperar. Corresponde al campo `path` devuelto por el endpoint [Search documentation](/es/api/assistant/search)."
+                  },
+                  "groups": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Grupos opcionales del usuario para el que lees. Si omites `groups`, solo puedes leer páginas públicas, con sus secciones públicas. En las implementaciones en las que todas las páginas requieren autenticación, omitir `groups` funciona como un array vacío. Un array vacío representa a un usuario con sesión iniciada sin grupos: también puedes leer las páginas abiertas a cualquier usuario con sesión iniciada. Cuando pasas grupos, también puedes leer las páginas restringidas a al menos uno de ellos. Las secciones `<Visibility>` que el usuario no puede ver se eliminan de la página. Mintlify no verifica la pertenencia a grupos, por lo que tu backend debe elegir los grupos para cada usuario. En las implementaciones protegidas con contraseña que tienen páginas públicas, pasa un array vacío para leer las páginas que no están marcadas como públicas."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contenido de la página recuperado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "La ruta de la página solicitada."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "El contenido de texto completo de la página."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El `path` falta o está vacío, o `groups` no es un array de cadenas. El cuerpo de la respuesta describe el error."
+          },
+          "401": {
+            "description": "La clave de API falta o no es válida."
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso a este domain, tu plan no incluye acceso a la API del assistant o tu solicitud provino de una dirección IP que no está en la lista de permitidos de tu clave de API."
+          },
+          "404": {
+            "description": "No existe un sitio de documentación para este domain, el sitio no tiene un índice de búsqueda o no existe ninguna página en esta ruta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Mensaje de error que describe por qué no se pudo encontrar la página."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Superaste el límite de tasa de 10,000 solicitudes por hora por organización."
+          },
+          "500": {
+            "description": "Se produjo un error inesperado del servidor. Vuelve a intentar la solicitud. Si el error persiste, contacta al soporte."
+          }
+        }
+      }
+    },
+    "/v1/search/{domain}": {
+      "post": {
+        "x-mint": {
+          "mcp": {
+            "enabled": true
+          }
+        },
+        "summary": "Buscar en la documentación",
+        "description": "Busca en tu documentación mediante búsqueda semántica y por palabras clave, con filtrado y paginación configurables.\n\nAutentícate con una clave de API del assistant. Las solicitudes de búsqueda no consumen créditos.",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "El identificador domain de tu URL `domain.mintlify.site`. Lo puedes encontrar al final de la URL de tu dashboard. Por ejemplo, `dashboard.mintlify.com/organization/domain` tiene un identificador domain de `domain`."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "La búsqueda que se ejecutará en el contenido de tu documentación."
+                  },
+                  "pageSize": {
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 50,
+                    "description": "Número de resultados de búsqueda que se mostrarán. Debe estar entre 1 y 50. De forma predeterminada es 10 si no se especifica."
+                  },
+                  "scoreThreshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Puntuación mínima de relevancia para los resultados. Solo se devuelven los resultados con una puntuación igual o superior a este umbral. Debe estar entre 0 y 1."
+                  },
+                  "filter": {
+                    "type": "object",
+                    "description": "Parámetros de filtrado opcionales para restringir los resultados de la búsqueda.",
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "description": "Filtra los resultados por versión de la documentación."
+                      },
+                      "language": {
+                        "type": "string",
+                        "description": "Filtra los resultados por idioma del contenido."
+                      },
+                      "tag": {
+                        "type": "string",
+                        "description": "Filtrar resultados por etiqueta."
+                      },
+                      "groups": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Grupos opcionales del usuario para el que buscas. Si omites `groups`, los resultados solo incluyen contenido público. En las implementaciones en las que todas las páginas requieren autenticación, omitir `groups` funciona como un array vacío. Un array vacío representa a un usuario con sesión iniciada sin grupos: los resultados también incluyen las páginas abiertas a cualquier usuario con sesión iniciada. Cuando pasas grupos, los resultados también incluyen las páginas restringidas a al menos uno de ellos. Las secciones `<Visibility>` para lectores con sesión iniciada o para grupos específicos siguen las mismas reglas. Mintlify no verifica la pertenencia a grupos, por lo que tu backend debe elegir los grupos para cada usuario. En las implementaciones protegidas con contraseña que tienen páginas públicas, pasa un array vacío para buscar en las páginas que no están marcadas como públicas."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultados de la búsqueda",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "description": "El contenido de tu documentación que coincide con la búsqueda."
+                      },
+                      "path": {
+                        "type": "string",
+                        "description": "La ruta o URL del documento de origen."
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "description": "Metadata adicional sobre el resultado de la búsqueda."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El `query` falta o no es una cadena, o `pageSize` o `filter` no es válido. El cuerpo de la respuesta describe el error."
+          },
+          "401": {
+            "description": "La clave de API falta o no es válida."
+          },
+          "403": {
+            "description": "Tu clave de API no tiene acceso a este domain, tu plan no incluye acceso a la API del assistant o tu solicitud provino de una dirección IP que no está en la lista de permitidos de tu clave de API."
+          },
+          "404": {
+            "description": "No existe un sitio de documentación para este domain, o la búsqueda no devolvió resultados."
+          },
+          "429": {
+            "description": "Superaste el límite de tasa de 10,000 solicitudes por hora por organización."
+          },
+          "500": {
+            "description": "Se produjo un error inesperado del servidor. Vuelve a intentar la solicitud. Si el error persiste, contacta al soporte."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "El encabezado Authorization requiere un token de tipo Bearer. Usa una clave de API del assistant. Genérala desde la [página de claves de API](https://dashboard.mintlify.com/settings/organization/api-keys) de tu dashboard. En producción, envía las solicitudes a través de tu backend en lugar de incrustar la clave en el código del lado del cliente."
+      }
+    }
+  }
+}

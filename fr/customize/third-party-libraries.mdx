@@ -1,0 +1,456 @@
+---
+title: "Bibliothèques tierces"
+description: "Importez des composants React depuis des paquets npm, tels que des graphiques et des composants de design system, dans vos pages MDX."
+keywords: ["npm packages", "package.json", "React components", "imports"]
+---
+
+import { SynchronizedCharts } from "/snippets/recharts-example.jsx";
+import { DitheringExample } from "/snippets/dithering-example.jsx";
+
+<Info>
+  Les bibliothèques tierces nécessitent un [forfait Enterprise](https://mintlify.com/pricing?ref=third-party-libraries). Contactez votre gestionnaire de compte pour les activer sur votre site.
+</Info>
+
+Utilisez des composants issus de paquets npm, tels que des graphiques ou votre propre design system, dans vos pages MDX. Lors du déploiement, Mintlify installe les paquets de votre lockfile, rend chaque composant en HTML et charge son JavaScript dans le navigateur.
+
+<Warning>
+  N'installez que des paquets de confiance. Le code des paquets s'exécute avec le même accès que la page, y compris le contenu de la page et tout ce que le navigateur du lecteur stocke pour votre site. Il peut effectuer des requêtes réseau vers n'importe quel serveur. Supprimer un paquet ou annuler un déploiement n'arrête pas le code déjà chargé dans le navigateur d'un lecteur.
+</Warning>
+
+Les bibliothèques tierces ne sont pas disponibles sur les sites qui utilisent l'[authentification](/fr/deploy/authentication-setup) ou la [personnalisation](/fr/create/personalization). Les déploiements qui incluent `packages` dans `docs.json` échouent sur ces sites, y compris leurs déploiements de prévisualisation.
+
+Sur un site sans authentification ni personnalisation, les [déploiements de prévisualisation](/fr/deploy/preview-deployments#restrict-access-to-preview-deployments) qui exigent une authentification de l'organisation ou un mot de passe sont tout de même déployés. Mintlify ne compile pas vos paquets pour ces prévisualisations, donc les composants de vos paquets ne s'y affichent pas.
+
+Tant que votre site utilise des bibliothèques tierces, vous ne pouvez pas activer l'authentification, la personnalisation ni les restrictions d'accès pour les déploiements de prévisualisation.
+
+<div id="examples">
+  ## Exemples
+</div>
+
+Les composants de cette section proviennent de paquets npm que ce site installe.
+
+<div id="interactive-charts">
+  ### Graphiques interactifs
+</div>
+
+Survolez l'un ou l'autre des graphiques, et les deux infobulles suivent la même date. Faites glisser les poignées sous le graphique de latence pour réduire la plage de dates des deux graphiques. Conçu avec [`recharts`](https://www.npmjs.com/package/recharts).
+
+<SynchronizedCharts />
+
+<Accordion title="Code du graphique">
+  ```jsx snippets/recharts-example.jsx
+  import { useId } from "react";
+  import {
+    Area,
+    AreaChart,
+    Brush,
+    CartesianGrid,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+  } from "recharts";
+
+  const data = [
+    { day: "Oct 1", requests: 16600, latency: 142 },
+    { day: "Oct 2", requests: 21900, latency: 154 },
+    { day: "Oct 3", requests: 18800, latency: 148 },
+    { day: "Oct 4", requests: 25800, latency: 182 },
+    { day: "Oct 5", requests: 28200, latency: 176 },
+    { day: "Oct 6", requests: 19700, latency: 136 },
+    { day: "Oct 7", requests: 22900, latency: 151 },
+    { day: "Oct 8", requests: 24100, latency: 158 },
+    { day: "Oct 9", requests: 26400, latency: 171 },
+    { day: "Oct 10", requests: 21300, latency: 149 },
+  ];
+
+  const tick = { fill: "currentColor", fillOpacity: 0.6, fontSize: 12 };
+  const grid = { stroke: "currentColor", strokeOpacity: 0.15 };
+  const tooltip = {
+    contentStyle: {
+      backgroundColor: "rgba(17, 24, 39, 0.92)",
+      border: "none",
+      borderRadius: 8,
+      color: "#fff",
+      fontSize: 12,
+    },
+    itemStyle: { color: "#fff" },
+    isAnimationActive: false,
+  };
+
+  export const SynchronizedCharts = () => {
+    const syncId = useId();
+
+    return (
+      <div style={{ width: "100%" }}>
+        <div style={{ width: "100%", height: 180 }}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <AreaChart data={data} syncId={syncId} accessibilityLayer>
+              <CartesianGrid vertical={false} {...grid} />
+              <XAxis dataKey="day" tick={tick} stroke="currentColor" strokeOpacity={0.3} />
+              <YAxis width={72} tick={tick} stroke="currentColor" strokeOpacity={0.3} />
+              <Tooltip {...tooltip} />
+              <Area
+                dataKey="requests"
+                name="Requests"
+                type="monotone"
+                stroke="#166E3F"
+                fill="#26BD6C"
+                fillOpacity={0.25}
+                isAnimationActive={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div style={{ width: "100%", height: 230 }}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <LineChart data={data} syncId={syncId} accessibilityLayer>
+              <CartesianGrid vertical={false} {...grid} />
+              <XAxis dataKey="day" tick={tick} stroke="currentColor" strokeOpacity={0.3} />
+              <YAxis
+                width={72}
+                domain={[0, 240]}
+                tick={tick}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+                tickFormatter={(value) => `${value} ms`}
+              />
+              <Tooltip {...tooltip} />
+              <Line
+                dataKey="latency"
+                name="Latency (ms)"
+                type="monotone"
+                stroke="#E0803A"
+                strokeWidth={2}
+                dot={false}
+                isAnimationActive={false}
+              />
+              <Brush
+                dataKey="day"
+                height={28}
+                travellerWidth={10}
+                stroke="#26BD6C"
+                fill="transparent"
+                ariaLabel="Visible date range for both charts"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    );
+  };
+  ```
+</Accordion>
+
+<div id="visual-effects">
+  ### Effets visuels
+</div>
+
+Modifiez la palette, la forme et la taille des pixels d'un shader animé. Conçu avec [`@paper-design/shaders-react`](https://www.npmjs.com/package/@paper-design/shaders-react).
+
+<DitheringExample />
+
+<Accordion title="Code du shader">
+  ```jsx snippets/dithering-example.jsx
+  import { useEffect, useId, useState } from "react";
+  import { Dithering } from "@paper-design/shaders-react";
+
+  const palettes = [
+    { name: "Mint", back: "#0b1f14", front: "#26BD6C" },
+    { name: "Violet", back: "#10091f", front: "#d9c6ff" },
+    { name: "Ember", back: "#1f0d06", front: "#ffb37a" },
+  ];
+
+  const shapes = ["sphere", "warp", "ripple", "swirl"];
+
+  const control = {
+    font: "inherit",
+    fontSize: 13,
+    padding: "4px 10px",
+    borderRadius: 6,
+    border: "1px solid rgba(127, 127, 127, 0.4)",
+    background: "transparent",
+    color: "inherit",
+    cursor: "pointer",
+  };
+
+  export const DitheringExample = () => {
+    const shapeId = useId();
+    const [palette, setPalette] = useState(palettes[0]);
+    const [shape, setShape] = useState("sphere");
+    const [size, setSize] = useState(3);
+    const [paused, setPaused] = useState(false);
+    // Hold the shader still until the reduced-motion check runs after mount.
+    const [motionChecked, setMotionChecked] = useState(false);
+
+    useEffect(() => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setPaused(true);
+      }
+      setMotionChecked(true);
+    }, []);
+
+    return (
+      <div style={{ width: "100%" }}>
+        <Dithering
+          width="100%"
+          height={320}
+          speed={paused || !motionChecked ? 0 : 0.4}
+          scale={0.6}
+          maxPixelCount={2000000}
+          colorBack={palette.back}
+          colorFront={palette.front}
+          shape={shape}
+          type="4x4"
+          size={size}
+          style={{ borderRadius: 12, overflow: "hidden", backgroundColor: palette.back }}
+        />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 8,
+            marginTop: 12,
+            marginBottom: 16,
+            fontSize: 13,
+          }}
+        >
+          {palettes.map((p) => (
+            <button
+              key={p.name}
+              type="button"
+              aria-pressed={palette.name === p.name}
+              onClick={() => setPalette(p)}
+              style={{
+                ...control,
+                borderColor: palette.name === p.name ? p.front : "rgba(127, 127, 127, 0.4)",
+              }}
+            >
+              {p.name}
+            </button>
+          ))}
+          <label htmlFor={shapeId} style={{ marginLeft: 8 }}>
+            Shape
+          </label>
+          <select
+            id={shapeId}
+            value={shape}
+            onChange={(e) => setShape(e.target.value)}
+            style={control}
+          >
+            {shapes.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8 }}>
+            Pixel size
+            <input
+              type="range"
+              min={1}
+              max={8}
+              value={size}
+              style={{ accentColor: palette.front }}
+              onChange={(e) => setSize(Number(e.target.value))}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => setPaused(!paused)}
+            style={{ ...control, marginLeft: "auto" }}
+          >
+            {paused ? "Play" : "Pause"}
+          </button>
+        </div>
+      </div>
+    );
+  };
+  ```
+</Accordion>
+
+<div id="more-examples">
+  ### Plus d'exemples
+</div>
+
+Ces pages importent d'autres paquets npm dans un site Mintlify. Chacune comprend une démo en direct et le code qui la génère.
+
+<CardGroup cols={2}>
+  <Card title="Diagrammes modifiables" icon="workflow" href="https://npm-packages.mintlify.site/react-flow/workflow">
+    Organisez et reliez les étapes d'un workflow avec React Flow.
+  </Card>
+  <Card title="Édition de texte enrichi" icon="square-pen" href="https://npm-packages.mintlify.site/tiptap/slash-commands">
+    Insérez des titres, des listes et des blocs de code depuis le clavier avec Tiptap.
+  </Card>
+  <Card title="Composants de design system" icon="component" href="https://npm-packages.mintlify.site/base-ui/combobox">
+    Filtrez une liste et sélectionnez plusieurs libellés avec une combobox Base UI.
+  </Card>
+  <Card title="Animation" icon="move" href="https://npm-packages.mintlify.site/motion/springs">
+    Ajustez la raideur, l'amortissement et la masse d'un ressort avec Motion.
+  </Card>
+</CardGroup>
+
+<div id="add-a-package">
+  ## Ajouter un paquet
+</div>
+
+<Steps>
+  <Step title="Listez vos dépendances">
+    Créez un fichier `package.json` dans le même dossier que votre fichier `docs.json`. Listez chaque paquet que vous importez sous `dependencies`, y compris `react` et `react-dom`.
+
+    ```json package.json
+    {
+      "private": true,
+      "dependencies": {
+        "@acme/charts": "^2.0.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+      }
+    }
+    ```
+
+    Mintlify installe uniquement les `dependencies`. Les paquets listés uniquement dans `devDependencies` ou `peerDependencies` ne sont pas disponibles pour vos pages.
+  </Step>
+  <Step title="Commitez un lockfile">
+    Installez vos dépendances et commitez le lockfile à côté de `package.json`.
+
+    <CodeGroup>
+      ```bash pnpm
+      pnpm install
+      ```
+
+      ```bash npm
+      npm install
+      ```
+    </CodeGroup>
+
+    Mintlify installe les versions exactes de votre lockfile. Il prend en charge `pnpm-lock.yaml` version 9 de pnpm et `package-lock.json` de npm. Les lockfiles Yarn et Bun ne sont pas pris en charge.
+  </Step>
+  <Step title="Activez les paquets">
+    Ajoutez la clé `packages` à votre `docs.json`. Un objet vide active les paquets avec les paramètres par défaut.
+
+    ```json docs.json
+    {
+      "packages": {}
+    }
+    ```
+  </Step>
+  <Step title="Importez un composant">
+    Créez un composant dans votre dossier `snippets` qui importe depuis le paquet.
+
+    ```jsx snippets/requests-chart.jsx
+    import { LineChart } from "@acme/charts";
+
+    const data = [
+      { day: "Mon", requests: 120 },
+      { day: "Tue", requests: 180 },
+      { day: "Wed", requests: 150 },
+    ];
+
+    export const RequestsChart = () => (
+      <LineChart data={data} x="day" y="requests" height={240} />
+    );
+    ```
+
+    Importez-le ensuite dans une page :
+
+    ```mdx
+    import { RequestsChart } from "/snippets/requests-chart.jsx";
+
+    <RequestsChart />
+    ```
+  </Step>
+  <Step title="Déployez">
+    Poussez vos modifications. Si un paquet ne peut pas être installé ou compilé, le déploiement échoue avec une erreur qui indique le paquet et le problème.
+  </Step>
+</Steps>
+
+Pour prévisualiser en local, installez vos dépendances puis exécutez [`mint dev`](/fr/cli/preview) depuis le dossier contenant votre fichier `docs.json`.
+
+<div id="use-package-components">
+  ## Utiliser des composants de paquets
+</div>
+
+Vous pouvez également importer des composants directement depuis un paquet dans une page MDX :
+
+```mdx
+import { Tooltip } from "@acme/ui";
+
+<Tooltip content="Requests per day">Usage</Tooltip>
+```
+
+- Placez les composants de paquets sur leurs propres lignes. Ils ne fonctionnent pas à l'intérieur d'un paragraphe, d'une cellule de tableau ou de texte en ligne.
+- Passez directement les chaînes, nombres et booléens comme props. Pour les fonctions, tableaux, objets ou props JSX, écrivez un composant wrapper dans votre dossier `snippets`, comme le graphique dans [Ajouter un paquet](#add-a-package), et passez-y les valeurs.
+- Le Markdown à l'intérieur d'un composant de paquet est rendu en HTML brut. Les composants Mintlify, tels que les callouts et les cartes, ne sont pas rendus à l'intérieur d'un composant de paquet.
+
+<div id="load-package-styles">
+  ## Charger les styles des paquets
+</div>
+
+Les composants peuvent importer leur propre CSS. Pour charger une feuille de style qu'un paquet fournit séparément, ajoutez son chemin dans le paquet installé à `packages.css` :
+
+```json docs.json
+{
+  "packages": {
+    "css": ["@acme/ui/dist/styles.css"]
+  }
+}
+```
+
+Les paquets doivent fournir du CSS compilé. Mintlify n'exécute pas d'outils de build ni de plugins CSS sur le code des paquets, et ne prend pas en charge les modules CSS. Les feuilles de style des paquets ne peuvent pas charger de polices ni d'images depuis des URL distantes. Chargez plutôt les polices avec les [paramètres de polices](/fr/customize/fonts) de votre site.
+
+<div id="wrap-components-in-a-provider">
+  ## Envelopper les composants dans un provider
+</div>
+
+Si vos composants ont besoin d'un provider de thème ou de contexte, exportez un composant `Provider` depuis un snippet et définissez `packages.provider` sur son chemin :
+
+```json docs.json
+{
+  "packages": {
+    "provider": "/snippets/provider.jsx"
+  }
+}
+```
+
+```jsx snippets/provider.jsx
+import { ThemeProvider } from "@acme/ui";
+
+export const Provider = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
+```
+
+Le provider enveloppe chaque composant de paquet séparément. Les composants ne partagent pas d'état par son intermédiaire.
+
+<div id="install-from-another-registry">
+  ## Installer depuis un autre registre
+</div>
+
+Les paquets sans scope s'installent depuis le registre npm public. Pour installer un scope depuis un registre différent, associez le scope à l'URL du registre dans `packages.registries` :
+
+```json docs.json
+{
+  "packages": {
+    "registries": {
+      "@acme": "https://npm.acme.com/"
+    }
+  }
+}
+```
+
+Le registre doit utiliser HTTPS sur le port par défaut et être accessible depuis l'internet public sans identifiants.
+
+<div id="limitations">
+  ## Limitations
+</div>
+
+- **Sources des dépendances** : Les dépendances doivent être des versions du registre, des plages de versions ou des tags. Les URL Git, les chemins locaux et les alias `file:`, `link:`, `workspace:` et `npm:` ne sont pas pris en charge.
+- **Scripts d'installation** : Les paquets s'installent sans exécuter de scripts d'installation tels que `postinstall`. Les paquets qui en ont besoin, ou qui nécessitent des binaires natifs, ne fonctionnent pas.
+- **Taille** : La sortie des paquets d'un déploiement peut inclure jusqu'à 1 000 fichiers, 8 Mo par fichier, 40 Mo au total et 5 Mo compressés avec gzip. Les paquets qui chargent de grands ensembles de modules à l'exécution, comme les maps d'icônes dynamiques, peuvent dépasser la limite de fichiers.
+- **Rendu côté serveur** : Chaque composant doit être rendu en moins de trois secondes sur le serveur. Un composant qui échoue ou expire n'est rendu que dans le navigateur, il est donc absent du HTML de la page.
+- **Recherche et IA** : La recherche, l'assistant et les exports Markdown utilisent votre source MDX, et non le contenu rendu par un composant. Conservez le contenu de référence important dans le texte de votre MDX.
+- **Éditeur web** : L'aperçu de l'éditeur web n'affiche pas les composants de paquets.
+
+Pour ne plus utiliser de paquets, supprimez `packages` de votre fichier `docs.json` et redéployez.

@@ -1,0 +1,474 @@
+---
+title: "Apparence et identité visuelle"
+description: "Configurez le thème, les couleurs, le logo, le favicon, les polices et l'arrière-plan dans docs.json pour votre site de documentation."
+keywords: ["theme", "colors", "logo", "favicon", "fonts", "background", "appearance", "branding", "dark mode", "icons", "styling", "docs.json"]
+---
+
+import IconsOptional from "/snippets/fr/icons-optional.mdx";
+
+Utilisez ces paramètres de `docs.json` pour contrôler l'identité visuelle de votre site de documentation : thème de mise en page, couleurs de marque, logo, typographie et arrière-plan.
+
+## Paramètres
+
+### `theme` - <Badge color="red">required</Badge>
+
+Le thème de mise en page de votre site.
+
+L'un des suivants : `mint`, `maple`, `palm`, `willow`, `linden`, `almond`, `aspen`, `sequoia`, `luma`.
+
+Voir [Thèmes](/fr/customize/themes) pour les aperçus et les détails.
+
+---
+
+### `name` - <Badge color="red">required</Badge>
+
+**Type :** `string`
+
+Le nom de votre projet, organisation ou produit. Apparaît dans le titre de l'onglet du navigateur et à d'autres endroits de votre site.
+
+---
+
+### `colors` - <Badge color="red">required</Badge>
+
+**Type :** `object`
+
+Les couleurs utilisées dans votre documentation. Les couleurs s'affichent différemment selon les thèmes. Si vous ne fournissez qu'une couleur principale, elle s'applique à tous les éléments de couleur.
+
+<ResponseField name="colors.primary" type="string" required>
+  La couleur principale de votre documentation. Généralement utilisée pour la mise en évidence en mode clair, avec quelques variations selon le thème.
+
+  Doit être un code hexadécimal commençant par `#`. Exemple : `"#0D9373"`.
+</ResponseField>
+
+<ResponseField name="colors.light" type="string">
+  La couleur utilisée pour la mise en évidence en mode sombre.
+
+  Doit être un code hexadécimal commençant par `#`.
+</ResponseField>
+
+<ResponseField name="colors.dark" type="string">
+  La couleur utilisée pour les boutons et les états de survol en modes clair et sombre, avec quelques variations selon le thème.
+
+  Doit être un code hexadécimal commençant par `#`.
+</ResponseField>
+
+```json docs.json
+"colors": {
+  "primary": "#0D9373",
+  "light": "#55D799",
+  "dark": "#0D9373"
+}
+```
+
+---
+
+### `logo`
+
+**Type :** `string` ou `object`
+
+Le logo de votre site. Fournissez un chemin d'image unique ou des images distinctes pour les modes clair et sombre.
+
+<ResponseField name="logo.light" type="string" required>
+  Chemin vers votre fichier de logo pour le mode clair. Incluez l'extension du fichier. Exemple : `/logo/light.svg`.
+</ResponseField>
+
+<ResponseField name="logo.dark" type="string" required>
+  Chemin vers votre fichier de logo pour le mode sombre. Incluez l'extension du fichier. Exemple : `/logo/dark.svg`.
+</ResponseField>
+
+<ResponseField name="logo.href" type="string (uri)">
+  L'URL vers laquelle rediriger lors d'un clic sur le logo. Si non fournie, le logo pointe vers la première page de la locale sélectionnée pour les [documentations internationalisées](/fr/guides/internationalization), ou vers votre page d'accueil pour les sites monolingues. Accepte une URL absolue, comme `https://yoursite.com`, ou un chemin relatif commençant par `/`, comme `/quickstart`.
+</ResponseField>
+
+```json docs.json
+"logo": {
+  "light": "/logo/light.svg",
+  "dark": "/logo/dark.svg",
+  "href": "https://yoursite.com"
+}
+```
+
+---
+
+### `favicon`
+
+**Type :** `string` ou `object`
+
+Chemin vers votre fichier de favicon, incluant l'extension du fichier. Redimensionné automatiquement aux tailles de favicon appropriées. Fournissez un fichier unique ou des fichiers distincts pour les modes clair et sombre.
+
+<ResponseField name="favicon.light" type="string" required>
+  Chemin vers votre favicon pour le mode clair. Incluez l'extension du fichier. Exemple : `/favicon.png`.
+</ResponseField>
+
+<ResponseField name="favicon.dark" type="string" required>
+  Chemin vers votre favicon pour le mode sombre. Incluez l'extension du fichier. Exemple : `/favicon-dark.png`.
+</ResponseField>
+
+```json docs.json
+"favicon": "/favicon.svg"
+```
+
+---
+
+### `appearance`
+
+**Type :** `object`
+
+Paramètres du mode clair/sombre.
+
+<ResponseField name="appearance.default" type='"system" | "light" | "dark"'>
+  Mode de couleur par défaut. Choisissez `system` pour correspondre aux paramètres de l'OS de l'utilisateur, ou `light` ou `dark` pour forcer un mode spécifique. Valeur par défaut : `system`.
+</ResponseField>
+
+<ResponseField name="appearance.strict" type="boolean">
+  Lorsque `true`, masque l'interrupteur du mode clair/sombre pour que les utilisateurs ne puissent pas changer de mode. Valeur par défaut : `false`.
+</ResponseField>
+
+```json docs.json
+"appearance": {
+  "default": "dark",
+  "strict": true
+}
+```
+
+---
+
+### `fonts`
+
+**Type :** `object`
+
+Polices personnalisées pour votre documentation. La police par défaut varie selon le thème. Prend en charge [Google Fonts](https://fonts.google.com) et les polices auto-hébergées.
+
+Définissez une seule police pour tout votre site avec `family`, `weight`, `source` et `format`. Ou définissez des polices distinctes pour les titres et le corps du texte avec `heading` et `body`. Ne combinez pas les deux : si vous définissez `family`, votre site ignore `heading` et `body`.
+
+<ResponseField name="fonts.family" type="string">
+  Obligatoire pour une police unique. Nom de la famille de polices, comme `"Inter"` ou `"Open Sans"`. Prend en charge les noms de familles [Google Fonts](https://fonts.google.com). Ces polices se chargent automatiquement sans nécessiter de `source`.
+</ResponseField>
+
+<ResponseField name="fonts.weight" type="number">
+  Graisse de la police, comme `400` ou `700`. Les polices variables prennent en charge les graisses fractionnaires comme `550`.
+</ResponseField>
+
+<ResponseField name="fonts.source" type="string (uri)">
+  URL vers une police hébergée ou chemin vers un fichier de police local. Non nécessaire pour les Google Fonts.
+
+  - Hébergée : `https://example.com/fonts/MyFont.woff2`
+  - Locale : `/fonts/MyFont.woff2`
+</ResponseField>
+
+<ResponseField name="fonts.format" type='"woff" | "woff2"'>
+  Format du fichier de police. Requis lors de l'utilisation du champ `source`.
+</ResponseField>
+
+<ResponseField name="fonts.heading" type="object">
+  Paramètres de police pour les titres. À utiliser avec `body` au lieu d'un `family` de premier niveau.
+
+  Accepte les mêmes champs `family`, `weight`, `source` et `format` qu'une police unique, y compris le champ obligatoire `family`.
+</ResponseField>
+
+<ResponseField name="fonts.body" type="object">
+  Paramètres de police pour le corps du texte. À utiliser avec `heading` au lieu d'un `family` de premier niveau.
+
+  Accepte les mêmes champs `family`, `weight`, `source` et `format` qu'une police unique, y compris le champ obligatoire `family`.
+</ResponseField>
+
+```json docs.json
+"fonts": {
+  "heading": {
+    "family": "Playfair Display"
+  },
+  "body": {
+    "family": "Inter"
+  }
+}
+```
+
+---
+
+### `icons`
+
+**Type :** `object`
+
+Paramètres de la bibliothèque d'icônes. Vous ne pouvez utiliser qu'une seule bibliothèque d'icônes par projet. Tous les noms d'icônes dans votre documentation doivent provenir de la bibliothèque sélectionnée.
+
+<ResponseField name="icons.library" type='"fontawesome" | "lucide" | "tabler"' required>
+  Bibliothèque d'icônes à utiliser dans toute votre documentation. Valeur par défaut : `fontawesome`.
+
+  <Note>
+    Vous pouvez spécifier une URL vers une icône hébergée en externe ou un chemin vers un fichier d'icône dans votre projet pour n'importe quelle icône individuelle, indépendamment du paramètre de bibliothèque.
+  </Note>
+</ResponseField>
+
+```json docs.json
+"icons": {
+  "library": "lucide"
+}
+```
+
+---
+
+### `background`
+
+**Type :** `object`
+
+Paramètres d'image d'arrière-plan, de décoration et de couleur.
+
+<ResponseField name="background.decoration" type='"gradient" | "grid" | "windows"'>
+  Un motif d'arrière-plan décoratif pour votre thème.
+</ResponseField>
+
+<ResponseField name="background.color" type="object">
+  Couleurs d'arrière-plan personnalisées pour les modes clair et sombre.
+
+  <Expandable title="background.color">
+    <ResponseField name="light" type="string">
+      Couleur d'arrière-plan pour le mode clair. Doit être un code hexadécimal commençant par `#`.
+    </ResponseField>
+    <ResponseField name="dark" type="string">
+      Couleur d'arrière-plan pour le mode sombre. Doit être un code hexadécimal commençant par `#`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="background.image" type="string or object">
+  Image d'arrière-plan pour votre site. Fournissez un chemin unique ou des chemins distincts pour les modes clair et sombre.
+
+  <Expandable title="background.image">
+    <ResponseField name="light" type="string" required>
+      Chemin vers votre image d'arrière-plan pour le mode clair. Exemple : `/background.png`.
+    </ResponseField>
+    <ResponseField name="dark" type="string" required>
+      Chemin vers votre image d'arrière-plan pour le mode sombre. Exemple : `/background-dark.png`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+```json docs.json
+"background": {
+  "decoration": "gradient",
+  "color": {
+    "light": "#F8FAFC",
+    "dark": "#0F172A"
+  }
+}
+```
+
+---
+
+### `styling`
+
+**Type :** `object`
+
+Contrôles de style visuel avancés.
+
+<ResponseField name="styling.eyebrows" type='"section" | "breadcrumbs"'>
+  Le style de l'eyebrow de la page (le libellé affiché en haut de la page). Choisissez `section` pour afficher le nom de la section ou `breadcrumbs` pour afficher le chemin de navigation complet. Valeur par défaut : `section`.
+</ResponseField>
+
+<ResponseField name="styling.latex" type="boolean">
+  Contrôle si les feuilles de style LaTeX se chargent. Par défaut, Mintlify détecte automatiquement l'utilisation de LaTeX dans votre contenu et charge les feuilles de style nécessaires.
+
+  - Définissez sur `true` pour forcer le chargement des feuilles de style LaTeX lorsque la détection automatique échoue.
+  - Définissez sur `false` pour empêcher le chargement des feuilles de style LaTeX et améliorer les performances si vous n'utilisez pas d'expressions mathématiques.
+</ResponseField>
+
+<ResponseField name="styling.codeblocks" type='"system" | "dark" | string | object'>
+  Thème des blocs de code. Valeur par défaut : `"system"`.
+
+  - `"system"` : Correspond au mode actuel du site (clair ou sombre)
+  - `"dark"` : Utilise toujours le mode sombre
+  - Un nom de [thème Shiki](https://shiki.style/themes) sous forme de chaîne : applique ce thème à tous les blocs de code
+  - Un objet avec les clés `light` et `dark` : applique des thèmes Shiki distincts par mode
+
+  <Expandable title="styling.codeblocks object">
+    <ResponseField name="theme" type="string">
+      Un thème Shiki unique pour les deux modes.
+
+      ```json
+      "styling": {
+        "codeblocks": {
+          "theme": "dracula"
+        }
+      }
+      ```
+    </ResponseField>
+    <ResponseField name="theme" type="object">
+      Thèmes Shiki distincts pour les modes clair et sombre.
+
+      <Expandable title="theme">
+        <ResponseField name="light" type="string" required>
+          Nom du thème Shiki pour le mode clair.
+        </ResponseField>
+        <ResponseField name="dark" type="string" required>
+          Nom du thème Shiki pour le mode sombre.
+        </ResponseField>
+      </Expandable>
+
+      ```json
+      "styling": {
+        "codeblocks": {
+          "theme": {
+            "light": "github-light",
+            "dark": "github-dark"
+          }
+        }
+      }
+      ```
+    </ResponseField>
+    <ResponseField name="languages" type="object">
+      Configuration personnalisée des langages pour les blocs de code.
+
+      <Expandable title="languages">
+        <ResponseField name="custom" type="array of string">
+          Chemins vers des fichiers JSON décrivant des langages Shiki personnalisés. Utilisez ceci pour ajouter la coloration syntaxique aux langages qui ne sont pas dans l'ensemble par défaut de Shiki. Chaque fichier doit respecter le [format de grammaire TextMate](https://macromates.com/manual/en/language_grammars).
+
+          ```json
+          "styling": {
+            "codeblocks": {
+              "languages": {
+                "custom": ["/languages/my-language.json"]
+              }
+            }
+          }
+          ```
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+---
+
+### `thumbnails`
+
+**Type :** `object`
+
+Personnalisation des vignettes pour les réseaux sociaux et les aperçus de page.
+
+<ResponseField name="thumbnails.preset" type='"classic" | "headline" | "minimal"'>
+  Mise en page des vignettes. Si elle n'est pas définie, les vignettes utilisent la mise en page par défaut d'origine, et non l'un des presets.
+
+  - `classic` : logo en haut à gauche, avec le titre et la description en dessous.
+  - `headline` : titre et description en haut, avec le logo en bas à droite.
+  - `minimal` : titre et description centrés, avec le logo dans un panneau en bas.
+
+  Avec un preset, le surtitre (eyebrow) au-dessus du titre utilise toujours une police à chasse fixe, même si vous définissez `thumbnails.fonts`.
+</ResponseField>
+
+<ResponseField name="thumbnails.appearance" type='"light" | "dark"'>
+  Thème visuel pour les vignettes. Si non défini, les vignettes utilisent le jeu de couleurs de votre site défini par `colors`.
+</ResponseField>
+
+<ResponseField name="thumbnails.surface" type='"brand" | "neutral"'>
+  Style d'arrière-plan des vignettes avec preset. S'applique uniquement lorsque vous définissez `thumbnails.preset`. Valeur par défaut : `brand`.
+
+  - `brand` : un arrière-plan et un halo teintés avec la teinte de votre couleur principale. Si vous définissez `background.color`, les vignettes utilisent cette couleur comme arrière-plan.
+  - `neutral` : la couleur d'arrière-plan de votre site, sans halo.
+</ResponseField>
+
+<ResponseField name="thumbnails.background" type="string">
+  Image d'arrière-plan pour les vignettes. Peut être un chemin relatif ou une URL absolue. Sur les vignettes avec preset, l'image remplace la couleur d'arrière-plan et le halo de `thumbnails.surface`.
+</ResponseField>
+
+<ResponseField name="thumbnails.fonts" type="object">
+  Configuration des polices pour les vignettes. Utilise une famille Google Fonts ou un fichier de police auto-hébergé. Si la police ne se charge pas, les vignettes utilisent la police par défaut.
+
+  <Expandable title="thumbnails.fonts">
+    <ResponseField name="family" type="string" required>
+      Nom de la famille de polices, comme `"Open Sans"` ou `"Playfair Display"`. Prend en charge les noms de familles [Google Fonts](https://fonts.google.com). Si vous définissez `source`, il s'agit du nom de votre police auto-hébergée.
+    </ResponseField>
+    <ResponseField name="source" type="string">
+      URL ou chemin vers un fichier de police auto-hébergé, comme `/fonts/custom.woff` ou `https://cdn.example.com/font.woff`.
+    </ResponseField>
+    <ResponseField name="format" type='"woff" | "ttf" | "otf"'>
+      Format du fichier de police auto-hébergé. Obligatoire lorsque vous définissez `source`. Les vignettes ne prennent pas en charge `woff2`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="thumbnails.eyebrow" type="object">
+  Le surtitre affiché au-dessus du titre de la page dans les vignettes.
+
+  <Expandable title="thumbnails.eyebrow">
+    <ResponseField name="source" type='"group" | "tab" | "dropdown" | "anchor" | "language" | "product" | "version" | "item" | "none"'>
+      Le niveau de navigation dont le nom apparaît comme surtitre. Valeur par défaut : `group`. Si une page ne se trouve pas dans un élément de navigation du type choisi, le surtitre affiche le nom du groupe. Utilisez `none` pour masquer le surtitre.
+    </ResponseField>
+    <ResponseField name="style" type='"plain" | "bar" | "pill"'>
+      Rendu du surtitre sur les vignettes avec preset. Valeur par défaut : `bar` pour `classic`, `pill` pour `headline` et `plain` pour `minimal`.
+    </ResponseField>
+    <ResponseField name="color" type="string">
+      Couleur hexadécimale du surtitre sur les vignettes avec preset. Si non défini, Mintlify dérive la couleur des couleurs de votre thème.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+```json docs.json
+"thumbnails": {
+  "preset": "headline",
+  "eyebrow": {
+    "source": "tab",
+    "style": "bar",
+    "color": "#FDE68A"
+  }
+}
+```
+
+<div id="override-thumbnails-for-a-page-or-section">
+  #### Remplacer les vignettes d'une page ou d'une section
+</div>
+
+Pour modifier la vignette d'une seule page, ajoutez un objet `thumbnail` au frontmatter de la page. Pour la modifier pour une section de navigation, ajoutez `thumbnail` à un groupe, un onglet, une ancre, un menu déroulant, un produit, une version, une langue ou un élément de menu dans `docs.json`.
+
+Un remplacement `thumbnail` accepte `preset`, `appearance`, `surface`, `background` et `eyebrow`. Dans un remplacement, `eyebrow` est le texte littéral affiché au-dessus du titre, et `""` le masque. Définissez `background` sur `""` pour supprimer une image d'arrière-plan héritée. Les options `source`, `style` et `color` du surtitre se définissent uniquement pour tout le site dans `thumbnails.eyebrow`.
+
+Mintlify résout chaque clé séparément. Il utilise d'abord le frontmatter de la page, puis la section de navigation la plus proche qui définit la clé, puis `thumbnails` dans `docs.json`. Mintlify ignore les valeurs de remplacement non valides et utilise le niveau suivant.
+
+```yaml Page frontmatter
+---
+title: "Webhooks"
+thumbnail:
+  preset: minimal
+  eyebrow: "API Reference"
+---
+```
+
+```json docs.json
+{
+  "group": "Webhooks",
+  "thumbnail": { "preset": "minimal" },
+  "pages": ["guides/webhooks"]
+}
+```
+
+## Exemple
+
+```json docs.json
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "Example Co.",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#93C5FD",
+    "dark": "#1D4ED8"
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://example.com"
+  },
+  "favicon": "/favicon.svg",
+  "appearance": {
+    "default": "system"
+  },
+  "fonts": {
+    "family": "Inter"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "background": {
+    "decoration": "gradient"
+  }
+}
+```

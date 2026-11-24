@@ -1,0 +1,169 @@
+---
+title: "Configuration de GraphQL"
+sidebarTitle: "GraphQL"
+description: "Générez des pages de référence pour votre API GraphQL depuis un fichier de schéma, avec types liés et exemples de requêtes, mutations et réponses."
+keywords: ["graphql", "schema", "sdl"]
+---
+
+<div id="add-a-graphql-schema">
+  ## Ajouter un schéma GraphQL
+</div>
+
+Pour créer des pages pour votre API GraphQL, vous avez besoin d’un schéma GraphQL valide au format SDL (Schema Definition Language). Stockez le schéma dans votre dépôt de documentation ou hébergez-le à une URL HTTPS que Mintlify peut récupérer.
+
+```graphql schema.graphql
+"An object with a stable identifier."
+interface Node {
+  id: ID!
+}
+
+type Organization implements Node {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  organization(id: ID!): Organization
+}
+```
+
+<div id="auto-populate-graphql-pages">
+  ## Remplir automatiquement les pages GraphQL
+</div>
+
+Pour générer automatiquement des pages pour chaque requête, mutation et type de votre schéma, ajoutez une propriété `graphql` à un onglet ou à un groupe dans votre `docs.json`. Mintlify analyse le schéma et crée une page pour chaque opération et chaque type nommé.
+
+<CodeGroup>
+
+```json Local file
+"navigation": {
+  "tabs": [
+    {
+      "tab": "GraphQL API",
+      "graphql": "schema.graphql"
+    }
+  ]
+}
+```
+
+```json Remote URL
+"navigation": {
+  "tabs": [
+    {
+      "tab": "GraphQL API",
+      "graphql": "https://example.com/schema.graphql"
+    }
+  ]
+}
+```
+
+```json Custom directory
+"navigation": {
+  "tabs": [
+    {
+      "tab": "GraphQL API",
+      "graphql": {
+        "source": "schema.graphql",
+        "directory": "api/graphql"
+      }
+    }
+  ]
+}
+```
+
+</CodeGroup>
+
+La propriété `graphql` accepte soit une chaîne (un chemin local ou une URL HTTPS), soit un objet avec les champs suivants :
+
+<Note>
+  Vous pouvez déclarer `graphql` uniquement sur un [onglet](/fr/organize/navigation#tabs) ou un [groupe](/fr/organize/navigation#groups).
+
+  Un onglet avec `graphql` peut inclure des `groups`, mais aucune autre structure de navigation, comme `pages`, `versions` ou `languages`.
+
+  Un groupe avec `graphql` peut inclure des `pages`.
+</Note>
+
+<ParamField path="source" type="string" required>
+  Un chemin local vers un fichier SDL dans votre dépôt de documentation ou une URL HTTPS vers un fichier SDL hébergé. Les URL HTTP ne sont pas acceptées.
+</ParamField>
+
+<ParamField path="directory" type="string">
+  Le répertoire dans lequel les pages générées sont placées. Par défaut, `graphql-reference`.
+</ParamField>
+
+<div id="generated-pages">
+  ## Pages générées
+</div>
+
+Mintlify organise les pages générées en trois sections sous l’onglet ou le groupe que vous avez configuré :
+
+- **Queries** — une page par champ de votre type racine `Query`.
+- **Mutations** — une page par champ de votre type racine `Mutation`.
+- **Types** — une page par type nommé (object, input, enum, interface, union ou scalar personnalisé).
+
+Sur un onglet, les sections apparaissent après les groupes que vous définissez. Sur un groupe, elles apparaissent sous forme de groupes imbriqués après les pages que vous listez.
+
+Les URL des pages utilisent chaque nom tel qu'il est écrit, comme `graphql-reference/types/Cart`. Si deux noms ne diffèrent que par la casse, comme `StoreFrontConfigType` et `StorefrontConfigType`, le nom qui arrive en premier dans l'ordre de tri conserve cette URL et l'autre utilise une URL en kebab-case, comme `graphql-reference/types/storefront-config-type`. Le build consigne un avertissement pour chaque nom qui reçoit une nouvelle URL, et `mint validate` le signale comme un avertissement `url-collision` qui ne fait pas échouer l'exécution.
+
+Chaque page d’opération affiche la description du champ, les arguments, le type de retour et des liens vers tous les types référencés. Les pages de requêtes et de mutations comprennent également un exemple d’opération généré, les variables requises et un exemple de réponse JSON.
+
+Les pages de types affichent la définition du schéma en lecture seule, avec des types de champs liés afin que les lecteurs puissent naviguer dans le graphe.
+
+<div id="select-specific-operations-and-types">
+  ## Sélectionner des opérations et des types spécifiques
+</div>
+
+Pour créer une référence sélectionnée au lieu de générer toutes les pages, listez des sélecteurs dans le tableau `pages` d'un groupe qui déclare `graphql`. Vous pouvez également les lister dans tout groupe imbriqué sous un onglet ou un groupe qui déclare `graphql`. Les onglets avec `graphql` ne peuvent pas inclure de `pages` : placez donc les sélecteurs dans un groupe à l'intérieur de l'onglet. Mintlify génère une page uniquement pour chaque opération ou type sélectionné.
+
+```json
+"navigation": {
+  "tabs": [
+    {
+      "tab": "Storefront API",
+      "graphql": "storefront.graphql",
+      "groups": [
+        {
+          "group": "Get started",
+          "pages": ["introduction"]
+        },
+        {
+          "group": "Cart",
+          "pages": [
+            "QUERY products",
+            "MUTATION cart.createCart",
+            "TYPE Cart"
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Un sélecteur est un type suivi d'un nom, séparés par un espace :
+
+- `QUERY <field>` : un champ de votre type racine `Query`.
+- `MUTATION <field>` : un champ de votre type racine `Mutation`.
+- `TYPE <name>` : un type nommé : object, input, enum, interface, union ou scalar personnalisé.
+
+Les types de sélecteur doivent être en majuscules. Utilisez un chemin avec des points, comme `MUTATION cart.createCart`, pour sélectionner une opération imbriquée sous un champ d'espace de noms. Les sélecteurs `TYPE` n'acceptent pas les chemins avec des points.
+
+La barre latérale affiche une opération imbriquée avec son dernier segment : `MUTATION cart.createCart` apparaît donc comme `createCart`. L'URL de la page conserve le chemin complet et se termine par `cart/createCart`.
+
+Si une page d'un onglet ou d'un groupe avec `graphql` est un sélecteur, Mintlify ne génère pas les sections complètes **Queries**, **Mutations** et **Types** pour cet élément. Les chemins de page classiques du même tableau `pages` fonctionnent normalement.
+
+Dans une référence sélective, les pages de requêtes et de mutations ne renvoient qu'aux pages de types générées par vos sélecteurs. Pour créer un lien vers un type référencé par une opération sélectionnée, ajoutez un sélecteur `TYPE` pour ce type.
+
+Si un sélecteur ne correspond à rien dans votre schéma, la compilation échoue avec une erreur qui indique l'opération ou le type manquant.
+
+<div id="deprecations">
+  ## Dépréciations
+</div>
+
+Les champs et les arguments marqués avec `@deprecated` dans votre schéma sont signalés comme dépréciés sur les pages générées. La raison de la dépréciation, lorsqu’elle est fournie, apparaît à côté du champ.
+
+<div id="update-your-documentation">
+  ## Mettre à jour votre documentation
+</div>
+
+Mintlify régénère les pages de référence GraphQL lorsque vous exécutez `mint dev` ou lorsque vous poussez des modifications vers votre dépôt de documentation. Si votre schéma est hébergé à une URL HTTPS, les mises à jour du schéma sont prises en compte lors de la prochaine build.

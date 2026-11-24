@@ -1,0 +1,309 @@
+---
+title: "Projets multi-référentiels"
+description: "Combinez des fichiers issus de plusieurs référentiels Git en un seul site Mintlify, avec un chemin d’URL pour chaque référentiel source."
+keywords: ["multi-repo", "multiple repositories", "git sources", "URL path", "multi-repository deployments"]
+---
+
+<Info>
+  Les projets multi-référentiels nécessitent un [plan Enterprise](https://mintlify.com/pricing?ref=multi-repo).
+</Info>
+
+Utilisez un projet multi-référentiels lorsqu’un même site doit regrouper du contenu provenant de plusieurs référentiels Git. Lorsque vous configurez plusieurs référentiels comme sources d’un projet, le contenu de chaque référentiel dispose de son propre chemin d’URL.
+
+Par exemple, vous pouvez combiner des référentiels distincts pour la documentation produit, la référence d’API et les guides SDK au sein d’un même site :
+
+```text
+docs.example.com/product
+docs.example.com/api
+docs.example.com/sdks
+```
+
+Une source d’un projet multi-référentiels peut utiliser un chemin d’URL racine (`/`). Le contenu de cette source est diffusé à la racine du site sans préfixe de chemin, tandis que les autres sources sont diffusées sous leurs chemins d’URL configurés. C’est utile lorsqu’un référentiel contient la documentation principale et que d’autres référentiels ajoutent des sections comme une référence d’API ou des guides SDK.
+
+<div id="how-multi-repository-projects-work">
+  ## Fonctionnement des projets multi-référentiels
+</div>
+
+Chaque référentiel d’un projet multi-référentiels possède :
+
+- Sa propre connexion à un fournisseur Git
+- Sa propre branche
+- Un répertoire de contenu facultatif
+- Son propre chemin d’URL
+- Son propre `docs.json`
+
+Lors du déploiement, Mintlify lit chaque référentiel et combine les sources configurées en un seul site. Chaque source apparaît sous son chemin d’URL configuré.
+
+Un référentiel sert de **source de base** pour le projet. Son `docs.json` est le `docs.json` racine et contrôle la configuration au niveau du site, y compris le thème, les couleurs, le logo, le nom du site, la navigation de premier niveau, les intégrations, le SEO et les autres champs de premier niveau. Chaque autre source fournit sa propre navigation et son propre contenu sous son chemin d’URL configuré, ses [redirections](#redirects-across-sources) et ses [motifs `.mintignore`](#exclude-files-across-sources), ainsi que toutes les [variables](#variables-across-sources) que la source de base ne définit pas. Le premier référentiel que vous configurez est la source de base par défaut, et vous pouvez [changer la source de base](#change-the-base-source) à tout moment.
+
+<Note>
+  Les projets multi-référentiels sont différents d’une [configuration monorepo](/fr/deploy/monorepo), dans laquelle vous stockez la documentation dans un sous-répertoire d’un seul référentiel. Pour comparer les configurations de dépôt, consultez [Choisir une configuration de dépôt](/fr/deploy/choose-repository-setup).
+</Note>
+
+<Tip>
+  Pour gérer de nombreux référentiels à partir d'un fichier de configuration, ou pour combiner des référentiels sans forfait Enterprise, utilisez la [GitHub Action multi-référentiels](/fr/deploy/multirepo-action). L'action copie le contenu de chaque référentiel dans un seul référentiel de documentation.
+</Tip>
+
+<div id="requirements">
+  ## Prérequis
+</div>
+
+- Un accès administrateur à votre projet Mintlify
+- Un fichier `docs.json` dans chaque référentiel source
+- Chaque référentiel ne peut être ajouté qu’une seule fois par projet. Mintlify rejette une configuration qui inclut le même référentiel comme deux sources, même avec des branches ou des répertoires de contenu différents
+- Toutes les sources doivent utiliser le même fournisseur Git (tout GitHub, tout GitLab, tout Bitbucket ou tout Azure Repos). L’ajout d’une source d’un autre fournisseur supprime toutes les sources existantes de l’autre type
+
+<Warning>
+  Les chemins d’URL doivent être uniques et ne peuvent pas se chevaucher. Par exemple, ne configurez pas une source sur `/docs` et une autre sur `/docs/api`. Une seule source peut utiliser le chemin d’URL racine (`/`).
+</Warning>
+
+<div id="configure-multiple-repositories">
+  ## Configurer plusieurs référentiels
+</div>
+
+<Steps>
+  <Step title="Ouvrir les paramètres Git">
+    Accédez aux [paramètres Git](https://app.mintlify.com/settings/project/git-settings) dans votre tableau de bord.
+  </Step>
+
+  <Step title="Ajouter un autre référentiel">
+    Cliquez sur **Add repository**.
+  </Step>
+
+  <Step title="Configurer la source du référentiel">
+    Sélectionnez le référentiel, la branche et tous les champs requis spécifiques au fournisseur Git (GitHub, GitLab ou Bitbucket).
+    
+    <Frame>
+    <img src="/images/deployments/repo-configuration-light.png" alt="Le panneau de configuration du référentiel sur la page des paramètres Git. Le référentiel, la branche et les champs spécifiques à GitHub sont visibles." className="block dark:hidden" />
+    <img src="/images/deployments/repo-configuration-dark.png" alt="Le panneau de configuration du référentiel sur la page des paramètres Git. Le référentiel, la branche et les champs spécifiques à GitHub sont visibles." className="hidden dark:block" />
+    </Frame>
+
+    Pour les sources GitHub, l’application GitHub de Mintlify doit avoir accès au référentiel. Pour les sources GitLab, fournissez l’ID du projet et un jeton d’accès avec les portées `api` et `read_api`. Pour les sources Bitbucket, connectez votre compte Bitbucket via OAuth et activez le dépôt. Consultez [Bitbucket](/fr/deploy/bitbucket) pour les instructions de configuration.
+
+    Si le `docs.json` du référentiel se trouve dans un sous-répertoire plutôt qu’à la racine, activez **docs.json is in a subdirectory** et saisissez le chemin vers ce répertoire.
+  </Step>
+
+  <Step title="Définir le chemin d’URL">
+    Saisissez un **URL path** pour la source du référentiel.
+
+    Le chemin d’URL détermine l’emplacement où le contenu de ce référentiel apparaît sur votre site de documentation. Par exemple, un chemin d’URL `api` diffuse le contenu sous `docs.example.com/api`.
+
+    Pour diffuser une source à la racine de votre site sans préfixe de chemin, laissez le chemin d’URL vide ou définissez-le sur `/`. Une seule source par projet peut utiliser le chemin d’URL racine.
+
+    <Note>
+      Vous pouvez saisir le chemin avec ou sans barre oblique de tête. Mintlify normalise la valeur lors de l’enregistrement.
+    </Note>
+  </Step>
+
+  <Step title="Enregistrer les modifications">
+    Cliquez sur **Save**. Mintlify enregistre la configuration et met en file d’attente un déploiement du site combiné.
+  </Step>
+</Steps>
+
+<div id="change-the-base-source">
+  ## Changer la source de base
+</div>
+
+La source de base fournit la configuration au niveau du site pour votre projet multi-référentiels. Changez la source de base lorsque vous souhaitez que le `docs.json` d’un autre référentiel contrôle les paramètres tels que le thème, les couleurs, le nom du site et la navigation de premier niveau.
+
+<Steps>
+  <Step title="Ouvrir les paramètres Git">
+    Accédez aux [paramètres Git](https://app.mintlify.com/settings/project/git-settings) dans votre tableau de bord.
+
+    La source de base actuelle affiche un badge **Base** à côté du nom du référentiel.
+  </Step>
+
+  <Step title="Définir une nouvelle source de base">
+    Sur le référentiel que vous souhaitez utiliser comme base, sélectionnez **Set as base**.
+
+    Mintlify met immédiatement à jour la source de base et met en file d’attente un déploiement qui utilise le `docs.json` du nouveau référentiel de base pour la configuration au niveau du site.
+  </Step>
+</Steps>
+
+<Warning>
+  Changer la source de base remplace les paramètres au niveau du site (tels que le thème, les couleurs, le logo, le nom du site et la navigation de premier niveau) par les valeurs du `docs.json` du nouveau référentiel de base. Les chemins d’URL et le contenu des autres sources ne sont pas affectés.
+</Warning>
+
+<div id="reorder-repository-sources">
+  ## Réorganiser les sources de référentiel
+</div>
+
+L’ordre des sources de référentiel sur la page des paramètres Git détermine l’ordre de leurs sections de produit dans la navigation combinée. L’ordre détermine également quelle source Mintlify utilise lorsque deux sources autres que la source de base définissent la même [variable](#variables-across-sources) ou la même [redirection](#redirects-across-sources).
+
+Pour modifier l’ordre, faites glisser une carte de référentiel vers une nouvelle position sur la page des [paramètres Git](https://app.mintlify.com/settings/project/git-settings). Mintlify enregistre le nouvel ordre et met en file d’attente un déploiement du site combiné.
+
+<div id="example-repository-layout">
+  ## Exemple d’organisation des référentiels
+</div>
+
+Dans cet exemple, chaque source dispose de son propre référentiel et de son propre `docs.json`.
+
+```text
+acme/product-docs
+├── docs.json
+├── overview.mdx
+└── guides/
+
+acme/api-docs
+├── docs.json
+├── introduction.mdx
+└── reference/
+
+acme/sdk-docs
+├── docs.json
+├── quickstart.mdx
+└── javascript/
+```
+
+Configurez chaque référentiel avec un chemin d’URL :
+
+| Référentiel | Chemin d’URL | Chemin publié |
+| --- | --- | --- |
+| `acme/product-docs` | `product` | `/product` |
+| `acme/api-docs` | `api` | `/api` |
+| `acme/sdk-docs` | `sdks` | `/sdks` |
+
+<div id="navigation-behavior">
+  ## Comportement de la navigation
+</div>
+
+Mintlify combine la navigation de chaque référentiel en une seule navigation de site. Chaque source de référentiel devient une section produit de premier niveau sous le chemin d’URL configuré.
+
+Le nom de chaque section produit provient du champ `name` du `docs.json` du référentiel correspondant. Par exemple, si le `docs.json` d’un référentiel définit `"name": "API Reference"`, sa section produit apparaît comme « API Reference » dans la navigation combinée.
+
+Conservez une navigation cantonnée à chaque source. Par exemple, les pages du référentiel API ne doivent référencer que des fichiers du référentiel API. De même, les pages du référentiel SDK ne doivent référencer que des fichiers du référentiel SDK.
+
+Les configurations imbriquées `navigation.products` ne sont pas prises en charge à l’intérieur des référentiels sources individuels.
+
+<div id="link-between-sources">
+  ### Créer des liens entre sources
+</div>
+
+Les liens Markdown relatifs ne peuvent pas être résolus entre référentiels, car chaque source ne voit que ses propres fichiers au moment de la compilation. Pour lier une page d’une source à une page d’une autre source, utilisez un chemin d’URL relatif à la racine qui inclut le chemin d’URL de la source de destination :
+
+```mdx
+See the [API reference](/api/reference/authentication) for details.
+```
+
+Dans cet exemple, `/api` est le chemin d’URL configuré pour la source du référentiel API. Le lien est résolu au niveau du site publié en `docs.example.com/api/reference/authentication`.
+
+N’utilisez pas d’URL complètes `https://` pour les liens internes entre sources — les chemins relatifs à la racine permettent aux previews et aux domaines personnalisés de continuer à fonctionner correctement.
+
+<div id="avoid-path-conflicts-across-sources">
+  ### Éviter les conflits de chemins entre les sources
+</div>
+
+Lorsqu’une source utilise le chemin d’URL racine, ses pages peuvent partager la même URL finale que des pages d’une autre source. Si deux sources produisent le même chemin de page, Mintlify diffuse la page depuis la source dont le chemin d’URL est le plus spécifique et enregistre un avertissement de conflit dans la mise à jour du déploiement. Pour éviter les conflits, veillez à ce que les noms de fichiers de la source racine ne chevauchent pas les chemins d’URL configurés pour les autres sources.
+
+<div id="variables-across-sources">
+  ## Variables entre les sources
+</div>
+
+Mintlify fusionne les [`variables`](/fr/organize/settings-reference#variables) définies dans le `docs.json` de chaque référentiel source en un seul ensemble pour le site déployé. Les pages de n’importe quelle source peuvent référencer n’importe quelle variable fusionnée avec la syntaxe `{{variableName}}`.
+
+Lorsque plusieurs sources définissent la même clé de variable :
+
+- La valeur de la source de base est toujours prioritaire.
+- Si deux sources non-base définissent la même clé avec des valeurs différentes et que la source de base ne la définit pas, Mintlify utilise la valeur de la source configurée en premier et enregistre un avertissement dans le déploiement pour mettre à jour les noms en conflit dans les sources non-base.
+
+<div id="redirects-across-sources">
+  ## Redirections entre les sources
+</div>
+
+Mintlify fusionne les [`redirects`](/fr/create/redirects) définies dans le `docs.json` de chaque référentiel source en une seule liste pour le site déployé.
+
+Écrivez les redirections d’une source non-base par rapport aux pages de cette même source. Mintlify préfixe le `source` et le `destination` de chaque redirection avec le chemin d’URL de la source. Les URL externes de `destination` restent inchangées. Par exemple, dans une source dont le chemin d’URL est `api`, cette redirection envoie `/api/old-auth` vers `/api/reference/authentication` :
+
+```json
+{
+  "redirects": [
+    {
+      "source": "/old-auth",
+      "destination": "/reference/authentication"
+    }
+  ]
+}
+```
+
+Les redirections de la source de base s’appliquent telles qu’elles sont écrites.
+
+Si plusieurs redirections ont le même `source` après l’ajout du préfixe, Mintlify conserve la première et ignore les autres. Les redirections de la source de base passent en premier, suivies de celles des autres sources dans l’ordre dans lequel vous les avez configurées. Mintlify enregistre un avertissement dans le déploiement pour chaque redirection ignorée.
+
+<div id="exclude-files-across-sources">
+  ## Exclure des fichiers entre les sources
+</div>
+
+Chaque source de référentiel peut avoir son propre fichier [`.mintignore`](/fr/organize/mintignore) à la racine de sa documentation. Les motifs du `.mintignore` d’une source non-base n’excluent que les fichiers de cette source, et Mintlify les applique par rapport à la racine de documentation de cette source. Si un motif de la source de base et un motif d’une source non-base entrent en conflit, le motif de la source de base l’emporte.
+
+<div id="reference-navigation-from-another-source">
+  ## Référencer la navigation d'une autre source
+</div>
+
+Utilisez `sourceRef` pour placer la navigation d'un autre référentiel à un emplacement précis dans le `docs.json` de la source de base. Si vous n'utilisez pas `sourceRef`, Mintlify ajoute chaque référentiel comme une section produit distincte de niveau supérieur.
+
+<div id="requirements">
+  ### Prérequis
+</div>
+
+- Le référentiel référencé doit être configuré comme source dans le même projet multi-référentiels.
+- Les valeurs de `sourceRef` doivent inclure au moins deux segments de chemin, comme `owner/repo`. Les chemins de montage et les noms de référentiel seuls ne sont pas pris en charge.
+  - Pour les référentiels GitLab dans des sous-groupes imbriqués, utilisez le chemin complet, comme `group/subgroup/repo`. Vous pouvez raccourcir la valeur aux deux derniers segments, comme `subgroup/repo`, sauf si deux sources partagent les mêmes segments finaux. Lorsque deux sources partagent les mêmes segments finaux, utilisez le chemin complet pour chacune.
+- La source référencée doit définir un schéma de navigation similaire à celui de la source principale. Par exemple, un `sourceRef` à l'intérieur de `anchors` exige que la source référencée définisse `navigation.anchors`.
+- Les entrées `sourceRef` ne peuvent pas former de cycle. Une source ne peut pas se référencer elle-même, et deux sources ne peuvent pas se référencer mutuellement.
+- `sourceRef` doit apparaître à l'intérieur d'un tableau de navigation. Il n'est pas valide au niveau supérieur de `navigation`.
+
+<div id="usage">
+  ### Utilisation
+</div>
+
+Ajoutez une entrée `sourceRef` à un tableau de navigation dans le `docs.json` de la source de base. La valeur doit être l'identifiant `owner/repo` du référentiel ou son chemin de groupe complet.
+
+```json
+{ "sourceRef": "acme/api-docs" }
+```
+
+Pour un référentiel GitLab dans un sous-groupe imbriqué, utilisez le chemin complet :
+
+```json
+{ "sourceRef": "acme/platform/api-docs" }
+```
+
+Mintlify prend en charge `sourceRef` dans `anchors`, `tabs`, `groups`, `pages`, `products`, `menu` et les tableaux sous `navigation.global`.
+
+Lorsque vous placez `sourceRef` dans le tableau `menu` d'un onglet, Mintlify remplace l'entrée par les éléments de menu que la source référencée déclare sous `navigation.groups[*].menu` et préfixe le chemin de page de chaque élément avec le chemin d'URL de la source référencée. Si la source référencée ne définit aucun élément de menu sous `navigation.groups`, le déploiement échoue.
+
+Par exemple, pour combiner les anchors de plusieurs référentiels dans une seule navigation d'anchors :
+
+```json
+{
+  "navigation": {
+    "anchors": [
+      {
+        "anchor": "Guides",
+        "pages": ["quickstart"]
+      },
+      {
+        "sourceRef": "acme/api-docs"
+      }
+    ]
+  }
+}
+```
+
+Si `acme/api-docs` définit son propre `navigation.anchors`, Mintlify remplace l'entrée `sourceRef` par ces anchors et préfixe leurs chemins avec le chemin d'URL de la source référencée.
+
+<div id="edit-sources-in-the-web-editor">
+  ## Modifier les sources dans l'éditeur web
+</div>
+
+Dans un projet multi-référentiels, la barre latérale de l'[éditeur](/fr/editor) affiche un menu des référentiels au-dessus de vos pages. Le menu indique le référentiel que vous modifiez et liste chaque source de référentiel avec son chemin d'URL.
+
+Sélectionnez un référentiel pour basculer l'éditeur vers les pages, les fichiers et les branches de cette source. L'éditeur ouvre la première page de la source sélectionnée.
+
+La navigation de la source de base peut inclure des pages d'une autre source, par exemple via [`sourceRef`](#reference-navigation-from-another-source). Vous ne pouvez pas modifier ces pages depuis la source de base. Si vous cliquez sur une page provenant d'une source différente de celle actuellement sélectionnée, l'éditeur bascule vers la source qui la contient.
+
+<div id="removing-a-repository-source">
+  ## Supprimer une source de référentiel
+</div>
+
+Vous pouvez supprimer une source de référentiel depuis la [page des paramètres Git](https://app.mintlify.com/settings/project/git-settings) de votre tableau de bord. Lorsqu’il ne reste plus qu’une seule source de référentiel, Mintlify supprime le chemin d’URL de la source et traite le référentiel restant comme la source racine du projet.

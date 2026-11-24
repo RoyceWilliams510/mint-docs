@@ -1,0 +1,173 @@
+---
+title: "Admin Model Context Protocol (MCP) server"
+sidebarTitle: "Admin MCP"
+description: "Give AI tools like Claude, ChatGPT, and Cursor write access to your Mintlify content and dashboard so they can edit pages, update settings, and open PRs."
+keywords: ["MCP", "write access", "AI", "editing", "Claude", "ChatGPT", "Cursor", "branch", "pull request"]
+boost: 3
+---
+
+import AdminMcpClaude from "/snippets/admin-mcp-claude.mdx";
+import AdminMcpClaudeCode from "/snippets/admin-mcp-claude-code.mdx";
+import AdminMcpChatgpt from "/snippets/admin-mcp-chatgpt.mdx";
+import AdminMcpCursor from "/snippets/admin-mcp-cursor.mdx";
+import AdminMcpCodex from "/snippets/admin-mcp-codex.mdx";
+
+## About the admin MCP
+
+The admin MCP server gives AI tools write access to your Mintlify content and settings. Use it to update content and access your dashboard. With the admin MCP, you can use your preferred AI tools to edit pages, restructure navigation, update `docs.json`, open pull requests, change settings, create automations, and more.
+
+Connect an MCP client such as Claude, Claude Code, ChatGPT, or Cursor to the admin MCP server. Use it to collaborate on your Mintlify content and settings with the same tools you use to write code. Each content tool call names the branch it works on. Edits to your deploy branch land as unpublished changes, and edits to any other branch go through a pull request. They ship when you call `publish` or merge the pull request. [Project management](/ai/admin-mcp-tools#project-management) changes, such as automation and settings updates, apply immediately to the live project. If your organization has multiple projects, a single admin MCP connection can access and switch between all of them.
+
+After you connect, see [Edit and publish with the admin MCP](/ai/admin-mcp-editing) for how AI tools change and publish your content, and [Admin MCP tools](/ai/admin-mcp-tools) for every tool the admin MCP exposes.
+
+<Note>
+  The admin MCP server allows AI tools to access your Mintlify dashboard. Treat it as a tool with write access. Connect it only from trusted AI tools, review every pull request before merging, and be aware that project management changes apply immediately without a pull request.
+</Note>
+
+The admin MCP is a hosted Mintlify service at `https://mcp.mintlify.com`. Every client connects to the same endpoint and authenticates with your Mintlify account.
+
+### How the admin MCP differs from other Mintlify MCP servers
+
+|  | Admin MCP | Search MCP |
+| :-- | :-- | :-- |
+| **Audience** | Your team | Your end users |
+| **Access** | Read, edit, restructure, publish, create automations, manage settings | Read and search one site's published pages |
+| **Endpoint** | `https://mcp.mintlify.com` | `/mcp` on your site domain |
+| **Output** | Content edits, navigation changes, pull requests, automation runs | Search results and page content from your site |
+
+## Prerequisites
+
+Before connecting the admin MCP, confirm the following:
+
+- **Mintlify account**: You need a Mintlify account with access to the project you want to edit. The OAuth session inherits your dashboard permissions. Viewers can only use read tools, and admin-only actions (such as `update_config` on protected settings) require an admin role on the project.
+- **Git provider access**: The GitHub, GitLab, or Bitbucket connection for the project must have write access to the deploy branch's repository. `publish` opens PRs through the same integration used for normal deploys.
+- **MCP client**: An MCP-capable AI tool such as Claude, Claude Code, ChatGPT, Cursor, or Codex.
+
+## Connect to the admin MCP
+
+You must have an interactive OAuth login against your Mintlify account to connect to the admin MCP. AI tools exchange that login for a session token scoped to one or more projects, depending on how you grant access. A connection scoped to specific projects can only access those projects. An organization-wide connection can access the projects in your organization that your role allows. Mintlify checks your role on each project, including any [project role](/dashboard/roles#project-roles), and leaves out projects where you have **No access**.
+
+Connect your tools to the admin MCP from [your dashboard](https://app.mintlify.com/products/mcp) or complete the following steps for your preferred tool. 
+
+<Tip>
+  To configure Claude Code, Codex, or Cursor from your terminal, run [`mint agent setup`](/cli/commands#mint-agent-setup). It adds the admin MCP to each agent's configuration and installs Mintlify skills. You still complete the OAuth sign-in in each agent.
+</Tip>
+
+<Tabs>
+  <Tab title="Claude">
+    <AdminMcpClaude />
+  </Tab>
+  <Tab title="Claude Code">
+    <AdminMcpClaudeCode />
+  </Tab>
+  <Tab title="ChatGPT">
+    <AdminMcpChatgpt />
+  </Tab>
+  <Tab title="Cursor">
+    <AdminMcpCursor />
+  </Tab>
+  <Tab title="Codex">
+    <AdminMcpCodex />
+  </Tab>
+</Tabs>
+
+### Limit a connection to search and read tools
+
+To connect an AI tool that only needs to look things up in your content, send the `x-mintlify-toolset: knowledge` header when you add the admin MCP. The connection then lists only these tools: `search`, `read`, `read_comments`, `read_page_history`, `list_nodes`, `list_branches`, and `list_deployments`. AI tools on that connection can't edit content, publish, or change settings.
+
+The admin MCP also gives the AI tool shorter instructions that focus on searching and reading pages.
+
+For example, with Claude Code:
+
+```bash
+claude mcp add --transport http mintlify-knowledge https://mcp.mintlify.com --header "x-mintlify-toolset: knowledge"
+```
+
+## Redirect URIs
+
+Popular MCP clients such as Claude, ChatGPT, and Cursor can always complete the OAuth login. To let other clients connect, add their redirect domains in the **Redirect URIs** section of **MCP → Settings**. Enter a domain or custom scheme, such as `myapp://callback`, in the **Allowed domains** field and click **Add domain**.
+
+Allowed domains apply to both the admin MCP and your [search MCP server](/ai/model-context-protocol#enable-authenticated-mcp).
+
+## Credentials
+
+Credentials let AI apps and gateways connect to the admin MCP without an interactive sign-in. Use them for environments where a user can't complete the OAuth login.
+
+1. In your dashboard sidebar, click **MCP**, then click **Credentials**.
+2. Click **Create credential**.
+3. Copy the secret. The dashboard shows the secret only once.
+
+Credentials can read content, but they can't change it. Tools that edit, comment on, branch, publish, or discard content, and `read_inbox`, require an OAuth login and return `user_principal_required` for a credential.
+
+To revoke a credential, click the delete icon next to it.
+
+## Example prompts
+
+After you connect the admin MCP, you can drive it with natural-language prompts. For example:
+
+- _"Start a branch titled 'Add billing FAQ' and create a new page under the FAQ group titled 'Billing'. Draft answers for the five questions in this Linear issue."_
+- _"Find every page that mentions the deprecated `legacy_token` field and update the example to use `api_key` instead. Publish it as a PR titled 'docs: replace legacy\_token references'."_
+- _"Reorganize the API reference: move the webhooks pages into a new group called 'Webhooks' and update the icons to match the rest of the section."_
+- _"Read the open comments on the quickstart page, make the requested edits, and reply to each thread, resolving it once addressed."_
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Open the editor URL">
+    `create_branch` returns an `editorUrl` for the branch. `create_node` and `publish` return an `editorUrl` for the page that changed. Open these links in a separate tab so you can watch the AI's changes render live in the dashboard editor while you prompt.
+  </Accordion>
+
+  <Accordion title="Review every PR">
+    The admin MCP can rewrite hundreds of pages in a single session. Before merging, read the PR diff and skim the rendered preview. Don't rubber-stamp large changes.
+  </Accordion>
+
+  <Accordion title="Keep branches focused">
+    Keep each branch focused on one change. Smaller branches produce pull requests that are easier to review and preserve agents' context windows. Call `create_branch` again to start unrelated work.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  If you abandon a branch you started with `create_branch` without discarding it, the branch and its pull request stay in your repository. Call `discard` to delete a branch you no longer need, or close its pull request.
+</Note>
+
+## Disconnect or revoke access
+
+Disconnect the admin MCP when you no longer want an AI tool to edit your project, or when you want to force a fresh OAuth login.
+
+- **Revoke the OAuth grant**: In your Mintlify dashboard, navigate to the [MCP settings](https://app.mintlify.com/products/mcp) in your dashboard and revoke the entry for the AI tool you connected. Revoking invalidates the tool's access token within 30 seconds. After that, tool calls fail and the tool must complete a new OAuth login on the next call.
+- **Delete a credential**: To revoke access for an AI app or gateway that uses a [credential](#credentials), go to the [Credentials](https://app.mintlify.com/products/mcp/admin-credentials) page in your MCP settings and delete it.
+- **Remove the connector in the client**: The admin MCP entry has the URL `https://mcp.mintlify.com`. Its name depends on how you added it, such as `mintlify-admin` or `mintlify`.
+  - Claude: **Settings → Connectors**, then remove the Mintlify entry.
+  - Claude Code: run `claude mcp list` to find the entry's name, then run `claude mcp remove <name>`.
+  - ChatGPT: **Settings → Connectors**, then remove the Mintlify entry.
+  - Cursor: uninstall the Mintlify plugin, or delete the entry from `mcp.json` and reload.
+  - Codex: delete the entry's `[mcp_servers.<name>]` block from `~/.codex/config.toml`, or from `.codex/config.toml` in your project.
+
+Revoking the OAuth grant doesn't affect pull requests the MCP has already opened. Close or revert those PRs in your Git provider if you want to undo pending changes.
+
+## Troubleshooting
+
+<Accordion title="Sign-in opens this troubleshooting section instead of your AI tool">
+  Mintlify can't finish the sign-in because your Mintlify connector was added, or your dashboard session started, before Mintlify updated its login system.
+
+  1. [Reinstall the connector](#stale-registration-error): remove it from your AI tool, then add it again.
+  2. If sign-in still opens this section, [sign out of the dashboard and sign back in](#fails-after-reinstalling), then connect your AI tool again.
+</Accordion>
+
+<Accordion title="Connection fails with a stale registration error" id="stale-registration-error">
+  Your AI tool's Mintlify connector was added before Mintlify updated its login system. Reinstall the connector: remove it from your AI tool, then add it again. See [Disconnect or revoke access](#disconnect-or-revoke-access) for the steps for each tool.
+</Accordion>
+
+<Accordion title="Connection still fails after reinstalling the connector" id="fails-after-reinstalling">
+  Sign out of the [dashboard](https://app.mintlify.com), sign back in, then connect your AI tool again. This replaces a dashboard session that started before the login update.
+</Accordion>
+
+<Accordion title="Tool calls return insufficient_scope" id="insufficient-scope">
+  Your connection doesn't have permission for that action. Your [dashboard role](/dashboard/roles) when you connect sets what the connection can do. Mintlify also checks your current role on that project on every call. Viewers can only use read tools, so edit tools such as `edit_page` return `insufficient_scope`.
+
+  If an admin gives you a role that can edit, remove the Mintlify connector from your AI tool and add it again. The new connection includes the write access your current role allows. See [Disconnect or revoke access](#disconnect-or-revoke-access) for the steps for each tool.
+</Accordion>
+
+<Accordion title="Admin MCP tools appear twice">
+  Your AI tool has more than one entry for `https://mcp.mintlify.com`. This can happen when you connect the admin MCP more than one way, such as adding it manually and then running [`mint agent setup`](/cli/commands#mint-agent-setup), or installing the Cursor plugin and running setup. Keep one entry and remove the others. See [Disconnect or revoke access](#disconnect-or-revoke-access) for the steps for each tool.
+</Accordion>

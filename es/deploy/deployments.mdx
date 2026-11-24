@@ -1,0 +1,102 @@
+---
+title: "Implementaciones"
+description: "Gestiona los despliegues de documentación en el panel de Mintlify: revisa el historial, supervisa las compilaciones, resuelve problemas y elimina un proyecto."
+keywords: ["implementación manual", "historial de implementaciones", "activadores de implementación", "eliminar proyecto", "eliminar implementación", "implementación cancelada"]
+boost: 3
+---
+
+Tu sitio de documentación se implementa automáticamente cuando haces push de cambios a tu repositorio conectado. Si tu repositorio está en GitHub, debes instalar y conectar la Aplicación de GitHub de Mintlify. Si tu repositorio está en GitLab o Bitbucket, consulta [GitLab](/es/deploy/gitlab) o [Bitbucket](/es/deploy/bitbucket) para configurar la conexión.
+
+Si tus últimos cambios no aparecen en tu sitio en producción y tu repositorio está en GitHub, primero verifica la instalación de la Aplicación de GitHub. La cuenta u organización de GitHub propietaria de tu repositorio de documentación debe tener instalada la Aplicación de GitHub. Consulta [Solución de problemas de GitHub](/es/deploy/github#troubleshooting) para más información.
+
+Si tu repositorio está conectado, pero los cambios aún no se implementan, activa manualmente una implementación desde tu dashboard.
+
+<div id="manually-trigger-a-deployment">
+  ## Activar una implementación manualmente
+</div>
+
+<Steps>
+  <Step title="Verifica que tu última confirmación se realizó correctamente.">
+    Comprueba que tu confirmación más reciente aparezca en tu repositorio de documentación y que no haya presentado errores. Puedes confirmar si la confirmación se compiló correctamente en tu [historial de implementaciones](#view-deployment-history).
+  </Step>
+
+  <Step title="Activa una implementación manualmente.">
+    Ve a tu [dashboard](https://dashboard.mintlify.com) y selecciona el botón de implementación.
+
+    <Frame>
+      <img src="/images/deployments/manual-update-light.png" alt="El botón de actualización manual resaltado con un rectángulo naranja." className="block dark:hidden" />
+
+      <img src="/images/deployments/manual-update-dark.png" alt="El botón de actualización manual resaltado con un rectángulo naranja." className="hidden dark:block" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="view-deployment-history">
+  ## Ver el historial de implementaciones
+</div>
+
+Ve a la página [Publishes](https://app.mintlify.com/publishes) en tu dashboard para revisar tu historial de implementaciones y comprobar si cada publicación se realizó correctamente. Haz clic en una publicación para expandirla y ver los detalles, incluidos el mensaje de la confirmación y su autor.
+
+<div id="search-indexing-status">
+  ### Estado de indexación de búsqueda
+</div>
+
+Después de cada publicación, Mintlify actualiza el índice de búsqueda de tu sitio. Cuando la indexación todavía está en curso, omite algunas páginas o falla, aparece una insignia **Search** junto al estado de la publicación. Pasa el cursor sobre la insignia para ver el resultado.
+
+| Insignia | Qué significa |
+| :--- | :--- |
+| Gris con un indicador de carga | La indexación está en curso. La búsqueda muestra tus cambios cuando termina la indexación. |
+| Naranja | La búsqueda se actualizó, pero Mintlify no pudo analizar algunas páginas para indexarlas. Esas páginas no aparecen en los resultados de búsqueda. |
+| Rojo | La indexación falló. La búsqueda sigue mostrando la versión anterior de tu documentación. |
+
+Para ver qué páginas dejó Mintlify fuera de la búsqueda, haz clic en la publicación y revisa la pestaña **Details**. Muestra hasta 10 rutas de páginas. Una página omitida permanece fuera de la búsqueda hasta que la modifiques y vuelvas a publicar.
+
+<div id="pages-that-fail-to-build">
+  ### Páginas que no se pueden compilar
+</div>
+
+Algunos errores, como una sintaxis MDX o un frontmatter no válidos en una página, pueden impedir que se compilen páginas individuales. Cuando esto ocurre, Mintlify puede publicar igualmente el resto de tu sitio. La publicación muestra el estado **Partially failed**.
+
+Para ver qué páginas fallaron, haz clic en la publicación y revisa la pestaña **Details**. Muestra hasta 10 errores junto con la página a la que afecta cada uno. Corrige los errores y vuelve a hacer push.
+
+Si tu repositorio está en GitHub, la comprobación **Mintlify Deployment** también finaliza con un resultado neutral y enumera las páginas que no se pudieron compilar.
+
+<div id="roll-back-a-deployment">
+  ## Revertir una implementación
+</div>
+
+Si un cambio llega a tu sitio en producción y debes eliminarlo de inmediato, sirve una compilación exitosa anterior en lugar de revertir confirmaciones y esperar una nueva compilación. Consulta [Reversiones](/es/deploy/rollbacks).
+
+<div id="delete-a-project">
+  ## Eliminar un proyecto
+</div>
+
+Puedes eliminar de forma permanente un proyecto desde la sección **Zona de peligro** de la página [General](https://app.mintlify.com/settings/organization/general) en la configuración de tu organización. Esta acción es irreversible y eliminará todos los datos del proyecto, incluidas las implementaciones de vista previa asociadas.
+
+<Steps>
+  <Step title="Ve a Zona de peligro.">
+    Ve a la sección **Zona de peligro** de la página [General](https://app.mintlify.com/settings/organization/general) en la configuración de tu organización.
+  </Step>
+
+  <Step title="Elimina el proyecto.">
+    1. En la fila **Delete project**, haz clic en **Delete…**.
+    2. Introduce un motivo para la eliminación.
+    3. Haz clic en **Delete project** para confirmar.
+  </Step>
+</Steps>
+
+<Warning>
+  Eliminar un proyecto es permanente y no se puede deshacer. Si tienes una suscripción activa, recibirás un crédito prorrateado por el tiempo no utilizado que quede en tu período de facturación.
+</Warning>
+
+Después de eliminar un proyecto, Mintlify reserva su subdominio para tu organización. Mientras está reservado, solo tu organización puede crear un proyecto con ese subdominio.
+
+Si tienes varios proyectos, después de la eliminación se te redirigirá a otro proyecto. Si eliminas tu único proyecto, se te redirigirá a la página de inicio de Mintlify. Cuando elimines un proyecto, el administrador de la organización recibirá una notificación por correo electrónico que confirma la eliminación.
+
+<div id="terminated-deployments">
+  ## Implementaciones canceladas
+</div>
+
+Mintlify puede cancelar las implementaciones que infrinjan los [Términos de servicio](https://www.mintlify.com/legal/terms). Las implementaciones canceladas dejan de estar en línea, y los miembros de tu organización reciben un correo electrónico con la lista de los subdominios afectados.
+
+Para disputar una cancelación, envía un correo electrónico a [support@mintlify.com](mailto:support@mintlify.com) con el nombre de tu organización y los subdominios afectados.

@@ -1,0 +1,49 @@
+---
+title: "Trigger preview deployment"
+openapi: "/openapi.json POST /project/preview/{projectId}"
+keywords: ["preview", "preview deployment", "branch preview", "staging"]
+---
+
+Use this endpoint to programmatically create or update a preview deployment for a Git branch. If a preview already exists for the specified branch, the endpoint triggers a redeployment instead of creating a duplicate.
+
+The response includes a `statusId` that you can pass to [Get deployment status](/api/update/status) to track the deployment progress.
+
+## Branch requirements
+
+The `branch` must exist in the repository connected to your Mintlify project and you must have the Mintlify GitHub App installed. This endpoint does not support branches on forks. See [Fork pull requests](/deploy/preview-deployments#fork-pull-requests) for how to preview changes from a fork.
+
+## Use cases
+
+- **CI/CD pipelines**: Automatically create preview deployments when users open or update pull requests.
+- **Scheduled previews**: Build previews from long-running feature branches on a schedule.
+- **Custom tooling**: Integrate preview creation into internal workflows or Slack bots.
+
+## Access to previews
+
+By default, previews created with this endpoint are publicly accessible unless you enable authentication for your previews. See [Restrict access to preview deployments](/deploy/preview-deployments#restrict-access-to-preview-deployments).
+
+To restrict access to a specific preview, pass an `auth` object in the request body. Mintlify applies the access setting to the preview before queuing the deployment. If you omit `auth`, the preview keeps its current access settings.
+
+- `{ "type": "password", "password": "..." }`: Anyone with the password can view the preview. Passwords must be at least 8 characters. Setting a password replaces any existing password on the preview.
+- `{ "type": "mintlify" }`: Only members of your organization signed in to Mintlify can view the preview.
+
+```bash
+curl --request POST \
+  --url https://api.mintlify.com/v1/project/preview/{projectId} \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "branch": "feature/new-guide",
+    "auth": { "type": "password", "password": "review-pass-123" }
+  }'
+```
+
+Setting `auth` has these requirements:
+
+- Your plan must include preview deployment authentication. Otherwise, the endpoint returns a `403`.
+- Your site must have [authentication](/deploy/authentication-setup) or preview authentication enabled. Otherwise, the endpoint returns a `409`.
+- Authentication must be enabled on the preview itself. Otherwise, the endpoint returns a `409`.
+
+## Rate limits
+
+This endpoint allows up to 5 requests per minute per organization.

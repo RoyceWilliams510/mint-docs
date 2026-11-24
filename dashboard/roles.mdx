@@ -1,0 +1,140 @@
+---
+title: "Roles"
+description: "Assign owner, admin, publisher, editor, commenter, or viewer roles to team members to control who can edit, review, and publish content in Mintlify."
+keywords: ["RBAC", "role-based access control", "owner", "admin", "publisher", "editor", "commenter", "viewer", "permissions", "review", "approve", "transfer ownership", "project roles", "no access"]
+boost: 3
+---
+
+<Info>
+  Role-based access control (RBAC) is available on [Enterprise plans](https://mintlify.com/pricing?ref=rbac).
+</Info>
+
+Mintlify provides three dashboard access levels: viewer, editor, and admin. Without RBAC, every member has full access to your organization's dashboard, and new members join as editors.
+
+To invite members, change their roles, transfer ownership, or remove them, see [Members](/dashboard/members).
+
+<Note>
+  If the role options on your [Members](https://app.mintlify.com/settings/organization/members) page include **Publisher**, your organization uses [expanded roles](#expanded-roles) instead.
+</Note>
+
+|                                | Viewer | Editor | Admin |
+| ------------------------------ | :----: | :----: | :---: |
+| View content in the editor     | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| View dashboard and analytics   | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Ask the [Slack agent](/agent/slack) questions | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Make changes with the Slack agent | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Edit content in the web editor | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Publish changes                | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes* | <Icon icon="check" color="#16a34a" /> Yes |
+| [Request a review](/editor/review#require-review-before-publishing) | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Approve review requests        | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Create, rename, and delete pages | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Reorder navigation             | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Upload media                   | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Trigger deployments            | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Roll back and promote deployments | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Create and delete API keys     | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Configure integrations         | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Configure assistant            | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Configure add-ons              | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Invite editors and viewers     | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Update user roles              | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Invite admins                  | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Delete users                   | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage billing                 | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage SSO                     | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage SCIM                    | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage IP allowlist and session lifetimes | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| View and export audit logs     | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage security contact        | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Update custom domain           | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Update Git source              | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Configure a custom subpath     | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Delete a project               | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Change [agent publishing setting](/ai/admin-mcp-editing#publishing) | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Delete organization            | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+
+\* If your project [requires review before publishing](/editor/review#require-review-before-publishing), editors request a review instead of publishing to the deployment branch, and an admin publishes the approved changes. Only admins can merge pull requests into the deployment branch from the editor.
+
+<Tip>
+  Limit admin access to only the people who need to perform admin tasks.
+</Tip>
+
+Roles control what people can do in the dashboard and editor, not in your Git repository. Anyone with write access to your repository can push changes, and pushes to your deployment branch deploy your site, whatever their role. Manage repository access in your Git provider.
+
+## Expanded roles
+
+Organizations with expanded roles have six roles: owner, admin, publisher, editor, commenter, and viewer.
+
+You can only invite members or assign roles up to your own role.
+
+- **Owner**: Everything an admin can do, plus deleting the project, deleting the organization, and transferring ownership. Every organization has one owner, starting with the person who creates it.
+- **Admin**: Full control over content, members, roles, and settings, including billing and the custom domain. Admins can publish without review, unless your deployment branch has branch protection.
+- **Publisher**: Everything an editor can do, plus publishing changes and approving [review requests](/editor/review#require-review-before-publishing).
+- **Editor**: Create and edit content, comment, request reviews, and manage site and workspace settings, integrations, API keys, and the assistant. Editors can't publish or approve reviews.
+- **Commenter**: Everything a viewer can do, plus commenting on pages.
+- **Viewer**: View content and preview unpublished edits.
+
+|                                   | Viewer | Commenter | Editor | Publisher | Admin | Owner |
+| --------------------------------- | :----: | :-------: | :----: | :-------: | :---: | :---: |
+| View pages                        | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Preview unpublished edits         | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Comment on pages                  | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Create and edit pages             | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Reorganize pages                  | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Delete pages                      | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Publish changes if review isn't required | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Request a review                  | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Approve review requests           | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Publish approved changes          | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Publish without review if review is required | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Merge branches from the editor without approval if review is required | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage site and workspace settings | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Invite and remove members         | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Assign roles                      | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage page access                | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage custom domain              | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Manage billing and plan           | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes | <Icon icon="check" color="#16a34a" /> Yes |
+| Delete the project                | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Delete the organization           | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+| Transfer ownership                | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="x" color="#dc2626" /> No | <Icon icon="check" color="#16a34a" /> Yes |
+
+## Custom roles
+
+If none of the built-in roles are sufficient for your team, create a custom role with the exact permissions a member needs. Custom roles are available to organizations with [expanded roles](#expanded-roles). Owners and admins can manage custom roles in the **Custom roles** section on the [Members](https://app.mintlify.com/settings/organization/members) page.
+
+### Create a custom role
+
+1. Navigate to the [Members](https://app.mintlify.com/settings/organization/members) page of your dashboard.
+2. In the **Custom roles** section, click **New custom role**.
+3. Enter a **Label**, which appears in role menus, and an optional description.
+4. Select permissions, or select **Grant all permissions**.
+5. Click **Create role**.
+
+Permissions come in three groups:
+
+- **Content**: **Pages** has read and write access. **Comments** and **Publishing and reviews** have write access only. Both require **Pages** read access.
+- **Project**: View or manage access to project-level settings, such as **Domain setup**, **Site**, **Editor**, **Git**, and **Assistant**.
+- **Organization**: View or manage access to organization settings, such as **Members**, **Security**, **Billing**, and **API keys**.
+
+You can only grant permissions you have yourself. Permissions that only the owner has, such as deleting the organization or transferring ownership, aren't available for custom roles. Every custom role can view the organization, the project, its publish history, and its members.
+
+To change a custom role, open its actions menu in the **Custom roles** section and select **Manage role**.
+
+## Project roles
+
+If your organization uses [expanded roles](#expanded-roles) and has more than one project, you can give a member a different role on each project. A member's organization role applies to every project unless you set a project role.
+
+A project role can do one of two things:
+
+- **Give more access on one project.** For example, make an organization-wide viewer a publisher on a single project. You can choose admin, publisher, editor, commenter, or viewer, but only roles with more access than the member's organization role. If the organization role is a custom role, the project role must include everything the custom role allows.
+- **Block a project.** Choose **No access** to hide the project from the member and block them from using it in the dashboard, the editor, the [CLI](/cli/install), and the [admin MCP](/ai/mintlify-mcp). If they open the project from a link, Mintlify sends them to another project they can access.
+
+Owners and admins have full access to every project, so you can't set project roles for them or block them from a project. You can only assign project roles whose permissions you have yourself, and you can't change a project role that has permissions you don't have. You can't change your own project roles.
+
+If you raise a member's organization role so that it includes a project role, Mintlify removes that project role. Promoting a member to admin removes their **No access** assignments.
+
+On the [Members](https://app.mintlify.com/settings/organization/members) page, the **Role** column shows each member's role on the project you have open. To set project roles, see [Set a member's role on a project](/dashboard/members#set-a-members-role-on-a-project).
+
+## Repository contributors and deployments
+
+Anyone with write access to your documentation repository can contribute by pushing changes. Pushes to your deploy branch deploy automatically, whatever the person's dashboard role. Dashboard roles only control what people can do in the Mintlify dashboard.

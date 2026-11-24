@@ -1,0 +1,54 @@
+---
+title: "AI 助手"
+description: "为你的文档站点添加 AI 助手：它根据你的内容回答问题，将无法回答的问题转给你的团队，并可在你的产品中运行。"
+keywords: ["聊天", "用户支持", "多模态"]
+boost: 3
+---
+
+<Info>
+  AI 助手需要 [Pro 或 Enterprise 套餐](https://mintlify.com/pricing?ref=assistant)。
+</Info>
+
+AI 助手是你文档站点上的 AI 聊天功能。用户用自然语言提问，并从你的内容中获得答案，即使不知道该去哪里查找，也能顺利使用你的产品。
+
+<div id="what-your-users-can-do-with-the-assistant">
+  ## 用户可以用 AI 助手做什么
+</div>
+
+- 获得引用来源页面的答案，并附有每个页面的链接。
+- 询问有关你的 API 的问题，并获得来自 OpenAPI 规范的方法、参数、请求体和响应 schema。
+- 复制 AI 助手根据你的文档编写的代码示例。
+- 询问你页面上的截图和图表。
+- 通过选中文本、发送代码块或附加文件来添加上下文。AI 助手也知道用户当前所在的页面。请参阅[为问题添加上下文](/zh/assistant/use#add-context-to-a-question)。
+- 当 AI 助手无法回答时，通过邮件、你的帮助中心或支持工单联系你的团队。
+
+<div id="get-started-with-the-assistant">
+  ## 开始使用 AI 助手
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设置 AI 助手" icon="settings" href="/zh/assistant/configure">
+    启用 AI 助手，添加起始问题，并在用户看到之前进行测试。
+  </Card>
+  <Card title="将问题转给你的团队" icon="life-buoy" href="/zh/assistant/support-routing">
+    将 AI 助手无法回答的问题发送到邮箱、你的帮助中心，或 Plain、Zendesk 中的工单。
+  </Card>
+  <Card title="改进回答" icon="sparkles" href="/zh/assistant/sources">
+    找出 AI 助手无法回答的问题，控制它使用的内容，并添加指令和 skills。
+  </Card>
+  <Card title="控制显示方式" icon="panel-right" href="/zh/assistant/use">
+    通过你自己的链接打开 AI 助手，调整或隐藏它的按钮样式，或将其关闭。
+  </Card>
+  <Card title="嵌入你的产品" icon="code" href="/zh/assistant/embed">
+    使用 AI 助手 API，在你的应用、仪表盘或支持门户中回答问题。
+  </Card>
+  <Card title="管理计费" icon="credit-card" href="/zh/assistant/billing">
+    了解 AI 助手消耗的积分，允许超额使用，并使用你自己的模型。
+  </Card>
+</CardGroup>
+
+<div id="how-the-assistant-answers">
+  ## AI 助手如何作答
+</div>
+
+AI 助手只根据你已发布的文档和 API 规范以及你添加的[搜索域名](/zh/assistant/sources#search-domains)作答。如果找不到相关信息，它会如实说明，而不是猜测。请参阅[管理 AI 助手掌握的内容](/zh/assistant/sources)，控制它使用的内容。

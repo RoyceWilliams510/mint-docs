@@ -1,0 +1,29 @@
+<Info>
+  Debes proporcionar `icon` o `src`.
+</Info>
+
+<ResponseField name="icon" type="string">
+  El icono que se mostrará desde una biblioteca de iconos.
+
+  Options:
+
+  * Nombre del [icono Font Awesome](https://fontawesome.com/icons), si tienes la `icons.library` [propiedad](/es/organize/settings-appearance#icons) configurada como `fontawesome` en tu `docs.json`
+  * Nombre del [icono Lucide](https://lucide.dev/icons), si tienes la `icons.library` [propiedad](/es/organize/settings-appearance#icons) configurada como `lucide` en tu `docs.json`
+  * Nombre del [icono Tabler](https://tabler.io/icons), si tienes la `icons.library` [propiedad](/es/organize/settings-appearance#icons) configurada como `tabler` en tu `docs.json`
+  * Un solo emoji (por ejemplo, `💡` o `🚀`)
+</ResponseField>
+
+<ResponseField name="src" type="string">
+  Ruta o URL de una imagen para usar como icono. Usa `src` en lugar de `icon` cuando quieras utilizar una imagen personalizada en lugar de un icono de una biblioteca.
+
+  Options:
+
+  * Ruta a un archivo de imagen en tu proyecto (por ejemplo, `/images/mi-icono.svg`)
+  * URL de una imagen alojada externamente (por ejemplo, `https://example.com/icon.png`)
+</ResponseField>
+
+<ResponseField name="iconType" type="string">
+  The [Font Awesome](https://fontawesome.com/icons) icon style. Only used with Font Awesome icons.
+
+  Options: `regular`, `solid`, `light`, `thin`, `sharp-solid`, `duotone`, `brands`.
+</ResponseField>
