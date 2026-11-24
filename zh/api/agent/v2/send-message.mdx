@@ -2,6 +2,13 @@
 title: "发送后续消息"
 openapi: /zh/admin-openapi.json POST /v2/agent/{projectId}/job/{id}/message
 keywords: [ "代理任务", "消息", "后续", "发送" ]
+audience: logged_in
+public_url: https://mintlify.com/docs/zh/api/agent/v2/send-message
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
+groups: ["admins"]
 ---
 
 向现有代理任务发送后续指令。该消息会异步处理——请轮询 [获取代理任务](/zh/api/agent/v2/get-agent-job) 端点以跟踪进度。

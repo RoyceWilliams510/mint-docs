@@ -2,6 +2,12 @@
 title: "Fix \"must be a single endpoint string\" deploy errors"
 description: "Resolve failed deployments caused by openapi, api, or asyncapi page frontmatter that lists multiple endpoints or uses a non-string value."
 keywords: ["must be a single endpoint string", "Deployment not updated", "openapi frontmatter", "api frontmatter", "asyncapi frontmatter", "multiple endpoints", "YAML array"]
+audience: all
+public_url: https://mintlify.com/docs/help-center/endpoint-frontmatter-must-be-a-single-string
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Each MDX endpoint page in Mintlify documents exactly one endpoint. The `openapi`, `api`, and `asyncapi` frontmatter fields must each be a single string. If any page sets one of these fields to a list, a number, or another non-string value, Mintlify fails the deployment with this message:

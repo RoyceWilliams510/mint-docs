@@ -2,6 +2,12 @@
 title: "Trigger automation webhook"
 openapi: "/admin-openapi.json POST /v2/workflow/{projectId}/{workflowSchemaId}/webhook"
 keywords: ["automation", "workflow", "webhook", "trigger", "CI"]
+audience: all
+public_url: https://mintlify.com/docs/api/automations/webhook
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Use this endpoint to run a custom automation with a **Webhook** trigger. Each request queues a run that uses the automation's saved prompt and reads the full repository history. This endpoint ignores request bodies.

@@ -2,6 +2,12 @@
 title: "Activar webhook de automatización"
 openapi: "/es/admin-openapi.json POST /v2/workflow/{projectId}/{workflowSchemaId}/webhook"
 keywords: ["automation", "workflow", "webhook", "trigger", "CI"]
+audience: all
+public_url: https://mintlify.com/docs/es/api/automations/webhook
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Usa este endpoint para ejecutar una automatización personalizada configurada con un activador de **Webhook**. Cada solicitud pone en cola una ejecución que usa el prompt guardado de la automatización y lee el historial completo del repositorio. Los cuerpos de solicitud se ignoran.

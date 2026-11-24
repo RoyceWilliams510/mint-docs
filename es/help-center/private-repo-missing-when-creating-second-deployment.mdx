@@ -2,6 +2,12 @@
 title: "Repositorio privado no aparece al crear un segundo proyecto"
 description: "Vuelve a autorizar Mintlify con acceso a repositorios privados para que un repositorio privado de GitHub aparezca en el selector de repositorios durante la incorporación de un nuevo proyecto."
 keywords: ["segundo proyecto", "múltiples proyectos mismo repo", "segunda implementación", "múltiples implementaciones mismo repo", "repositorio privado no aparece", "selector de repositorios de onboarding", "autorizar GitHub", "private=true", "re-autorizar GitHub"]
+audience: all
+public_url: https://mintlify.com/docs/es/help-center/private-repo-missing-when-creating-second-deployment
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Cuando creas un segundo proyecto de Mintlify desde el mismo repositorio privado de GitHub que ya respalda un proyecto existente, el selector de repositorios del onboarding puede no mostrar ese repositorio privado. Esto ocurre porque tu autorización inicial de GitHub solo concedió el ámbito `public_repo`, y al volver al onboarding se reutiliza la autorización existente en lugar de solicitar de nuevo acceso a repositorios privados.

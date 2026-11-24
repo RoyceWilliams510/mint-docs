@@ -2,6 +2,13 @@
 title: "获取代理任务"
 openapi: /zh/admin-openapi.json GET /v2/agent/{projectId}/job/{id}
 keywords: [ "代理任务", "状态", "获取", "详细信息", "轮询" ]
+audience: logged_in
+public_url: https://mintlify.com/docs/zh/api/agent/v2/get-agent-job
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
+groups: ["admins"]
 ---
 
 轮询此端点以跟踪代理任务的进度。`status` 字段会从 `active` 变为 `completed` 或 `failed`。

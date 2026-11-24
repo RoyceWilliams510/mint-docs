@@ -2,6 +2,13 @@
 title: "Envoyer un message de suivi"
 openapi: /fr/admin-openapi.json POST /v2/agent/{projectId}/job/{id}/message
 keywords: [ "tâche d’agent", "message", "suivi", "envoyer" ]
+audience: logged_in
+public_url: https://mintlify.com/docs/fr/api/agent/v2/send-message
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
+groups: ["admins"]
 ---
 
 Envoyez une instruction de suivi à une tâche d’agent existante. Le message est traité de façon asynchrone — interrogez le point de terminaison [récupérer la tâche d’agent](/fr/api/agent/v2/get-agent-job) pour suivre sa progression.

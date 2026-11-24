@@ -2,6 +2,12 @@
 title: "触发 Autopilot webhook"
 openapi: "/zh/admin-openapi.json POST /v2/autopilot/{projectId}/webhook"
 keywords: ["autopilot", "webhook", "trigger", "prompt", "CI"]
+audience: all
+public_url: https://mintlify.com/docs/zh/api/autopilot/webhook
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 使用此端点从你自己的工具启动一次 [Autopilot](/zh/autopilot) 运行。每个请求都会将一次运行加入队列，该运行按照请求体中的 `prompt` 执行，并使用与 Autopilot 其他运行相同的上下文、技能和审核设置。

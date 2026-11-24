@@ -2,6 +2,12 @@
 title: "Advertise an externally hosted MCP server"
 description: "Expose a self-hosted MCP server alongside the built-in search MCP server on your docs domain, since Mintlify's discovery endpoints only list servers it hosts."
 keywords: ["MCP discovery", "external MCP server", "well-known mcp", "second MCP server", "self-hosted MCP", "reverse proxy", "api-catalog"]
+audience: all
+public_url: https://mintlify.com/docs/help-center/register-external-mcp-server-in-discovery
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Mintlify hosts a search MCP server for every site and advertises it through the `/.well-known/mcp`, `/.well-known/mcp.json`, `/.well-known/mcp/server-card.json`, and `/.well-known/mcp/server-cards.json` endpoints described in [Search MCP server](/ai/model-context-protocol#discovery-endpoint). Mintlify generates these endpoints automatically. They only list the MCP servers Mintlify hosts for your site (the public `/mcp` endpoint, and `/authed/mcp` if you use authentication). There is no `docs.json` field for adding a second, externally hosted MCP server to those responses.

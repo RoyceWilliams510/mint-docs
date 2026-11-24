@@ -2,6 +2,12 @@
 title: "Annoncer un serveur MCP hébergé en externe"
 description: "Exposez un MCP auto-hébergé aux côtés du MCP de recherche intégré sur votre domaine, car les endpoints de découverte de Mintlify ne listent que les siens."
 keywords: ["MCP discovery", "external MCP server", "well-known mcp", "second MCP server", "self-hosted MCP", "reverse proxy", "api-catalog"]
+audience: all
+public_url: https://mintlify.com/docs/fr/help-center/register-external-mcp-server-in-discovery
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Mintlify héberge un serveur MCP de recherche pour chaque site et l'annonce via les endpoints `/.well-known/mcp`, `/.well-known/mcp.json`, `/.well-known/mcp/server-card.json` et `/.well-known/mcp/server-cards.json` décrits dans [Serveur MCP de recherche](/fr/ai/model-context-protocol#discovery-endpoint). Mintlify génère ces endpoints automatiquement. Ils ne listent que les serveurs MCP que Mintlify héberge pour votre site (l'endpoint public `/mcp`, et `/authed/mcp` si vous utilisez l'authentification). Il n'existe pas de champ dans `docs.json` pour ajouter un second serveur MCP hébergé en externe à ces réponses.

@@ -2,6 +2,12 @@
 title: "Déclencher le webhook Autopilot"
 openapi: "/fr/admin-openapi.json POST /v2/autopilot/{projectId}/webhook"
 keywords: ["autopilot", "webhook", "trigger", "prompt", "CI"]
+audience: all
+public_url: https://mintlify.com/docs/fr/api/autopilot/webhook
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Utilisez cet endpoint pour lancer une exécution d'[Autopilot](/fr/autopilot) depuis vos propres outils. Chaque requête met en file d'attente une exécution qui suit le `prompt` du corps de la requête, avec le même contexte, les mêmes compétences et les mêmes paramètres de revue que les autres exécutions d'Autopilot.

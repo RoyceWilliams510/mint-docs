@@ -2,6 +2,12 @@
 title: "在发现端点中宣告外部托管的 MCP 服务器"
 description: "在你的文档域名上与内置搜索 MCP 服务器一同公开自托管的 MCP 服务器，因为 Mintlify 的发现端点仅列出其自身托管的服务器。"
 keywords: ["MCP discovery", "external MCP server", "well-known mcp", "second MCP server", "self-hosted MCP", "reverse proxy", "api-catalog"]
+audience: all
+public_url: https://mintlify.com/docs/zh/help-center/register-external-mcp-server-in-discovery
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Mintlify 为每个站点托管一个搜索 MCP 服务器，并通过 [搜索 MCP 服务器](/zh/ai/model-context-protocol#discovery-endpoint) 中描述的 `/.well-known/mcp`、`/.well-known/mcp.json`、`/.well-known/mcp/server-card.json` 和 `/.well-known/mcp/server-cards.json` 端点进行宣告。Mintlify 会自动生成这些端点。它们只列出 Mintlify 为你的站点托管的 MCP 服务器（公共的 `/mcp` 端点，以及在使用认证时的 `/authed/mcp`）。`docs.json` 中没有可用来在这些响应中添加第二个外部托管 MCP 服务器的字段。

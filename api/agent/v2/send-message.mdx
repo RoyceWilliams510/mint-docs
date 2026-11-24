@@ -3,6 +3,13 @@ title: "Send follow-up message"
 openapi: /admin-openapi.json POST /v2/agent/{projectId}/job/{id}/message
 keywords: ["agent job", "message", "follow-up", "send"]
 
+audience: logged_in
+public_url: https://mintlify.com/docs/api/agent/v2/send-message
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
+groups: ["admins"]
 ---
 
 Send a follow-up instruction to an existing agent job. The agent processes the message asynchronously. Poll the [get agent job](/api/agent/v2/get-agent-job) endpoint to track progress.

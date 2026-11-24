@@ -2,6 +2,13 @@
 title: "Récupérer une tâche d’agent"
 openapi: /fr/admin-openapi.json GET /v2/agent/{projectId}/job/{id}
 keywords: [ "tâche d’agent", "statut", "récupérer", "détails", "interroger" ]
+audience: logged_in
+public_url: https://mintlify.com/docs/fr/api/agent/v2/get-agent-job
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
+groups: ["admins"]
 ---
 
 Interrogez régulièrement ce point de terminaison pour suivre la progression d’une tâche d’agent. Le champ `status` passe de `active` à `completed` ou `failed`.

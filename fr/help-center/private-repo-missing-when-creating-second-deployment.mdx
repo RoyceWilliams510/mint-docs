@@ -2,6 +2,12 @@
 title: "Dépôt privé absent lors de la création d'un second projet"
 description: "Réautorisez Mintlify avec l'accès aux dépôts privés afin qu'un dépôt GitHub privé existant apparaisse dans le sélecteur de dépôts d'onboarding d'un nouveau projet."
 keywords: ["second projet", "plusieurs projets même dépôt", "second déploiement", "plusieurs déploiements même dépôt", "dépôt privé absent", "sélecteur de dépôts d'onboarding", "autoriser GitHub", "private=true", "réautoriser GitHub"]
+audience: all
+public_url: https://mintlify.com/docs/fr/help-center/private-repo-missing-when-creating-second-deployment
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Lorsque vous créez un second projet Mintlify depuis le même dépôt GitHub privé qui héberge déjà un projet existant, le sélecteur de dépôts de l'onboarding peut ne pas afficher ce dépôt privé. Cela vient du fait que votre autorisation GitHub initiale n'a accordé que le scope `public_repo`, et qu'en revenant à l'onboarding l'autorisation existante est réutilisée au lieu de redemander l'accès aux dépôts privés.

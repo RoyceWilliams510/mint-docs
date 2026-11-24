@@ -2,6 +2,12 @@
 title: "触发自动化 webhook"
 openapi: "/zh/admin-openapi.json POST /v2/workflow/{projectId}/{workflowSchemaId}/webhook"
 keywords: ["automation", "workflow", "webhook", "trigger", "CI"]
+audience: all
+public_url: https://mintlify.com/docs/zh/api/automations/webhook
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 使用此端点运行一个配置为 **Webhook** 触发器的自定义自动化。每次请求会将一次运行加入队列，该运行使用自动化保存的 prompt 并读取仓库的完整历史记录。请求体会被忽略。

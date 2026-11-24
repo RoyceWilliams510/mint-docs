@@ -2,6 +2,12 @@
 title: "修复 logo.href 或 navbar.primary.href 的 \"Must be a valid url\" 错误"
 description: "解决在 logo.href、navbar.links 或 navbar.primary.href 中使用 /contact 等相对路径时出现的 docs.json 验证错误。"
 keywords: ["Must be a valid url", "Invalid docs.json", "logo.href", "navbar.primary.href", "navbar.links", "relative path", "mint dev error"]
+audience: all
+public_url: https://mintlify.com/docs/zh/help-center/docs-json-href-must-be-a-valid-url
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 当你在 `docs.json` 的 `logo.href`、`navbar.links[].href` 或 `navbar.primary.href` 字段中使用 `/contact` 等相对路径并运行 `mint dev` 或 `mint validate` 时，过时的 CLI 会报告如下错误：

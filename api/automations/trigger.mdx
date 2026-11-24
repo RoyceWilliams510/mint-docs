@@ -2,6 +2,12 @@
 title: "Trigger automation"
 openapi: "/openapi.json POST /workflow/{projectId}/{workflowSchemaId}/trigger"
 keywords: ["automation", "workflow", "trigger", "webhook", "schedule", "CI"]
+audience: all
+public_url: https://mintlify.com/docs/api/automations/trigger
+published: true
+service_agent: enabled
+copilot: enabled
+sales_agent: enabled
 ---
 
 Use this endpoint to trigger a scheduled automation on demand, instead of waiting for its next scheduled run. The automation behaves identically to a regular scheduled run: it picks up everything that has changed since the last completed run.
